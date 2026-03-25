@@ -5,6 +5,9 @@ import 'package:dana_graduation_project/features/auth/login/presentation/views/s
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+
+import '../../../../../../../../providers/app_theme_provider.dart';
 
 class NewPasswordScreen extends StatelessWidget {
   const NewPasswordScreen({super.key});
@@ -24,9 +27,13 @@ class NewPasswordScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.bg_surface_default_light,
+        color: isDark
+            ? AppColors.bg_surface_default_dark
+            : AppColors.bg_surface_default_light,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(AppRadius.radius_lg.r),
           topRight: Radius.circular(AppRadius.radius_lg.r),

@@ -2,7 +2,11 @@ import 'package:dana_graduation_project/core/utils/app_colors.dart';
 import 'package:dana_graduation_project/core/utils/app_raduis.dart';
 import 'package:dana_graduation_project/features/auth/login/presentation/views/screens/forget_password/widgets/drag_Indicator.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+
+import '../../../../../../../../providers/app_theme_provider.dart';
 
 class SheetContainer extends StatelessWidget {
   final ScrollController scrollController;
@@ -12,9 +16,13 @@ class SheetContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.whiteColor,
+        color: isDark
+            ? AppColors.bg_surface_default_dark
+            : AppColors.bg_surface_default_light,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(AppRadius.radius_lg.r),
           topRight: Radius.circular(AppRadius.radius_lg.r),
@@ -22,7 +30,7 @@ class SheetContainer extends StatelessWidget {
       ),
       child: Column(
         children: [
-           DragIndicator(),
+          DragIndicator(),
           Expanded(
             child: SingleChildScrollView(
               controller: scrollController,

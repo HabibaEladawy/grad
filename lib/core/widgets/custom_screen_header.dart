@@ -19,12 +19,12 @@ class CustomScreenHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: AppTextStyle.medium20TextDisplay,
+          style: AppTextStyle.medium20TextDisplay(context),
         ),
         SizedBox(height: AppSizes.h8),
         Text(
           subtitle,
-          style: AppTextStyle.regular16TextBody,
+          style: AppTextStyle.regular16TextBody(context),
         ),
       ],
     );

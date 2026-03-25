@@ -7,76 +7,76 @@ import 'package:dana_graduation_project/features/booking/presentation/views/Book
 import 'package:dana_graduation_project/features/booking/presentation/views/OnlinePayment/screens/payment_Add_Screen.dart';
 import 'package:flutter/material.dart';
 
-class ReviewBookingContent extends StatelessWidget {
-  final BuildContext parentContext;
-
-  const ReviewBookingContent({super.key, required this.parentContext});
-
-  // void _showConfirmationBottomSheet() {
-  //   Navigator.pop(parentContext);
-  // }
-  void _showConfirmationBottomSheet() {
-    Navigator.pop(parentContext);
-
-    Navigator.push(
-      parentContext,
-      MaterialPageRoute(
-        builder: (context) =>  PaymentAddScreen(),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 134,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: AppColors.border_card_default_light,
-                  borderRadius: BorderRadius.circular(100),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text('مراجعة الحجز', style: AppTextStyle.medium20TextDisplay),
-            const SizedBox(height: 8),
-            Text('تأكد من التفاصيل قبل إكمال الحجز.', style: AppTextStyle.regular16TextBody),
-            const SizedBox(height: 24),
-            const DoctorCard(),
-            const SizedBox(height: 16),
-            const PatientCard(),
-            const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text('اختر طريقة الدفع', style: AppTextStyle.medium16TextDisplay),
-            ),
-            const SizedBox(height: 12),
-            const PaymentCard(),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _showConfirmationBottomSheet,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary_default_light,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                minimumSize: const Size(double.infinity, 52),
-              ),
-              child: Text(
-                'استمرار للدفع',
-                style: AppTextStyle.semibold16TextHeading.copyWith(color: Colors.white),
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
-    );
-  }
-}
+// class ReviewBookingContent extends StatelessWidget {
+//   final BuildContext parentContext;
+//
+//   const ReviewBookingContent({super.key, required this.parentContext});
+//
+//   // void _showConfirmationBottomSheet() {
+//   //   Navigator.pop(parentContext);
+//   // }
+//   void _showConfirmationBottomSheet() {
+//     Navigator.pop(parentContext);
+//
+//     Navigator.push(
+//       parentContext,
+//       MaterialPageRoute(
+//         builder: (context) =>  PaymentAddScreen(),
+//       ),
+//     );
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Directionality(
+//       textDirection: TextDirection.rtl,
+//       child: SingleChildScrollView(
+//         padding: const EdgeInsets.all(16),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Center(
+//               child: Container(
+//                 width: 134,
+//                 height: 5,
+//                 decoration: BoxDecoration(
+//                   color: AppColors.border_card_default_light,
+//                   borderRadius: BorderRadius.circular(100),
+//                 ),
+//               ),
+//             ),
+//             const SizedBox(height: 16),
+//             Text('مراجعة الحجز', style: AppTextStyle.medium20TextDisplay),
+//             const SizedBox(height: 8),
+//             Text('تأكد من التفاصيل قبل إكمال الحجز.', style: AppTextStyle.regular16TextBody),
+//             const SizedBox(height: 24),
+//             const DoctorCard(),
+//             const SizedBox(height: 16),
+//             const PatientCard(),
+//             const SizedBox(height: 12),
+//             Align(
+//               alignment: Alignment.centerRight,
+//               child: Text('اختر طريقة الدفع', style: AppTextStyle.medium16TextDisplay),
+//             ),
+//             const SizedBox(height: 12),
+//             const PaymentCard(),
+//             const SizedBox(height: 24),
+//             ElevatedButton(
+//               onPressed: _showConfirmationBottomSheet,
+//               style: ElevatedButton.styleFrom(
+//                 backgroundColor: AppColors.primary_default_light,
+//                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+//                 minimumSize: const Size(double.infinity, 52),
+//               ),
+//               child: Text(
+//                 'استمرار للدفع',
+//                 style: AppTextStyle.semibold16TextHeading.copyWith(color: Colors.white),
+//               ),
+//             ),
+//             const SizedBox(height: 16),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }

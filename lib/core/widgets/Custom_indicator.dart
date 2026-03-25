@@ -4,6 +4,9 @@ import 'package:dana_graduation_project/core/utils/app_colors.dart';
 import 'package:dana_graduation_project/core/utils/app_sizes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/app_theme_provider.dart';
 
 class CustomIndicator extends StatelessWidget {
   final bool active;
@@ -25,6 +28,8 @@ class CustomIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
+
     return AnimatedContainer(
       width: active
           ? (activeWidth ?? AppSizes.w86)
@@ -34,12 +39,17 @@ class CustomIndicator extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(100),
         color: active
-            ? (activeColor ?? AppColors.secondary_default_light)
-            : (inactiveColor ?? AppColors.border_card_default_light),
+            ? (activeColor ?? (isDark
+            ? AppColors.secondary_default_dark
+            : AppColors.secondary_default_light))
+            : (inactiveColor ?? (isDark
+            ? AppColors.border_card_default_dark
+            : AppColors.border_card_default_light)),
       ),
     );
   }
 }
+
 class CustomIndicatorRow extends StatelessWidget {
   final int currentIndex;
   final int itemCount;

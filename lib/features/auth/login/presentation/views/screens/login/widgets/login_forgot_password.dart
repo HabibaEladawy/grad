@@ -4,20 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:dana_graduation_project/core/utils/app_colors.dart';
 import 'package:dana_graduation_project/core/utils/app_text_style.dart';
 import 'package:dana_graduation_project/l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 
+import '../../../../../../../../providers/app_theme_provider.dart';
 
 class LoginForgotPassword extends StatelessWidget {
   const LoginForgotPassword({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
     return TextButton(
       onPressed: () => ForgetPasswordDialog.show(context),
       child: Text(
         AppLocalizations.of(context)!.forgotPassword,
-        style: AppTextStyle.medium16PrimaryDefault.copyWith(
+        style: AppTextStyle.medium16PrimaryDefault(context).copyWith(
           decoration: TextDecoration.underline,
-          decorationColor: AppColors.primary_default_light,
+          decorationColor: isDark
+              ? AppColors.primary_default_dark
+              : AppColors.primary_default_light,
         ),
       ),
     );

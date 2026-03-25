@@ -5,7 +5,10 @@ import 'package:dana_graduation_project/features/onboarding/presentation/views/w
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import '../../../../../core/utils/app_assets.dart';
+import '../../../../../core/utils/app_colors.dart';
+import '../../../../../providers/app_theme_provider.dart';
 
 class OnBoardScreen extends StatefulWidget {
   static const String routeName = 'OnBoardScreen';
@@ -19,13 +22,15 @@ class _ScreenOnboardState extends State<OnBoardScreen> {
   PageController controller = PageController();
   int index = 0;
 
-
   @override
   Widget build(BuildContext context) {
-
+    final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
     final onboardList = OnboardModel.getOnboardingData(context);
 
     return Scaffold(
+      backgroundColor: isDark
+          ? AppColors.bg_surface_default_dark
+          : AppColors.bg_surface_default_light,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.w),
         child: Column(
@@ -44,16 +49,14 @@ class _ScreenOnboardState extends State<OnBoardScreen> {
                   });
                 },
                 itemBuilder: (context, i) {
-
                   return CustomOnboard(
                     index: i,
                     controller: controller,
                     onboardModel: onboardList[i],
                   );
-                }
+                },
               ),
             ),
-
             CustomNextSkip(index: index, controller: controller),
             SizedBox(height: 34.h),
           ],

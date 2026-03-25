@@ -2,7 +2,6 @@ import 'package:dana_graduation_project/core/utils/app_sizes.dart';
 import 'package:dana_graduation_project/core/utils/app_text_style.dart';
 import 'package:dana_graduation_project/l10n/app_localizations.dart';
 import 'package:flutter/cupertino.dart';
-
 class ForgetPasswordTexts extends StatelessWidget {
   const ForgetPasswordTexts({super.key});
 
@@ -12,13 +11,13 @@ class ForgetPasswordTexts extends StatelessWidget {
       children: [
         Text(
           AppLocalizations.of(context)!.forgotPassword,
-          style: AppTextStyle.medium20TextDisplay,
+          style: AppTextStyle.medium20TextDisplay(context),
           textAlign: TextAlign.center,
         ),
         SizedBox(height: AppSizes.h8),
         Text(
           AppLocalizations.of(context)!.forgotPasswordDesc,
-          style: AppTextStyle.regular16TextBody,
+          style: AppTextStyle.regular16TextBody(context),
           textAlign: TextAlign.center,
         ),
       ],

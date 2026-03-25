@@ -1,12 +1,14 @@
 
 import 'package:dana_graduation_project/core/widgets/custom_elevetedButton.dart';
-import 'package:dana_graduation_project/features/signUp/presentation/views/screens/auth/Personal_Information/views/widgets/custom_alreadyHaveAccount.dart';
-import 'package:dana_graduation_project/features/signUp/presentation/views/screens/auth/Personal_Information/views/widgets/custom_text_rich.dart';
-import 'package:dana_graduation_project/features/signUp/presentation/views/screens/auth/Personal_Information/views/widgets/cutom_google_signUp.dart';
-import 'package:dana_graduation_project/features/signUp/presentation/views/screens/auth/contact_info/presentation/views/screens/Otp_Dialog.dart';
-import 'package:flutter/material.dart';
+
 import 'package:dana_graduation_project/core/utils/app_sizes.dart';
 import 'package:dana_graduation_project/l10n/app_localizations.dart';
+import 'package:flutter/cupertino.dart';
+
+import '../../../../../../signUp/presentation/views/screens/Personal_Information/views/widgets/custom_alreadyHaveAccount.dart';
+import '../../../../../../signUp/presentation/views/screens/Personal_Information/views/widgets/custom_text_rich.dart';
+import '../../../../../../signUp/presentation/views/screens/Personal_Information/views/widgets/cutom_google_signUp.dart';
+import '../../../../../../signUp/presentation/views/screens/contact_info/presentation/views/screens/Otp_Dialog.dart';
 
 class LoginActions extends StatelessWidget {
   const LoginActions({super.key});

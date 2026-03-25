@@ -11,6 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   google_fonts: ^6.3.0
+  toggle_switch: ^2.3.0
   flutter_localizations:
     sdk: flutter
   intl: any
@@ -48,3 +49,4 @@ flutter:
     - assets/Images/
     - assets/icons/
     - assets/Images/doctor_circle.png
+    - assets/Images/exam_1.png

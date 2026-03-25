@@ -3,38 +3,31 @@ import 'package:dana_graduation_project/core/utils/app_colors.dart';
 import 'package:dana_graduation_project/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/app_theme_provider.dart';
 /// widget=>elevetedButton
 class CustomElevatedButton extends StatelessWidget {
-  ///text=>in buttom
   final String text;
-  ///الفنكشن اللي هتتنفذ لما نضغط على الزرار
   final VoidCallback? onTap;
-  ///(ممكن تحطيها أو لأ)
   final IconData? icon;
-  ///بون الهلفيه
-  final Color backgroundColor;
-  ///لون النص
-  final Color textColor;
-  ///لون حدود الزرار
+  final Color? backgroundColor;
+  final Color? textColor;
   final Color? borderColor;
-  ///عرض الزرار
   final double? borderWidth;
-
   final double? height;
   final double? width;
-  ////ارتفاع وعرض الزرار
   final double? fontSize;
   final FontWeight? fontWeight;
-  ///حجم وسمك الخط
   final bool isIconAtStart;
-///هل الأيقونة تيجي في الأول ولا بعد النص
+
   const CustomElevatedButton({
     super.key,
     required this.text,
     required this.onTap,
     this.icon,
-    this.backgroundColor = AppColors.primary_default_light,
-    this.textColor = AppColors.bg_card_default_light,
+    this.backgroundColor,
+    this.textColor,
     this.borderColor,
     this.borderWidth,
     this.height,
@@ -46,21 +39,34 @@ class CustomElevatedButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
     bool isRTL = Directionality.of(context) == TextDirection.rtl;
+
+
+    final effectiveBackgroundColor = backgroundColor ?? (isDark
+        ? AppColors.primary_default_dark
+        : AppColors.primary_default_light);
+
+    final effectiveTextColor = textColor ?? (isDark
+        ? AppColors.bg_card_default_dark
+        : AppColors.bg_card_default_light);
+
+    final effectiveBorderColor = borderColor ?? (isDark
+        ? AppColors.border_button_primary_dark
+        : AppColors.border_button_primary_light);
 
     return SizedBox(
       width: 392,
-      // width: width ?? double.infinity,
       height: height ?? 48.h,
       child: ElevatedButton(
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
+          backgroundColor: effectiveBackgroundColor,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.radius_lg.r),
             side: BorderSide(
-              color: borderColor ?? AppColors.border_button_primary_light,
+              color: effectiveBorderColor,
               width: borderWidth ?? 0.6.w,
             ),
           ),
@@ -69,49 +75,37 @@ class CustomElevatedButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
-          children: _buildButtonContent(isRTL),
+          children: _buildButtonContent(isRTL, effectiveTextColor),
         ),
       ),
     );
   }
 
-  List<Widget> _buildButtonContent(bool isRTL) {
+  List<Widget> _buildButtonContent(bool isRTL, Color effectiveTextColor) {
     final textWidget = Text(
       text,
       style: TextStyle(
-        color: textColor,
+        color: effectiveTextColor,
         fontWeight: fontWeight ?? FontWeight.w600,
         fontSize: fontSize ?? 16.sp,
       ),
     );
 
-    if (icon == null) {
-      return [textWidget];
-    }
+    if (icon == null) return [textWidget];
 
     final iconWidget = Icon(
       icon,
-      color: textColor,
+      color: effectiveTextColor,
       size: 18.r,
     );
 
     if (isIconAtStart) {
-      return [
-        iconWidget,
-        SizedBox(width: 8.w),
-        textWidget,
-      ];
+      return [iconWidget, SizedBox(width: 8.w), textWidget];
     }
 
-
-    return [
-      textWidget,
-      SizedBox(width: 8.w),
-      iconWidget,
-    ];
+    return [textWidget, SizedBox(width: 8.w), iconWidget];
   }
 }
-
 ///لو انتي محددة isIconAtStart = true → يمشي على كلامك
 //
 // لو لا → يخلي الاتجاه حسب اللغة

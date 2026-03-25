@@ -2,7 +2,6 @@
 import 'package:dana_graduation_project/core/widgets/custom_textForm.dart';
 import 'package:flutter/material.dart';
 import 'package:dana_graduation_project/l10n/app_localizations.dart';
-
 class LoginPasswordField extends StatelessWidget {
   const LoginPasswordField({super.key});
 

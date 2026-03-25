@@ -1,4 +1,5 @@
 
+import 'package:dana_graduation_project/core/utils/app_routes.dart';
 import 'package:dana_graduation_project/core/widgets/custom_elevetedButton.dart';
 import 'package:dana_graduation_project/core/widgets/custom_screen_header.dart';
 import 'package:dana_graduation_project/features/auth/login/presentation/views/screens/new_password/widgets/new_password_drag_indicator.dart';
@@ -31,7 +32,7 @@ class NewPasswordBody extends StatelessWidget {
             CustomElevatedButton(
               text: AppLocalizations.of(context)!.confirmPasswordButton,
               onTap: () {
-                // Navigate => home
+               Navigator.of(context).pushNamed(AppRoutes.home);
               },
             ),
             SizedBox(height: AppSizes.h24),

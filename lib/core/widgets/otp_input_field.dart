@@ -4,6 +4,9 @@ import 'package:dana_graduation_project/core/utils/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pinput/pinput.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/app_theme_provider.dart';
 
 
 class OtpInputField extends StatelessWidget {
@@ -18,15 +21,21 @@ class OtpInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
+
     final defaultPinTheme = PinTheme(
       width: 56.w,
       height: 56.h,
-      textStyle: AppTextStyle.medium20TextDisplay,
+      textStyle: AppTextStyle.medium20TextDisplay(context),
       decoration: BoxDecoration(
-        color: AppColors.bg_surface_default_light,
+        color: isDark
+            ? AppColors.bg_surface_default_dark
+            : AppColors.bg_surface_default_light,
         borderRadius: BorderRadius.circular(AppRadius.radius_sm.r),
         border: Border.all(
-          color: AppColors.border_card_default_light,
+          color: isDark
+              ? AppColors.border_card_default_dark
+              : AppColors.border_card_default_light,
           width: 1,
         ),
       ),
@@ -35,7 +44,9 @@ class OtpInputField extends StatelessWidget {
     final focusedPinTheme = defaultPinTheme.copyWith(
       decoration: defaultPinTheme.decoration!.copyWith(
         border: Border.all(
-          color: AppColors.primary_default_light,
+          color: isDark
+              ? AppColors.primary_default_dark
+              : AppColors.primary_default_light,
           width: 2,
         ),
       ),
@@ -43,9 +54,13 @@ class OtpInputField extends StatelessWidget {
 
     final submittedPinTheme = defaultPinTheme.copyWith(
       decoration: defaultPinTheme.decoration!.copyWith(
-        color: AppColors.primary_50_light,
+        color: isDark
+            ? AppColors.primary_50_dark
+            : AppColors.primary_50_light,
         border: Border.all(
-          color: AppColors.primary_default_light,
+          color: isDark
+              ? AppColors.primary_default_dark
+              : AppColors.primary_default_light,
           width: 1,
         ),
       ),

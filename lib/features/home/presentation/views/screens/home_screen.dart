@@ -1,3 +1,5 @@
+import 'package:dana_graduation_project/core/utils/app_routes.dart';
+import 'package:dana_graduation_project/features/booking/presentation/views/BookingScreen/screens/BookingScreen_page.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -7,11 +9,16 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey,
       body: Center(
-        child: Text('Home',style: TextStyle(
-          fontSize: 50,
-          fontWeight: FontWeight.bold,
-            color: Colors.purple
-        ),),
+        child: TextButton(onPressed: (){
+          Navigator.of(context).pushNamed(AppRoutes.doctorTime);
+        },
+          child: Text('Home',
+              style: TextStyle(
+                  fontSize: 50,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.purple
+              )),
+          ),
       ),
     );
   }

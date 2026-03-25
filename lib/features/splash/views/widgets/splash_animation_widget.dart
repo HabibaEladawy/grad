@@ -1,7 +1,9 @@
 
 import 'package:dana_graduation_project/core/utils/app_assets.dart';
-import 'package:dana_graduation_project/core/utils/app_routes.dart';
+import 'package:dana_graduation_project/core/utils/app_sizes.dart';
 import 'package:flutter/material.dart';
+
+import '../../../../core/utils/app_routes.dart';
 
 class SplashAnimationWidget extends StatefulWidget {
   const SplashAnimationWidget({super.key});
@@ -11,73 +13,96 @@ class SplashAnimationWidget extends StatefulWidget {
 }
 
 class _SplashAnimationWidgetState extends State<SplashAnimationWidget>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+    with TickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final AnimationController _bounce1Controller;
+  late final AnimationController _bounce2Controller;
 
-  /// أنيميشن للقلب الكامل
-  late Animation<Offset> _heartSlide;
-
-  /// أنيميشن للنقطتين
-  late Animation<Offset> _dot1Slide;
-  late Animation<Offset> _dot2Slide;
-
-  /// أنيميشن لأيقونة دانا من اليمين
-  late Animation<Offset> _danaSlide;
+  late final Animation<Offset> _heartSlide;
+  late final Animation<Offset> _dot1Slide;
+  late final Animation<Offset> _dot2Slide;
+  late final Animation<Offset> _danaSlide;
+  late final Animation<Offset> _bounce1;
+  late final Animation<Offset> _bounce2;
 
   @override
   void initState() {
     super.initState();
+    _initControllers();
+    _initAnimations();
+    _startSequence();
+  }
+
+  void _initControllers() {
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     );
+    _bounce1Controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+    );
+    _bounce2Controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+    );
+  }
 
-    /// القلب يجي من الشمال
+  void _initAnimations() {
     _heartSlide = Tween<Offset>(
       begin: const Offset(-3, 0),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    /// النقطة الأولى تيجي من فوق شمال
     _dot1Slide = Tween<Offset>(
       begin: const Offset(-3, -3),
-      end: Offset.zero,
+      end: const Offset(0, 1),
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    /// النقطة الثانية تيجي من فوق شمال (أقرب للوسط)
     _dot2Slide = Tween<Offset>(
       begin: const Offset(-1.5, -3),
-      end: Offset.zero,
+      end:  Offset.zero,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    /// كلمة دانا تيجي من اليمين
     _danaSlide = Tween<Offset>(
       begin: const Offset(3, 0),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    /// شاشة بيضاء 500ms ثم ابدأ الأنيميشن
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        _controller.forward();
-      }
-    });
+    _bounce1 = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0, -0.8),
+    ).animate(CurvedAnimation(parent: _bounce1Controller, curve: Curves.easeInOut));
 
-    /// بعد ما الأنيميشن يخلص، روح للصفحة التانية
-    _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        Future.delayed(const Duration(milliseconds: 1000), () {
-          if (mounted) {
-            Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
-          }
-        });
-      }
-    });
+    _bounce2 = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0, -0.8),
+    ).animate(CurvedAnimation(parent: _bounce2Controller, curve: Curves.easeInOut));
+  }
+
+  Future<void> _startSequence() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    if (!mounted) return;
+
+    await _controller.forward();
+
+    await _bounce1Controller.forward();
+    await _bounce1Controller.reverse();
+
+    await _bounce2Controller.forward();
+    await _bounce2Controller.reverse();
+
+    if (mounted) {
+      await Future.delayed(const Duration(milliseconds: 500));
+      Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
+    }
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _bounce1Controller.dispose();
+    _bounce2Controller.dispose();
     super.dispose();
   }
 
@@ -90,60 +115,58 @@ class _SplashAnimationWidgetState extends State<SplashAnimationWidget>
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          /// كلمة دانا من اليمين
           SlideTransition(
             position: _danaSlide,
             child: Image.asset(
               AppAssets.right,
-              width: 136,
-              height: 123,
+              width: AppSizes.w136,
+              height: AppSizes.h123,
               fit: BoxFit.contain,
             ),
           ),
-          const SizedBox(width: 20),
-
-          /// القلب مع النقطتين
+           SizedBox(width: AppSizes.w20),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              /// النقطتين فوق
               Row(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// النقطة الأولى
                   SlideTransition(
                     position: _dot1Slide,
-                    child: Image.asset(
-                      AppAssets.logoTopLeft,
-                      width: 20,
-                      height: 23,
-                      fit: BoxFit.contain,
+                    child: SlideTransition(
+                      position: _bounce1,
+                      child: Image.asset(
+                        AppAssets.logoTopLeft,
+                        width: AppSizes.w20,
+                        height: AppSizes.h23,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 10),
-
-                  /// النقطة الثانية
+                   SizedBox(width: AppSizes.w10),
                   SlideTransition(
                     position: _dot2Slide,
-                    child: Image.asset(
-                      AppAssets.logoTopRight,
-                      width: 30,
-                      height: 30,
-                      fit: BoxFit.contain,
+                    child: SlideTransition(
+                      position: _bounce2,
+                      child: Image.asset(
+                        AppAssets.logoTopRight,
+                        width: AppSizes.w30,
+                        height: AppSizes.h30,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 5),
-
-              /// القلب الكامل
+               SizedBox(height: AppSizes.h5),
               SlideTransition(
                 position: _heartSlide,
                 child: Image.asset(
-                  'assets/Images/heart.png',
-                  width: 100,
-                  height: 100,
+
+                  AppAssets.heartSplash,
+                  width: AppSizes.w100,
+                  height: AppSizes.h100,
                   fit: BoxFit.contain,
                 ),
               ),

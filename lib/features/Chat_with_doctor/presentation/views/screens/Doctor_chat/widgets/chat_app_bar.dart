@@ -1,66 +1,79 @@
-import 'package:dana_graduation_project/core/utils/app_colors.dart';
-import 'package:dana_graduation_project/core/utils/app_sizes.dart';
-import 'package:dana_graduation_project/core/utils/app_text_style.dart';
+import 'package:dana_graduation_project/core/utils/app_raduis.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+
+import '../../../../../../../core/utils/app_colors.dart';
+import '../../../../../../../core/utils/app_text_style.dart';
+import '../../../../../../../providers/app_theme_provider.dart';
+import '../../../../../../Chat_bot/presentation/controller/data/model/message_model.dart';
+import 'chat_Back_Button.dart';
+import 'doctor_avatar.dart';
 
 class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String doctorName;
-  final String specialty;
+  final Doctor doctor;
+  final VoidCallback? onBackPressed;
 
-  const ChatAppBar({
-    super.key,
-    required this.doctorName,
-    required this.specialty,
-  });
+  const ChatAppBar({super.key, required this.doctor, this.onBackPressed});
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(80);
 
   @override
   Widget build(BuildContext context) {
-     return SizedBox(
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
+    final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
 
-       child: Container(
-         color: AppColors.bg_card_default_light,
-         width: 440,
-
-         child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24,vertical: 8),
-              child: CircleAvatar(
-                radius: 20,
-                backgroundImage: const AssetImage('assets/Images/doctor_circle.png'),
-              ),
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.bg_card_default_dark
+            : AppColors.bg_card_default_light,
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: SizedBox(
+          height: 80.h,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppRadius.space_xl,
+              vertical: AppRadius.space_sm,
             ),
-            Column(
-
-
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Row(
+              textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  doctorName,
-                  textDirection: TextDirection.rtl,
-                  style: AppTextStyle.medium16TextHeading,
+                DoctorAvatar(imageUrl: doctor.imageUrl),
+                SizedBox(width: AppRadius.space_sm),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: isRtl
+                        ? CrossAxisAlignment.start
+                        : CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        doctor.name,
+                        style: AppTextStyle.medium16TextHeading(context),
+                      ),
+                      Text(
+                        doctor.specialty,
+                        style: AppTextStyle.regular12TextBody(context),
+                      ),
+
+                    ],
+                  ),
                 ),
-                SizedBox(width:AppSizes.w12),
-                Text(
-                  specialty,
-                  textDirection: TextDirection.rtl,
-                  style: AppTextStyle.regular12TextBody,
+                ChatBackButton(
+                  isRtl: isRtl,
+                  onPressed: onBackPressed ?? () => Navigator.maybePop(context),
                 ),
               ],
             ),
-            Spacer(),
-            IconButton(
-              icon: const Icon(Icons.chevron_right, color: AppColors.text_heading_light,size: 24,),
-              onPressed: () => Navigator.maybePop(context),
-            ),
-
-
-          ],
-             ),
-       ),
-     );
+          ),
+        ),
+      ),
+    );
   }
 }

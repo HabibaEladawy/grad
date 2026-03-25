@@ -17,6 +17,7 @@ class LoginBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SizedBox(height: AppSizes.h32),
         CustomScreenHeader(
           title: AppLocalizations.of(context)!.welcomeBackTitle,
           subtitle: AppLocalizations.of(context)!.loginDesc,

@@ -27,7 +27,6 @@ class ForgetPasswordBody extends StatelessWidget {
         padding: EdgeInsets.all(AppSizes.w24),
         child: Column(
           children: [
-
             ForgetPasswordImage(),
             SizedBox(height: AppSizes.h24),
             ForgetPasswordTexts(),

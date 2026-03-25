@@ -128,11 +128,371 @@ abstract class AppLocalizations {
   /// **'Next'**
   String get next;
 
+  /// No description provided for @relatedVideos.
+  ///
+  /// In en, this message translates to:
+  /// **'Related Videos'**
+  String get relatedVideos;
+
+  /// No description provided for @noDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'No description available'**
+  String get noDescription;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You can find the videos you need through search'**
+  String get searchHint;
+
   /// No description provided for @doctorConsult.
   ///
   /// In en, this message translates to:
   /// **'Doctor Consult'**
   String get doctorConsult;
+
+  /// No description provided for @guideBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Awareness Guide'**
+  String get guideBooks;
+
+  /// No description provided for @page.
+  ///
+  /// In en, this message translates to:
+  /// **'Page'**
+  String get page;
+
+  /// No description provided for @responseRarely.
+  ///
+  /// In en, this message translates to:
+  /// **'Rarely / Never'**
+  String get responseRarely;
+
+  /// No description provided for @responseSometimes.
+  ///
+  /// In en, this message translates to:
+  /// **'Sometimes'**
+  String get responseSometimes;
+
+  /// No description provided for @responseAlways.
+  ///
+  /// In en, this message translates to:
+  /// **'Always'**
+  String get responseAlways;
+
+  /// No description provided for @views.
+  ///
+  /// In en, this message translates to:
+  /// **'views'**
+  String get views;
+
+  /// No description provided for @doctorSpecialty.
+  ///
+  /// In en, this message translates to:
+  /// **'Physical Therapy Specialist'**
+  String get doctorSpecialty;
+
+  /// No description provided for @backButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get backButton;
+
+  /// No description provided for @writeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a message to the doctor'**
+  String get writeMessage;
+
+  /// No description provided for @endToEndEncrypted.
+  ///
+  /// In en, this message translates to:
+  /// **'End-to-end encrypted.'**
+  String get endToEndEncrypted;
+
+  /// No description provided for @encryptionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages are secured with end-to-end encryption.'**
+  String get encryptionSubtitle;
+
+  /// No description provided for @viewProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'View Profile'**
+  String get viewProfile;
+
+  /// No description provided for @messageRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read at'**
+  String get messageRead;
+
+  /// No description provided for @warningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notice'**
+  String get warningTitle;
+
+  /// No description provided for @aiAssistantName.
+  ///
+  /// In en, this message translates to:
+  /// **'Dana AI Assistant'**
+  String get aiAssistantName;
+
+  /// No description provided for @suggestedQuestionsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Here are some suggested questions to help you get started...\nPick what suits you and we\'ll go from there.'**
+  String get suggestedQuestionsHint;
+
+  /// No description provided for @suggestedQ1.
+  ///
+  /// In en, this message translates to:
+  /// **'How do I assess my child\'s condition?'**
+  String get suggestedQ1;
+
+  /// No description provided for @suggestedQ2.
+  ///
+  /// In en, this message translates to:
+  /// **'What are the steps to start at home?'**
+  String get suggestedQ2;
+
+  /// No description provided for @suggestedQ3.
+  ///
+  /// In en, this message translates to:
+  /// **'General health tips'**
+  String get suggestedQ3;
+
+  /// No description provided for @suggestedQ4.
+  ///
+  /// In en, this message translates to:
+  /// **'Does this problem affect my child\'s development?'**
+  String get suggestedQ4;
+
+  /// No description provided for @suggestedQ5.
+  ///
+  /// In en, this message translates to:
+  /// **'Prevention and safe treatment methods'**
+  String get suggestedQ5;
+
+  /// No description provided for @askAboutChild.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask me about your child\'s condition here...'**
+  String get askAboutChild;
+
+  /// No description provided for @doctorName.
+  ///
+  /// In en, this message translates to:
+  /// **'Dr. Islam Ghoneim'**
+  String get doctorName;
+
+  /// No description provided for @doctorLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Cairo - Heliopolis'**
+  String get doctorLocation;
+
+  /// No description provided for @sampleMessage1.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor, I came to check on my son.'**
+  String get sampleMessage1;
+
+  /// No description provided for @sampleMessage2.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for sharing. Are these movements involuntary?'**
+  String get sampleMessage2;
+
+  /// No description provided for @sampleMessage3.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes doctor, they happen without him meaning to.'**
+  String get sampleMessage3;
+
+  /// No description provided for @sampleMessage4.
+  ///
+  /// In en, this message translates to:
+  /// **'It seems like simple involuntary movements.'**
+  String get sampleMessage4;
+
+  /// No description provided for @sampleMessage5.
+  ///
+  /// In en, this message translates to:
+  /// **'Okay doctor... does this need immediate treatment?'**
+  String get sampleMessage5;
+
+  /// No description provided for @sampleMessage6.
+  ///
+  /// In en, this message translates to:
+  /// **'We usually start with a simple assessment.'**
+  String get sampleMessage6;
+
+  /// No description provided for @sampleMessage7.
+  ///
+  /// In en, this message translates to:
+  /// **'Sure doctor. We will monitor and record all observations.'**
+  String get sampleMessage7;
+
+  /// No description provided for @sampleMessage8.
+  ///
+  /// In en, this message translates to:
+  /// **'It is best to schedule a visit soon.'**
+  String get sampleMessage8;
+
+  /// No description provided for @warningDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This assessment is a guidance tool to help you and does not replace specialized medical consultation.'**
+  String get warningDescription;
+
+  /// No description provided for @resultSpecialistTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Consult a Specialist for Support.'**
+  String get resultSpecialistTitle;
+
+  /// No description provided for @resultSpecialistDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The assessment shows that your child faces sensory challenges affecting their daily life. This is not a failure in your parenting, but a difference in their nervous system. Early intervention is important, so we recommend booking a consultation with a sensory integration specialist.'**
+  String get resultSpecialistDescription;
+
+  /// No description provided for @bookSpecialistConsultation.
+  ///
+  /// In en, this message translates to:
+  /// **'Book a Specialist Consultation Now'**
+  String get bookSpecialistConsultation;
+
+  /// No description provided for @resultNormalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reassuring Result: Your Child is Developing Normally'**
+  String get resultNormalTitle;
+
+  /// No description provided for @resultNormalDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on your answers, your child\'s responses to sensory stimuli are normal and appropriate for their age. Any discomfort or tantrums they experience now are a very natural part of their emotional growth. Keep providing a safe and supportive environment.'**
+  String get resultNormalDescription;
+
+  /// No description provided for @browseActivities.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse Activities to Develop Their Skills'**
+  String get browseActivities;
+
+  /// No description provided for @readBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Read Book'**
+  String get readBook;
+
+  /// No description provided for @resultSensitivityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs Attention: Your Child Has Some Sensitivity'**
+  String get resultSensitivityTitle;
+
+  /// No description provided for @resultSensitivityDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your answers show that your child is more affected by certain sensory stimuli (such as sounds or touch) than usual, which may be causing some of their reactions. They need you to observe what bothers them and avoid it, while trying some calming sensory activities at home to help them adapt.'**
+  String get resultSensitivityDescription;
+
+  /// No description provided for @sensoryActivitiesPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensory Activities Plan for Home'**
+  String get sensoryActivitiesPlan;
+
+  /// No description provided for @sectionHeaderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Initial Assessment of Sensory Challenges'**
+  String get sectionHeaderTitle;
+
+  /// No description provided for @sectionHeaderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick questions to help us understand how your child responds to surrounding stimuli.'**
+  String get sectionHeaderSubtitle;
+
+  /// No description provided for @examinationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Examine Your Child'**
+  String get examinationTitle;
+
+  /// No description provided for @touchAndSoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Response to Touch and Sound'**
+  String get touchAndSoundTitle;
+
+  /// No description provided for @touchAndSoundSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'(Sensitivity)'**
+  String get touchAndSoundSubtitle;
+
+  /// No description provided for @motorInteractionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Motor and Environmental Interaction'**
+  String get motorInteractionTitle;
+
+  /// No description provided for @motorInteractionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'(Seeking or Avoiding Sensation)'**
+  String get motorInteractionSubtitle;
+
+  /// No description provided for @question1.
+  ///
+  /// In en, this message translates to:
+  /// **'Does your child get severely bothered by normal sounds like a vacuum cleaner, blender, or a sudden loud noise, covering their ears?'**
+  String get question1;
+
+  /// No description provided for @question2.
+  ///
+  /// In en, this message translates to:
+  /// **'Does your child strongly refuse to wear certain clothes due to their texture, or cry excessively about clothing tags or sock seams?'**
+  String get question2;
+
+  /// No description provided for @question3.
+  ///
+  /// In en, this message translates to:
+  /// **'Does your child overreact when suddenly touched, or strongly avoid hugging and cuddling even from close relatives?'**
+  String get question3;
+
+  /// No description provided for @question4.
+  ///
+  /// In en, this message translates to:
+  /// **'Does your child move constantly and excessively (as if motor-driven) and have great difficulty sitting still for a period appropriate for their age?'**
+  String get question4;
+
+  /// No description provided for @showResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Result'**
+  String get showResult;
+
+  /// No description provided for @publishedYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Published in'**
+  String get publishedYear;
+
+  /// No description provided for @featuredBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Our Picks for Your Journey'**
+  String get featuredBooks;
 
   /// No description provided for @childDoctorOptions.
   ///
@@ -614,24 +974,6 @@ abstract class AppLocalizations {
   /// **'Friday'**
   String get friday;
 
-  /// No description provided for @doctorName.
-  ///
-  /// In en, this message translates to:
-  /// **'Dr. Islam Ghoneim'**
-  String get doctorName;
-
-  /// No description provided for @doctorSpecialty.
-  ///
-  /// In en, this message translates to:
-  /// **'Physical Therapy Specialist'**
-  String get doctorSpecialty;
-
-  /// No description provided for @doctorLocation.
-  ///
-  /// In en, this message translates to:
-  /// **'Cairo - Heliopolis'**
-  String get doctorLocation;
-
   /// No description provided for @yearsExperience.
   ///
   /// In en, this message translates to:
@@ -787,6 +1129,408 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Revisit'**
   String get revisit;
+
+  /// No description provided for @priceValue.
+  ///
+  /// In en, this message translates to:
+  /// **'250'**
+  String get priceValue;
+
+  /// No description provided for @currencyPound.
+  ///
+  /// In en, this message translates to:
+  /// **'EGP'**
+  String get currencyPound;
+
+  /// No description provided for @thousand.
+  ///
+  /// In en, this message translates to:
+  /// **'K'**
+  String get thousand;
+
+  /// No description provided for @seven.
+  ///
+  /// In en, this message translates to:
+  /// **'7'**
+  String get seven;
+
+  /// No description provided for @fourPointFive.
+  ///
+  /// In en, this message translates to:
+  /// **'4.5'**
+  String get fourPointFive;
+
+  /// No description provided for @threePointFive.
+  ///
+  /// In en, this message translates to:
+  /// **'3.5'**
+  String get threePointFive;
+
+  /// No description provided for @videos.
+  ///
+  /// In en, this message translates to:
+  /// **'Videos'**
+  String get videos;
+
+  /// No description provided for @books.
+  ///
+  /// In en, this message translates to:
+  /// **'Books'**
+  String get books;
+
+  /// No description provided for @examination.
+  ///
+  /// In en, this message translates to:
+  /// **'Examination'**
+  String get examination;
+
+  /// No description provided for @viewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View All'**
+  String get viewAll;
+
+  /// No description provided for @searchResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Results ....'**
+  String get searchResults;
+
+  /// No description provided for @heroGrowthJourney.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Little Hero\'s Growth Journey'**
+  String get heroGrowthJourney;
+
+  /// No description provided for @searchVideos.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for the video you need...'**
+  String get searchVideos;
+
+  /// No description provided for @noResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No results match your search'**
+  String get noResults;
+
+  /// No description provided for @understandSPD.
+  ///
+  /// In en, this message translates to:
+  /// **'Understand His Sensory World (SPD)'**
+  String get understandSPD;
+
+  /// No description provided for @sensoryActivities.
+  ///
+  /// In en, this message translates to:
+  /// **'Fun Sensory Activities at Home'**
+  String get sensoryActivities;
+
+  /// No description provided for @angerManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Managing Sensory Anger Episodes'**
+  String get angerManagement;
+
+  /// No description provided for @sensoryDisorder.
+  ///
+  /// In en, this message translates to:
+  /// **'What is Sensory Processing Disorder?'**
+  String get sensoryDisorder;
+
+  /// No description provided for @babyGrowth.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Baby\'s Growth Journey'**
+  String get babyGrowth;
+
+  /// No description provided for @motorDevelopment.
+  ///
+  /// In en, this message translates to:
+  /// **'Motor Development: From Crawling to Walking'**
+  String get motorDevelopment;
+
+  /// No description provided for @firstWords.
+  ///
+  /// In en, this message translates to:
+  /// **'First Words: How to Encourage Speech?'**
+  String get firstWords;
+
+  /// No description provided for @healthCapsules.
+  ///
+  /// In en, this message translates to:
+  /// **'Better Awareness Capsules'**
+  String get healthCapsules;
+
+  /// No description provided for @sleepCapsule.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy Sleep Capsule'**
+  String get sleepCapsule;
+
+  /// No description provided for @nutritionCapsule.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy Nutrition Capsule'**
+  String get nutritionCapsule;
+
+  /// No description provided for @noResultsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check the spelling, or try searching in the main library sections.'**
+  String get noResultsDesc;
+
+  /// No description provided for @bookSensoryIntegrationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensory Integration and the Child'**
+  String get bookSensoryIntegrationTitle;
+
+  /// No description provided for @bookSensoryIntegrationAuthor.
+  ///
+  /// In en, this message translates to:
+  /// **'Lindsay Biel & Nancy Peske'**
+  String get bookSensoryIntegrationAuthor;
+
+  /// No description provided for @bookSensoryIntegrationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'A specialized book on understanding children\'s sensory systems and how to handle daily challenges in a scientific and simplified way.'**
+  String get bookSensoryIntegrationDesc;
+
+  /// No description provided for @bookSensoryChapter1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'What is Sensory Integration?'**
+  String get bookSensoryChapter1Title;
+
+  /// No description provided for @bookSensoryChapter1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensory integration is the process by which the brain organizes information from different senses. When this system works properly, the child can respond to the environment appropriately.'**
+  String get bookSensoryChapter1Body;
+
+  /// No description provided for @bookSensoryChapter2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Signs of Sensory Integration Difficulties'**
+  String get bookSensoryChapter2Title;
+
+  /// No description provided for @bookSensoryChapter2Body.
+  ///
+  /// In en, this message translates to:
+  /// **'There are many signs that may indicate sensory integration difficulties, including: refusing to wear certain clothes due to texture, extreme sensitivity to loud sounds.'**
+  String get bookSensoryChapter2Body;
+
+  /// No description provided for @bookAsyncChildTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The Out-of-Sync Child'**
+  String get bookAsyncChildTitle;
+
+  /// No description provided for @bookAsyncChildAuthor.
+  ///
+  /// In en, this message translates to:
+  /// **'Carol Stock Kranowitz'**
+  String get bookAsyncChildAuthor;
+
+  /// No description provided for @bookAsyncChildDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'A comprehensive guide for dealing with children who develop at a different pace than their peers and need special understanding and support.'**
+  String get bookAsyncChildDesc;
+
+  /// No description provided for @bookAsyncChapter1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Who is the Out-of-Sync Child?'**
+  String get bookAsyncChapter1Title;
+
+  /// No description provided for @bookAsyncChapter1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'The out-of-sync child is one whose developmental levels vary significantly, being very advanced in one area like intelligence or language, while being at an earlier stage emotionally or socially.'**
+  String get bookAsyncChapter1Body;
+
+  /// No description provided for @bookAsyncChapter2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Support Your Out-of-Sync Child?'**
+  String get bookAsyncChapter2Title;
+
+  /// No description provided for @bookAsyncChapter2Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Real support starts with acceptance and understanding. You must accept that your child moves at their own pace, and that this is not a flaw but a characteristic that needs different care.'**
+  String get bookAsyncChapter2Body;
+
+  /// No description provided for @bookSensorySignalsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept Your Child\'s Sensory Signals'**
+  String get bookSensorySignalsTitle;
+
+  /// No description provided for @bookSensorySignalsAuthor.
+  ///
+  /// In en, this message translates to:
+  /// **'Dr. Karen Sourkav'**
+  String get bookSensorySignalsAuthor;
+
+  /// No description provided for @bookSensorySignalsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'A practical book that helps you understand and read your child\'s sensory signals and deal with them correctly and effectively.'**
+  String get bookSensorySignalsDesc;
+
+  /// No description provided for @bookSensorySignalsChapter1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'What are Sensory Signals?'**
+  String get bookSensorySignalsChapter1Title;
+
+  /// No description provided for @bookSensorySignalsChapter1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensory signals are the way your child\'s body expresses its sensory needs.'**
+  String get bookSensorySignalsChapter1Body;
+
+  /// No description provided for @bookSensorySignalsChapter2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Respond to Your Child\'s Signals?'**
+  String get bookSensorySignalsChapter2Title;
+
+  /// No description provided for @bookSensorySignalsChapter2Body.
+  ///
+  /// In en, this message translates to:
+  /// **'The correct response to sensory signals depends on the type of signal and its context.'**
+  String get bookSensorySignalsChapter2Body;
+
+  /// No description provided for @bookGuide1Author.
+  ///
+  /// In en, this message translates to:
+  /// **'Anji Qaws'**
+  String get bookGuide1Author;
+
+  /// No description provided for @bookGuide1Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'A quick reference book explaining how to understand your child\'s behaviors and how to intervene calmly to contain tantrums.'**
+  String get bookGuide1Desc;
+
+  /// No description provided for @bookGuide1Chapter1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'To Every Parent Who Feels Their Child is Hard to Handle'**
+  String get bookGuide1Chapter1Title;
+
+  /// No description provided for @bookGuide1Chapter1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'We focus on the dynamic movement that begins from the moment your child wakes up.'**
+  String get bookGuide1Chapter1Body;
+
+  /// No description provided for @bookGuide1Chapter2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Imagine if Every Touch was Sandpaper'**
+  String get bookGuide1Chapter2Title;
+
+  /// No description provided for @bookGuide1Chapter2Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Imagine walking inside a city filled with millions of sounds.'**
+  String get bookGuide1Chapter2Body;
+
+  /// No description provided for @bookBodyLanguageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Guide to Understanding Your Child\'s Body Language'**
+  String get bookBodyLanguageTitle;
+
+  /// No description provided for @bookBodyLanguageAuthor.
+  ///
+  /// In en, this message translates to:
+  /// **'Mariam Al-Abdullah'**
+  String get bookBodyLanguageAuthor;
+
+  /// No description provided for @bookBodyLanguageDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Introduces you to physical signals that help improve communication with your child and better understand their needs.'**
+  String get bookBodyLanguageDesc;
+
+  /// No description provided for @bookBodyLanguageChapter1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Introduction - Body Language in Children'**
+  String get bookBodyLanguageChapter1Title;
+
+  /// No description provided for @bookBodyLanguageChapter1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Children communicate in many ways before they master speech.'**
+  String get bookBodyLanguageChapter1Body;
+
+  /// No description provided for @bookAngerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Strategies for Dealing with Tantrums'**
+  String get bookAngerTitle;
+
+  /// No description provided for @bookAngerAuthor.
+  ///
+  /// In en, this message translates to:
+  /// **'Ahmed Qasim'**
+  String get bookAngerAuthor;
+
+  /// No description provided for @bookAngerDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'A collection of effective tips for understanding how to deal with tantrums in a positive and effective way.'**
+  String get bookAngerDesc;
+
+  /// No description provided for @bookAngerChapter1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Why Does Your Child Get Angry?'**
+  String get bookAngerChapter1Title;
+
+  /// No description provided for @bookAngerChapter1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Tantrums in children are usually not rebellion or stubbornness, but a clear message: I cannot handle what is happening now.'**
+  String get bookAngerChapter1Body;
+
+  /// No description provided for @bookEmotionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Identify Your Child\'s Emotions'**
+  String get bookEmotionsTitle;
+
+  /// No description provided for @bookEmotionsAuthor.
+  ///
+  /// In en, this message translates to:
+  /// **'Rana Samir'**
+  String get bookEmotionsAuthor;
+
+  /// No description provided for @bookEmotionsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'A guide that helps you identify your child\'s emotions and guide them to express themselves in a healthy way.'**
+  String get bookEmotionsDesc;
+
+  /// No description provided for @bookEmotionsChapter1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Emotional Intelligence Starts at Home'**
+  String get bookEmotionsChapter1Title;
+
+  /// No description provided for @bookEmotionsChapter1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Children are not born knowing the names of their feelings, nor do they know how to deal with them. This is a skill that is taught and acquired.'**
+  String get bookEmotionsChapter1Body;
 }
 
 class _AppLocalizationsDelegate

@@ -13,11 +13,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/app_theme_provider.dart';
 
 
 class OtpBottomSheet extends StatefulWidget {
   final String phoneNumber;
-  final VoidCallback? onVerified; // ✅
+  final VoidCallback? onVerified;
 
   const OtpBottomSheet({
     super.key,
@@ -84,9 +87,13 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.whiteColor,
+        color: isDark
+            ? AppColors.bg_surface_default_dark
+            : AppColors.bg_surface_default_light,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(AppRadius.radius_lg.r),
           topRight: Radius.circular(AppRadius.radius_lg.r),
@@ -99,7 +106,7 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildDragIndicator(),
+            _buildDragIndicator(isDark),
             _buildBody(),
           ],
         ),
@@ -107,13 +114,15 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
     );
   }
 
-  Widget _buildDragIndicator() {
+  Widget _buildDragIndicator(bool isDark) {
     return Container(
       margin: EdgeInsets.only(top: AppSizes.h12, bottom: AppSizes.h8),
       width: 134.w,
       height: 5.h,
       decoration: BoxDecoration(
-        color: AppColors.border_card_default_light,
+        color: isDark
+            ? AppColors.border_card_default_dark
+            : AppColors.border_card_default_light,
         borderRadius: BorderRadius.circular(2.r),
       ),
     );
@@ -151,7 +160,7 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
   Widget _buildTitle() {
     return Text(
       AppLocalizations.of(context)!.verificationTitle,
-      style: AppTextStyle.medium20TextDisplay,
+      style: AppTextStyle.medium20TextDisplay(context),
     );
   }
 
@@ -160,12 +169,12 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
       children: [
         Text(
           AppLocalizations.of(context)!.verificationDescLine1(widget.phoneNumber),
-          style: AppTextStyle.regular16TextBody,
+          style: AppTextStyle.regular16TextBody(context),
           textAlign: TextAlign.center,
         ),
         Text(
           AppLocalizations.of(context)!.verificationDescLine2,
-          style: AppTextStyle.regular16TextBody,
+          style: AppTextStyle.regular16TextBody(context),
           textAlign: TextAlign.center,
         ),
       ],

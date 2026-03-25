@@ -33,7 +33,7 @@ class OnboardModel {
       ),
       OnboardModel(
         mainImage: AppAssets.onboardAi,
-        headingText: AppLocalizations.of(context)!.onboarding3Desc,
+        headingText: AppLocalizations.of(context)!.onboarding3Title,
         textLg: AppLocalizations.of(context)!.onboarding3Desc,
       ),
     ];

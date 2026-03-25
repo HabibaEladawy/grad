@@ -11,6 +11,6 @@ class MyThemeData {
     textTheme: GoogleFonts.ibmPlexSansArabicTextTheme(),
   );
   static final ThemeData darkTheme = ThemeData(
-
+    scaffoldBackgroundColor: Colors.black
   );
 }
