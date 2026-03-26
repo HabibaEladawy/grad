@@ -17,6 +17,9 @@ dependencies:
   intl: any
   intl_phone_field: ^3.2.0
   animate_do: ^4.2.0
+  dio: ^5.8.0+1
+  get_it: ^8.0.3
+  flutter_bloc: ^9.0.0
   provider: ^6.0.5
   flutter_svg: ^2.0.9
   smooth_page_indicator: ^1.2.1
@@ -26,6 +29,9 @@ dependencies:
   pinput: ^5.0.0
   country_code_picker: ^3.0.0
   confetti: ^0.7.0
+  equatable: ^2.0.7
+  dartz: ^0.10.1
+  internet_connection_checker_plus: ^2.7.1
 
 dev_dependencies:
   flutter_test:
