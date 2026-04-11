@@ -1,19 +1,21 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-
+import '../../../../../../../../core/di/injection_container.dart';
 import '../../../../../../../../core/utils/app_colors.dart';
 import '../../../../../../../../core/utils/app_raduis.dart';
 import '../../../../../../../../core/utils/app_sizes.dart';
 import '../../../../../../../../core/widgets/Otp_Bottom_Sheet.dart';
 import '../../../../../../../../providers/app_theme_provider.dart';
+import '../../../../cubit/reset_password_cubit.dart';
+import '../../../../cubit/reset_password_state.dart';
+import '../../../../cubit/sign_in_cubit.dart';
 import '../../new_password/screens/new_password_screen.dart';
 import '../widgets/forget_Password_Body.dart';
 
 class ForgetPasswordDialog extends StatefulWidget {
   static const String routeName = 'ForgetPasswordDialog';
-
   const ForgetPasswordDialog({super.key});
 
   static void show(BuildContext context) {
@@ -23,7 +25,10 @@ class ForgetPasswordDialog extends StatefulWidget {
       backgroundColor: Colors.transparent,
       isDismissible: true,
       enableDrag: true,
-      builder: (context) => const ForgetPasswordDialog(),
+      builder: (_) => BlocProvider(
+        create: (_) => sl<ResetPasswordCubit>(),
+        child: const ForgetPasswordDialog(),
+      ),
     );
   }
 
@@ -44,15 +49,9 @@ class _ForgetPasswordDialogState extends State<ForgetPasswordDialog> {
   }
 
   void _onNextPressed() {
-    final nav = Navigator.of(context);
-    Navigator.pop(context);
-    OtpBottomSheet.show(
-      context,
-      _phoneController.text,
-      onVerified: () {
-        nav.pushNamed(NewPasswordScreen.routeName);
-      },
-    );
+    final phone = _phoneController.text.trim();
+    if (phone.isEmpty) return;
+    context.read<ResetPasswordCubit>().sendOtp(phone: phone);
   }
 
   void _expandSheet() {
@@ -67,44 +66,71 @@ class _ForgetPasswordDialogState extends State<ForgetPasswordDialog> {
   Widget build(BuildContext context) {
     final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
 
-    return DraggableScrollableSheet(
-      controller: _sheetController,
-      initialChildSize: 0.5,
-      minChildSize: 0.5,
-      maxChildSize: 0.95,
-      snap: true,
-      snapSizes: const [0.5, 0.95],
-      builder: (context, scrollController) {
-        return Container(
-          decoration: BoxDecoration(
-            color: isDark
-                ? AppColors.bg_surface_default_dark
-                : AppColors.bg_surface_default_light,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(AppRadius.radius_lg.r),
-              topRight: Radius.circular(AppRadius.radius_lg.r),
+    return BlocConsumer<ResetPasswordCubit, ResetPasswordState>(
+      listener: (context, state) {
+        if (state is ResetPasswordOtpSent) {
+          final nav = Navigator.of(context);
+          Navigator.pop(context); // اقفل الـ bottom sheet
+
+          OtpBottomSheet.show(
+            context,
+            state.phone,
+            onVerified:  (pin) {
+            context.read<SignInCubit>().verifySignIn(otp: pin);
+          },
+          );
+        } else if (state is ResetPasswordFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
             ),
-          ),
-          child: Column(
-            children: [
-              _buildDragIndicator(isDark),
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom,
-                    ),
-                    child: ForgetPasswordBody(
-                      phoneController: _phoneController,
-                      onNextPressed: _onNextPressed,
-                      onPhoneFieldTap: _expandSheet,
-                    ),
-                  ),
+          );
+        }
+      },
+      builder: (context, state) {
+        return DraggableScrollableSheet(
+          controller: _sheetController,
+          initialChildSize: 0.5,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
+          snap: true,
+          snapSizes: const [0.5, 0.95],
+          builder: (context, scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppColors.bg_surface_default_dark
+                    : AppColors.bg_surface_default_light,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(AppRadius.radius_lg.r),
+                  topRight: Radius.circular(AppRadius.radius_lg.r),
                 ),
               ),
-            ],
-          ),
+              child: Column(
+                children: [
+                  _buildDragIndicator(isDark),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      controller: scrollController,
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).viewInsets.bottom,
+                        ),
+                        child: ForgetPasswordBody(
+                          phoneController: _phoneController,
+                          isLoading: state is ResetPasswordLoading,
+                          onNextPressed: _onNextPressed,
+                          onPhoneFieldTap: _expandSheet,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );

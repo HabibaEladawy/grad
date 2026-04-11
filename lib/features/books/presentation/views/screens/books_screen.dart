@@ -1,5 +1,4 @@
 
-import 'package:dana_graduation_project/features/videos/presentation/views/widgets/custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -7,8 +6,9 @@ import 'package:provider/provider.dart';
 import '../../../../../core/utils/app_colors.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../providers/app_theme_provider.dart';
-import '../../../../videos/presentation/views/screens/search_Screen.dart';
-import '../../../../videos/presentation/views/widgets/videos_TabBar.dart';
+import '../../../../videos/presentation/screens/search_Screen.dart';
+import '../../../../videos/presentation/widgets/custom_appbar.dart';
+import '../../../../videos/presentation/widgets/videos_TabBar.dart';
 import '../../../data/model/book_Model.dart';
 import '../widgets/books_horizontal_list.dart';
 import '../widgets/books_section_header.dart';

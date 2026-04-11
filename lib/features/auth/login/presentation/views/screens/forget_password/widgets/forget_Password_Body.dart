@@ -4,19 +4,19 @@ import 'package:dana_graduation_project/core/widgets/custom_elevetedButton.dart'
 import 'package:dana_graduation_project/features/auth/login/presentation/views/screens/forget_password/widgets/forget_Password_Image.dart';
 import 'package:dana_graduation_project/features/auth/login/presentation/views/screens/forget_password/widgets/forget_Password_Texts.dart';
 import 'package:dana_graduation_project/l10n/app_localizations.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 
 class ForgetPasswordBody extends StatelessWidget {
   final TextEditingController phoneController;
   final VoidCallback onNextPressed;
   final VoidCallback onPhoneFieldTap;
+  final bool isLoading;
 
   const ForgetPasswordBody({
     required this.phoneController,
     required this.onNextPressed,
     required this.onPhoneFieldTap,
+    this.isLoading = false,
   });
 
   @override
@@ -27,9 +27,9 @@ class ForgetPasswordBody extends StatelessWidget {
         padding: EdgeInsets.all(AppSizes.w24),
         child: Column(
           children: [
-            ForgetPasswordImage(),
+            const ForgetPasswordImage(),
             SizedBox(height: AppSizes.h24),
-            ForgetPasswordTexts(),
+            const ForgetPasswordTexts(),
             SizedBox(height: AppSizes.h32),
             CustomPhoneField(
               label: AppLocalizations.of(context)!.phoneNumber,
@@ -41,7 +41,7 @@ class ForgetPasswordBody extends StatelessWidget {
             CustomElevatedButton(
               text: AppLocalizations.of(context)!.nextButton,
               icon: Icons.arrow_forward_ios,
-              onTap: onNextPressed,
+              onTap: isLoading ? null : onNextPressed,
             ),
             SizedBox(height: AppSizes.h24),
           ],
@@ -50,7 +50,3 @@ class ForgetPasswordBody extends StatelessWidget {
     );
   }
 }
-
-
-
-

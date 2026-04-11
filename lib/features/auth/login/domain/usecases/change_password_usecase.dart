@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-
 import '../../../../../core/errors/failures.dart';
 import '../../../../../core/usecases/usecases.dart';
 import '../repo/auth_repository.dart';

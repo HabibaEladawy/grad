@@ -1,11 +1,14 @@
 // lib/core/di/injection_container.dart
 // ignore_for_file: cascade_invocations
 
+import 'package:dana_graduation_project/core/api/api_constant.dart';
+import 'package:dana_graduation_project/core/api/api_manger.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 import '../../features/auth/login/data/datasources/auth_remote_data_source.dart';
+import '../../features/auth/login/data/datasources/auth_remote_data_source_impl.dart';
 import '../../features/auth/login/data/repo/auth_repository_impl.dart';
 import '../../features/auth/login/domain/repo/auth_repository.dart';
 import '../../features/auth/login/domain/usecases/change_password_usecase.dart';
@@ -21,7 +24,6 @@ import '../../features/auth/login/presentation/cubit/create_doctor_cubit.dart';
 import '../../features/auth/login/presentation/cubit/reset_password_cubit.dart';
 import '../../features/auth/login/presentation/cubit/sign_in_cubit.dart';
 import '../../features/auth/login/presentation/cubit/sign_up_cubit.dart';
-import '../constant/api_constants.dart';
 import '../network/network_info.dart';
 import '../network/network_info_impl.dart';
 
@@ -113,7 +115,7 @@ Future<void> init() async {
   sl.registerLazySingleton<Dio>(
         () => Dio(
       BaseOptions(
-        baseUrl: ApiConstants.baseUrl,
+        baseUrl: ApiConstant.baseUrl,
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 15),
         headers: {'Accept': 'application/json'},

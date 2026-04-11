@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import '../../domain/entities/user_entity.dart';
 
 class UserModel extends UserEntity {
@@ -21,17 +20,11 @@ class UserModel extends UserEntity {
     );
   }
 
-  /// Decode the JWT payload and create a UserModel from it.
-  /// The new API returns { token: "JWT_TOKEN" } on verify-signIn.
-  factory UserModel.fromToken({
-    required String token,
-    required String phone,
-  }) {
+  factory UserModel.fromToken({required String token}) {
     try {
       final parts = token.split('.');
       if (parts.length != 3) throw const FormatException('Invalid JWT');
 
-      // JWT payload is Base64Url encoded
       String payload = parts[1];
       payload = payload.replaceAll('-', '+').replaceAll('_', '/');
       while (payload.length % 4 != 0) {
@@ -40,7 +33,6 @@ class UserModel extends UserEntity {
 
       final decoded = jsonDecode(utf8.decode(base64Decode(payload)));
 
-      // Try standard OIDC claims first, then Microsoft URIs
       final id =
           decoded['sub']?.toString() ??
               decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']
@@ -52,6 +44,9 @@ class UserModel extends UserEntity {
               decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name']
                   ?.toString() ??
               'مستخدم';
+
+      // ✅ phone بييجي من الـ JWT مش من الـ request
+      final phone = decoded['phone']?.toString() ?? '';
 
       final role =
           decoded['role']?.toString() ??
@@ -70,7 +65,7 @@ class UserModel extends UserEntity {
       return UserModel(
         id: '',
         name: 'مستخدم',
-        phone: phone,
+        phone: '',
         token: token,
         role: 'parent',
       );

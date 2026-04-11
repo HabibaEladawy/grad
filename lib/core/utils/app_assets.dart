@@ -6,6 +6,7 @@ class AppAssets {
   static String logoTopRight = 'assets/Images/top_right.png';
   static String logoTopLeft = 'assets/Images/top_left.png';
   static String right = 'assets/Images/right.png';
+
   ///----------------------------------
   // static String boy = 'assets/Images/boy.png';
   // static String girl = 'assets/Images/girl.png';
@@ -16,11 +17,7 @@ class AppAssets {
   static String send = 'assets/Images/send.png';
   static String camera = 'assets/Images/camera.png';
   static String record = 'assets/Images/record.png';
-  static String aiAvater = 'assets/Images/aiAvater.png';
-
-
-
-
+  static String aiAvatar = 'assets/Images/aiAvatar.png';
 
   static String ranking = 'assets/Images/ranking.png';
   static String book_one = 'assets/Images/book_one.png';
@@ -37,8 +34,7 @@ class AppAssets {
   static String book_8 = 'assets/Images/book_8.png';
   static String exam_1 = 'assets/Images/exam_1.png';
   static String exam_2 = 'assets/Images/exam_2.png';
-  static String emam_3 = 'assets/Images/emam_3.png';
-
+  static String exam_3 = 'assets/Images/exam_3.png';
 
   static String star = 'assets/Images/star.png';
   static String people = 'assets/Images/people.png';
@@ -50,20 +46,17 @@ class AppAssets {
   static String doctor = 'assets/Images/doctor.png';
   static String messages = 'assets/Images/messages.png';
 
-  static String image_v1 = 'assets/Images/image_v1.png';
-  static String image_v2 = 'assets/Images/image_v2.png';
-  static String image_v3 = 'assets/Images/image_v3.png';
-  static String image_v4 = 'assets/Images/image_v4.png';
-  static String image_v5 = 'assets/Images/image_v5.png';
-  static String image_v6 = 'assets/Images/image_v6.png';
-  static String image_v7 = 'assets/Images/image_v7.png';
-  static String image_v8 = 'assets/Images/image_v8.png';
-  static String image_v9 = 'assets/Images/image_v9.png';
+  static String image_v1 = 'assets/Images/videos/image_v1.png';
+  static String image_v2 = 'assets/Images/videos/image_v2.png';
+  static String image_v3 = 'assets/Images/videos/image_v3.png';
+  static String image_v4 = 'assets/Images/videos/image_v4.png';
+  static String image_v5 = 'assets/Images/videos/image_v5.png';
+  static String image_v6 = 'assets/Images/videos/image_v6.png';
+  static String image_v7 = 'assets/Images/videos/image_v7.png';
+  static String image_v8 = 'assets/Images/videos/image_v8.png';
+  static String image_v9 = 'assets/Images/videos/image_v9.png';
   static String search_normal = 'assets/Images/search-normal.png';
   static String empty_search = 'assets/Images/empty_search.png';
-
-
-
 }
 
 class AppIcons {
@@ -73,5 +66,4 @@ class AppIcons {
   // static String google_icon_container
   // = 'assets/icons/google_icon_container.svg';
   static String logo = 'assets/Icons/logo.svg';
-
 }

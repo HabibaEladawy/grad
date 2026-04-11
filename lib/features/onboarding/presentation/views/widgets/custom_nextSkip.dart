@@ -3,14 +3,12 @@ import 'package:dana_graduation_project/core/utils/app_raduis.dart';
 import 'package:dana_graduation_project/core/utils/app_routes.dart';
 import 'package:dana_graduation_project/core/utils/app_text_style.dart';
 import 'package:dana_graduation_project/features/onboarding/data/model/onboard_Model.dart';
-import 'package:dana_graduation_project/features/onboarding/presentation/views/widgets/skip_Button.dart';
 import 'package:dana_graduation_project/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../providers/app_theme_provider.dart';
-import '../../../../booking/presentation/views/DoctorTime/widgets/next_Button.dart';
 
 class CustomNextSkip extends StatelessWidget {
   final int index;

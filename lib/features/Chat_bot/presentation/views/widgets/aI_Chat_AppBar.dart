@@ -49,7 +49,7 @@ class AIChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                 width: 40.w,
                 height: 40.w,
                 child: CircleAvatar(
-                  backgroundImage: AssetImage(AppAssets.aiAvater),
+                  backgroundImage: AssetImage(AppAssets.aiAvatar),
                 ),
               ),
               SizedBox(width: AppRadius.space_sm),

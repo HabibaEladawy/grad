@@ -6,19 +6,28 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import 'core/di/injection_container.dart' as di;
 void main() async {
-  ///دول عشان الشريط ال فوق ميظهرش
   WidgetsFlutterBinding.ensureInitialized();
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-  ///عشان ارن الابلكيشن
-  runApp( MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => AppLanguageProvider()),
-        ChangeNotifierProvider(create: (context) => AppThemeProvider()),
+  await di.init();
 
-      ],
-      child: Dana()));
+  FlutterError.onError = (FlutterErrorDetails details) {
+    print('Flutter Error: ${details.exception}');
+    print('Stack: ${details.stack}');
+  };
+
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.edgeToEdge,
+  );
+
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => AppLanguageProvider()),
+      ChangeNotifierProvider(create: (context) => AppThemeProvider()),
+    ],
+    child: const Dana(),
+  ));
 }
 
 class Dana extends StatelessWidget {
@@ -26,10 +35,10 @@ class Dana extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-///Code => Responsive
     return ScreenUtilInit(
       designSize: const Size(440, 956),
       minTextAdapt: true,
+      ensureScreenSize: true,
       builder: (context, child) {
         return MyApp();
       },

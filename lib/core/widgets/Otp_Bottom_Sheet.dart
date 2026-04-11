@@ -1,34 +1,27 @@
-
+import 'dart:async';
 import 'package:dana_graduation_project/core/utils/app_colors.dart';
 import 'package:dana_graduation_project/core/utils/app_raduis.dart';
 import 'package:dana_graduation_project/core/utils/app_sizes.dart';
 import 'package:dana_graduation_project/core/utils/app_text_style.dart';
 import 'package:dana_graduation_project/core/widgets/otp_input_field.dart';
 import 'package:dana_graduation_project/core/widgets/otp_resend_section.dart';
-import 'package:dana_graduation_project/features/auth/login/presentation/views/screens/new_password/screens/new_password_screen.dart';
-
-
 import 'package:dana_graduation_project/l10n/app_localizations.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-
 import '../../providers/app_theme_provider.dart';
-
 
 class OtpBottomSheet extends StatefulWidget {
   final String phoneNumber;
-  final VoidCallback? onVerified;
+  final ValueChanged<String>? onVerified;
 
   const OtpBottomSheet({
     super.key,
     required this.phoneNumber,
-    this.onVerified, // ✅
+    this.onVerified,
   });
 
-  static void show(BuildContext context, String phoneNumber, {VoidCallback? onVerified}) {
+  static void show(BuildContext context, String phoneNumber, {ValueChanged<String>? onVerified}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -37,7 +30,7 @@ class OtpBottomSheet extends StatefulWidget {
       enableDrag: true,
       builder: (context) => OtpBottomSheet(
         phoneNumber: phoneNumber,
-        onVerified: onVerified, // ✅
+        onVerified: onVerified,
       ),
     );
   }
@@ -50,6 +43,7 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
   final TextEditingController _otpController = TextEditingController();
   int _remainingSeconds = 90;
   bool _canResend = false;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -60,29 +54,36 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
   @override
   void dispose() {
     _otpController.dispose();
+    _timer?.cancel();
     super.dispose();
   }
 
   void _startTimer() {
+    _timer?.cancel();
     setState(() {
       _remainingSeconds = 90;
       _canResend = false;
     });
-    Future.delayed(const Duration(seconds: 1), _countdown);
-  }
-
-  void _countdown() {
-    if (_remainingSeconds > 0) {
-      setState(() => _remainingSeconds--);
-      Future.delayed(const Duration(seconds: 1), _countdown);
-    } else {
-      setState(() => _canResend = true);
-    }
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (_remainingSeconds > 0) {
+        setState(() => _remainingSeconds--);
+      } else {
+        setState(() => _canResend = true);
+        timer.cancel();
+      }
+    });
   }
 
   void _handleOtpComplete(String pin) {
+    debugPrint('OTP entered: $pin');
     Navigator.pop(context);
-    NewPasswordScreen.show(context);
+    if (widget.onVerified != null) {
+      widget.onVerified!(pin);
+    }
   }
 
   @override

@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 import '../../../../../core/utils/app_colors.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../providers/app_theme_provider.dart';
-import '../../../../videos/presentation/views/screens/search_Screen.dart';
-import '../../../../videos/presentation/views/widgets/custom_appbar.dart';
+import '../../../../videos/presentation/screens/search_Screen.dart';
+import '../../../../videos/presentation/widgets/custom_appbar.dart';
 import '../../../data/model/book_Model.dart';
 import '../widgets/book_card_horizontal.dart';
 

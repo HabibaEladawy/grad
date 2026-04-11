@@ -19,15 +19,33 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   // ── helper ──────────────────────────────────────────────────────────────────
+  // Future<Either<Failure, T>> _guard<T>(Future<T> Function() call) async {
+  //   if (!await networkInfo.isConnected) {
+  //     return const Left(NetworkFailure(message: 'لا يوجد اتصال بالإنترنت'));
+  //   }
+  //   try {
+  //     return Right(await call());
+  //   } on ServerException catch (e) {
+  //     return Left(ServerFailure(message: e.message));
+  //   } catch (_) {
+  //     return const Left(UnknownFailure(message: 'حدث خطأ غير متوقع'));
+  //   }
+  // }
   Future<Either<Failure, T>> _guard<T>(Future<T> Function() call) async {
     if (!await networkInfo.isConnected) {
+      print('🔴 Network disconnected');
       return const Left(NetworkFailure(message: 'لا يوجد اتصال بالإنترنت'));
     }
     try {
-      return Right(await call());
+      print('🔹 Calling remote data source...');
+      final result = await call();
+      print('✅ Remote call success: $result');
+      return Right(result);
     } on ServerException catch (e) {
+      print('🔴 ServerException: ${e.message}');
       return Left(ServerFailure(message: e.message));
-    } catch (_) {
+    } catch (e) {
+      print('🔴 Unknown Exception: $e');
       return const Left(UnknownFailure(message: 'حدث خطأ غير متوقع'));
     }
   }

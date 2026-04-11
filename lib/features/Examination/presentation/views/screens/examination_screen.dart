@@ -7,7 +7,7 @@ import '../../../../../core/utils/app_colors.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../providers/app_theme_provider.dart';
 
-import '../../../../videos/presentation/views/widgets/videos_TabBar.dart';
+import '../../../../videos/presentation/widgets/videos_TabBar.dart';
 import '../../../data/model/examination_model.dart';
 import '../widgets/examination_Body.dart';
 import '../widgets/examination_Header.dart';

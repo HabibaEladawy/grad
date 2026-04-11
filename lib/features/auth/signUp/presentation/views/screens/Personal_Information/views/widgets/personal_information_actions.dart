@@ -1,16 +1,15 @@
-
 import 'package:dana_graduation_project/core/widgets/custom_elevetedButton.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dana_graduation_project/core/utils/app_sizes.dart';
 import 'package:dana_graduation_project/l10n/app_localizations.dart';
-
+import '../../../../../../../login/presentation/cubit/sign_up_cubit.dart';
 import 'custom_alreadyHaveAccount.dart';
 import 'custom_text_rich.dart';
 import 'cutom_google_signUp.dart';
 
 class PersonalInformationActions extends StatelessWidget {
   final VoidCallback? onNext;
-
   const PersonalInformationActions({super.key, required this.onNext});
 
   @override
@@ -18,7 +17,10 @@ class PersonalInformationActions extends StatelessWidget {
     return Column(
       children: [
         CustomElevatedButton(
-          onTap: onNext,
+          onTap: () {
+            final canProceed = context.read<SignUpCubit>().onStep1Next();
+            if (canProceed) onNext?.call();
+          },
           text: AppLocalizations.of(context)!.next,
           icon: Icons.arrow_forward_ios,
         ),

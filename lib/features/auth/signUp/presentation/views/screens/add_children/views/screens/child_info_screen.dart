@@ -1,19 +1,17 @@
-
 import 'package:dana_graduation_project/core/utils/app_raduis.dart';
-
 import 'package:dana_graduation_project/core/widgets/custom_elevetedButton.dart';
 import 'package:dana_graduation_project/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import '../../../../../../../../../core/utils/app_colors.dart';
 import '../../../../../../../../../providers/app_theme_provider.dart';
-import '../../../contact_info/presentation/views/screens/contant_Info_screen.dart';
+import '../../../../../../../login/presentation/cubit/sign_up_cubit.dart';
 import '../widgets/child_info_body.dart';
-///ضيف اولادك
+
 class ChildInfoScreen extends StatefulWidget {
   static const String routeName = 'ChildInfoScreen';
   final VoidCallback? onNext;
-
   const ChildInfoScreen({super.key, required this.onNext});
 
   @override
@@ -21,7 +19,7 @@ class ChildInfoScreen extends StatefulWidget {
 }
 
 class _ChildInfoScreenState extends State<ChildInfoScreen> {
-  int selectedIndex = 1;
+  int selectedIndex = 1; // 1=male, 2=female
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +32,10 @@ class _ChildInfoScreenState extends State<ChildInfoScreen> {
       bottomNavigationBar: Padding(
         padding: EdgeInsets.all(AppRadius.space_xl),
         child: CustomElevatedButton(
-          onTap: () => Navigator.of(context).pushNamed(ContactInfoScreen.routeName),
+          onTap: () {
+            final canProceed = context.read<SignUpCubit>().onStep2Next();
+            if (canProceed) widget.onNext?.call();
+          },
           icon: Icons.arrow_forward_ios,
           text: AppLocalizations.of(context)!.next,
         ),
@@ -42,7 +43,12 @@ class _ChildInfoScreenState extends State<ChildInfoScreen> {
       body: SafeArea(
         child: ChildInfoBody(
           selectedIndex: selectedIndex,
-          onGenderSelect: (i) => setState(() => selectedIndex = i),
+          onGenderSelect: (i) {
+            setState(() => selectedIndex = i);
+            context.read<SignUpCubit>().updateChildGender(
+              i == 1 ? 'male' : 'female',
+            );
+          },
         ),
       ),
     );

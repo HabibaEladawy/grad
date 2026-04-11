@@ -1,13 +1,11 @@
-import 'dart:io';
+
 import 'package:dana_graduation_project/features/auth/login/presentation/cubit/sign_up_state.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../data/datasources/auth_remote_data_source.dart';
 import '../../domain/usecases/pre_sign_up_usecase.dart';
 import '../../domain/usecases/verify_sign_up_usecase.dart';
 
-// ── Cubit ─────────────────────────────────────────────────────────────────────
 class SignUpCubit extends Cubit<SignUpState> {
   final PreSignUpUseCase preSignUpUseCase;
   final VerifySignUpUseCase verifySignUpUseCase;
@@ -17,44 +15,131 @@ class SignUpCubit extends Cubit<SignUpState> {
     required this.verifySignUpUseCase,
   }) : super(const SignUpInitial());
 
-  /// Step 1 – إرسال بيانات الأب والأطفال
-  Future<void> preSignUp({
-    required String parentName,
-    required String email,
-    required String phone,
-    required String government,
-    required String address,
-    required String password,
-    required List<ChildData> children,
-    File? profileImage,
-  }) async {
+  // ── Step 1: Personal Information ──────────────────────────────────────────
+  String _parentName = '';
+  String _government = '';
+  String _address = '';
+
+  void updateParentName(String value) => _parentName = value;
+  void updateGovernment(String value) => _government = value;
+  void updateAddress(String value) => _address = value;
+
+  // ── Step 2: Child Information ─────────────────────────────────────────────
+  String _childName = '';
+  String _childBirthDate = '';
+  String _childGender = 'male';
+
+  void updateChildName(String value) => _childName = value;
+  void updateChildBirthDate(String value) => _childBirthDate = value;
+  void updateChildGender(String value) => _childGender = value;
+
+  // ── Step 3: Contact Information ───────────────────────────────────────────
+  String _phone = '';
+  String _email = '';
+
+  void updatePhone(String value) => _phone = value;
+  void updateEmail(String value) => _email = value;
+
+  // ── Step 4: Password ──────────────────────────────────────────────────────
+  String _password = '';
+
+  void updatePassword(String value) => _password = value;
+
+  // ── Getter للـ OTP screen ─────────────────────────────────────────────────
+  String get phone => _phone;
+
+  // ── Validation ────────────────────────────────────────────────────────────
+  String? validateStep1() {
+    if (_parentName.trim().isEmpty) return 'من فضلك ادخل الاسم';
+    if (_government.trim().isEmpty) return 'من فضلك اختر المحافظة';
+    if (_address.trim().isEmpty) return 'من فضلك ادخل العنوان';
+    return null;
+  }
+
+  String? validateStep2() {
+    if (_childName.trim().isEmpty) return 'من فضلك ادخل اسم الطفل';
+    if (_childBirthDate.trim().isEmpty) return 'من فضلك ادخل تاريخ الميلاد';
+    return null;
+  }
+
+  String? validateStep3() {
+    if (_phone.trim().isEmpty) return 'من فضلك ادخل رقم الهاتف';
+    if (_email.trim().isEmpty) return 'من فضلك ادخل البريد الإلكتروني';
+    return null;
+  }
+
+  String? validateStep4() {
+    if (_password.trim().isEmpty) return 'من فضلك ادخل كلمة المرور';
+    if (_password.trim().length < 6) return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+    return null;
+  }
+
+  // ── Step 1 Next ───────────────────────────────────────────────────────────
+  bool onStep1Next() {
+    final error = validateStep1();
+    if (error != null) {
+      emit(SignUpFailure(message: error));
+      emit(const SignUpInitial());
+      return false;
+    }
+    return true;
+  }
+
+  // ── Step 2 Next ───────────────────────────────────────────────────────────
+  bool onStep2Next() {
+    final error = validateStep2();
+    if (error != null) {
+      emit(SignUpFailure(message: error));
+      emit(const SignUpInitial());
+      return false;
+    }
+    return true;
+  }
+
+  // ── Step 3+4: إرسال البيانات كلها وطلب OTP ────────────────────────────────
+  Future<void> preSignUp() async {
+    final step3Error = validateStep3();
+    if (step3Error != null) {
+      emit(SignUpFailure(message: step3Error));
+      return;
+    }
+    final step4Error = validateStep4();
+    if (step4Error != null) {
+      emit(SignUpFailure(message: step4Error));
+      return;
+    }
+
     emit(const SignUpLoading());
+
     final result = await preSignUpUseCase(
       PreSignUpParams(
-        parentName: parentName,
-        email: email,
-        phone: phone,
-        government: government,
-        address: address,
-        password: password,
-        children: children,
-        profileImage: profileImage,
+        parentName: _parentName,
+        email: _email,
+        phone: _phone,
+        government: _government,
+        address: _address,
+        password: _password,
+        children: [
+          ChildData(
+            childName: _childName,
+            gender: _childGender,
+            birthDate: _childBirthDate,
+          ),
+        ],
       ),
     );
+
     result.fold(
           (f) => emit(SignUpFailure(message: f.message)),
-          (_) => emit(SignUpOtpSent(phone: phone)),
+          (_) => emit(SignUpOtpSent(phone: _phone)),
     );
   }
 
-  /// Step 2 – تأكيد OTP
-  Future<void> verifySignUp({
-    required String phone,
-    required String otp,
-  }) async {
+  // ── Step 4: تأكيد OTP ─────────────────────────────────────────────────────
+  Future<void> verifySignUp({required String otp}) async {
     emit(const SignUpLoading());
     final result = await verifySignUpUseCase(
-      VerifySignUpParams(phone: phone, otp: otp),
+      VerifySignUpParams(phone: _phone, otp: otp),
     );
     result.fold(
           (f) => emit(SignUpFailure(message: f.message)),

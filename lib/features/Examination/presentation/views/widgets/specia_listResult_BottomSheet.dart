@@ -44,7 +44,7 @@ class SpecialistResultBottomSheet extends StatelessWidget {
         children: [
           const DragHandle(),
           SizedBox(height: 24.h),
-          ResultImage(imagePath: AppAssets.emam_3),
+          ResultImage(imagePath: AppAssets.exam_3),
           SizedBox(height: 48.h),
           ResultContent(
             titleColor: AppColors.error_default_light,

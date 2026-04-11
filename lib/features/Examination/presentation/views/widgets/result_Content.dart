@@ -29,7 +29,7 @@ class ResultContent extends StatelessWidget {
             title,
             textAlign: TextAlign.center,
             textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-            style: AppTextStyle.semibold2XLSuccess(context).copyWith(
+            style: AppTextStyle.semibold20Success(context).copyWith(
               color: titleColor,
             ),
           ),

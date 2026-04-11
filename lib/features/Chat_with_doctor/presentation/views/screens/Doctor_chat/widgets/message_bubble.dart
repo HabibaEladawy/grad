@@ -226,7 +226,7 @@ class _MessageBubbleState extends State<MessageBubble> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: AssetImage(AppAssets.aiAvater),
+                      image: AssetImage(AppAssets.aiAvatar),
                     ),
                   ),
                 ),

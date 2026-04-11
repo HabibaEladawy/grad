@@ -1,11 +1,9 @@
 import 'package:dana_graduation_project/core/utils/app_colors.dart';
+import 'package:dana_graduation_project/core/utils/app_routes.dart';
 import 'package:dana_graduation_project/core/utils/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../../../../../../../../providers/app_theme_provider.dart';
-
-
 
 class CustomAlreadyHaveAccount extends StatelessWidget {
   final String textOne;
@@ -22,7 +20,6 @@ class CustomAlreadyHaveAccount extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Row(
@@ -33,7 +30,7 @@ class CustomAlreadyHaveAccount extends StatelessWidget {
             style: AppTextStyle.regular16TextBody(context),
           ),
           TextButton(
-            onPressed: onTap,
+            onPressed: onTap ?? () => Navigator.pushReplacementNamed(context, AppRoutes.login),
             style: TextButton.styleFrom(
               padding: EdgeInsets.zero,
               minimumSize: Size.zero,

@@ -1,13 +1,8 @@
 import 'package:dana_graduation_project/features/auth/login/presentation/cubit/sign_in_state.dart';
-import 'package:equatable/equatable.dart';
+import 'package:dana_graduation_project/features/auth/login/domain/usecases/pre_sign_in_usecase.dart';
+import 'package:dana_graduation_project/features/auth/login/domain/usecases/verify_sign_in_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../domain/entities/user_entity.dart';
-import '../../domain/usecases/pre_sign_in_usecase.dart';
-import '../../domain/usecases/verify_sign_in_usecase.dart';
-
-
-// ── Cubit ─────────────────────────────────────────────────────────────────────
 class SignInCubit extends Cubit<SignInState> {
   final PreSignInUseCase preSignInUseCase;
   final VerifySignInUseCase verifySignInUseCase;
@@ -17,29 +12,35 @@ class SignInCubit extends Cubit<SignInState> {
     required this.verifySignInUseCase,
   }) : super(const SignInInitial());
 
-  /// Step 1 – إرسال رقم الهاتف وكلمة المرور
-  Future<void> preSignIn({
-    required String phone,
-    required String password,
-  }) async {
+  // ── الـ fields بتخزن قيم الـ form ─────────────────────────────────────────
+  String _phone = '';
+  String _password = '';
+
+  void updatePhone(String value) => _phone = value;
+  void updatePassword(String value) => _password = value;
+
+  // ── Step 1: إرسال رقم الهاتف وكلمة المرور ────────────────────────────────
+  Future<void> preSignIn() async {
+    if (_phone.isEmpty || _password.isEmpty) {
+      emit(const SignInFailure(message: 'من فضلك ادخل رقم الهاتف وكلمة المرور'));
+      return;
+    }
+
     emit(const SignInLoading());
     final result = await preSignInUseCase(
-      PreSignInParams(phone: phone, password: password),
+      PreSignInParams(phone: _phone, password: _password),
     );
     result.fold(
           (f) => emit(SignInFailure(message: f.message)),
-          (_) => emit(SignInOtpSent(phone: phone)),
+          (_) => emit(SignInOtpSent(phone: _phone)),
     );
   }
 
-  /// Step 2 – تأكيد OTP والحصول على التوكن
-  Future<void> verifySignIn({
-    required String phone,
-    required String otp,
-  }) async {
+  // ── Step 2: تأكيد OTP والحصول على التوكن ─────────────────────────────────
+  Future<void> verifySignIn({required String otp}) async {
     emit(const SignInLoading());
     final result = await verifySignInUseCase(
-      VerifySignInParams(phone: phone, otp: otp),
+      VerifySignInParams(phone: _phone, otp: otp),
     );
     result.fold(
           (f) => emit(SignInFailure(message: f.message)),

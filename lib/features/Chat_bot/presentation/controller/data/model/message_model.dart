@@ -47,7 +47,7 @@ Doctor getAIDoctor(BuildContext context) => Doctor(
   name: AppLocalizations.of(context)!.aiAssistantName,
   specialty: '',
   location: '',
-  imageUrl: AppAssets.aiAvater,
+  imageUrl: AppAssets.aiAvatar,
 );
 
 List<Message> getSampleMessages(BuildContext context) => [

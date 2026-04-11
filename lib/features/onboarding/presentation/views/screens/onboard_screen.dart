@@ -27,26 +27,25 @@ class _ScreenOnboardState extends State<OnBoardScreen> {
     final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
     final onboardList = OnboardModel.getOnboardingData(context);
 
+
     return Scaffold(
       backgroundColor: isDark
           ? AppColors.bg_surface_default_dark
           : AppColors.bg_surface_default_light,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.w),
-        child: Column(
+        child: Column(  // ✅ شيل SingleChildScrollView
           children: [
             Padding(
               padding: EdgeInsets.only(top: 67.h),
               child: Image.asset(AppAssets.onboard_image),
             ),
-            Expanded(
+            Expanded(  // ✅ دلوقتي هيشتغل صح
               child: PageView.builder(
                 controller: controller,
                 itemCount: onboardList.length,
                 onPageChanged: (i) {
-                  setState(() {
-                    index = i;
-                  });
+                  setState(() => index = i);
                 },
                 itemBuilder: (context, i) {
                   return CustomOnboard(

@@ -11,6 +11,8 @@ import '../../providers/app_theme_provider.dart';
 
 
 
+
+
 class CustomTextForm extends StatelessWidget {
   final String text;
   final String hintText;
@@ -47,7 +49,11 @@ class CustomTextForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
+    final themeProvider = context.watch<AppThemeProvider>();
+    final isDark =
+        themeProvider.appTheme == ThemeMode.dark ||
+            (themeProvider.appTheme == ThemeMode.system &&
+                MediaQuery.of(context).platformBrightness == Brightness.dark);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,21 +68,18 @@ class CustomTextForm extends StatelessWidget {
           maxLines: obscureText ? 1 : maxLines,
           readOnly: readOnly,
           onTap: onTap,
-          style: TextStyle(
-            color: isDark ? Colors.white : Colors.black,
-          ),
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
           decoration: InputDecoration(
             filled: true,
-            fillColor: isDark
-                ? AppColors.bg_card_default_dark
-                : Colors.white,
+            fillColor: isDark ? AppColors.bg_card_default_dark : Colors.white,
             hintText: hintText,
             hintStyle: AppTextStyle.regular12TextBody(context),
             contentPadding: EdgeInsets.symmetric(
               horizontal: 16.w,
-              vertical: 14.h,
+              vertical: 12.h,
             ),
-            suffixIcon: suffixIcon ??
+            suffixIcon:
+            suffixIcon ??
                 (icon != null
                     ? Icon(
                   icon,
@@ -114,10 +117,7 @@ class CustomTextForm extends StatelessWidget {
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.radius_sm),
-              borderSide: BorderSide(
-                color: Colors.red,
-                width: 2.0,
-              ),
+              borderSide: BorderSide(color: Colors.red, width: 2.0),
             ),
           ),
         ),

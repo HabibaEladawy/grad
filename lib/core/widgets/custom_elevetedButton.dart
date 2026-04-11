@@ -1,6 +1,5 @@
 import 'package:dana_graduation_project/core/utils/app_raduis.dart';
 import 'package:dana_graduation_project/core/utils/app_colors.dart';
-import 'package:dana_graduation_project/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';

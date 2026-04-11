@@ -17,7 +17,7 @@ class AIProfileCard extends StatelessWidget {
           width: 80.w,
           height: 80.w,
           child: CircleAvatar(
-            backgroundImage: AssetImage(AppAssets.aiAvater),
+            backgroundImage: AssetImage(AppAssets.aiAvatar),
           ),
         ),
         SizedBox(height: 16.h),

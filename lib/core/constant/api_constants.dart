@@ -1,10 +1,10 @@
-// lib/core/constants/api_constants.dart
+
 
 class ApiConstants {
   ApiConstants._();
 
 
-  static const String baseUrl = 'https://<DOMAIN>/api';
+  static const String baseUrl = 'https://2940-196-139-178-175.ngrok-free.app/api';
 
   // ── Parent / Auth ────────────────────────────────────────────────────────────
   static const String preSignUp       = '/v1/parent/pre-SignUp';
