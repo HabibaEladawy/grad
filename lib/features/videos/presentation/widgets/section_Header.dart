@@ -17,23 +17,33 @@ class SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isRtl = Localizations.localeOf(context).languageCode == 'ar';
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
         children: [
-          Text(
-            title,
-            style: AppTextStyle.medium16TextHeading(context),
-          ),
-          GestureDetector(
-            onTap: onViewAll,
+          /// 🔹 Title
+          Expanded(
             child: Text(
-              l10n.viewAll,
-              style: AppTextStyle.regular12TextBody(context),
+              title,
+              style: AppTextStyle.medium16TextHeading(context),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+
+          /// 🔹 View All button
+          InkWell(
+            onTap: onViewAll,
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 8.w,
+                vertical: 4.h,
+              ),
+              child: Text(
+                l10n.viewAll,
+                style: AppTextStyle.regular12TextBody(context),
+              ),
             ),
           ),
         ],

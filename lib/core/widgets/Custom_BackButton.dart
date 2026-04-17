@@ -68,7 +68,7 @@ class CustomBackButton extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.all(iconPadding ?? 8.r),
           child: SvgPicture.asset(
-            iconSrc ?? 'assets/Icons/dark_arrow_back.svg',
+            iconSrc ?? 'assets/icons/dark_arrow_back.svg',
             color:
             iconColor ??
                 (isDark

@@ -2,11 +2,12 @@ import 'package:dana_graduation_project/core/utils/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../l10n/app_localizations.dart';
-import '../../data/model/video_Model.dart';
+import '../../domain/entity/Video_Entity.dart';
+import 'no_Results_Widget.dart';
 import 'video_Card.dart';
 
 class ViewAllWidget extends StatelessWidget {
-  final List<VideoModel> videos;
+  final List<VideoEntity> videos;
   final String sectionTitle;
   final double? imageWidth;
 
@@ -19,49 +20,47 @@ class ViewAllWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final isRtl = Localizations.localeOf(context).languageCode == 'ar';
+    if (videos.isEmpty) {
+      return const NoResultsWidget();
+    }
 
     return Column(
-      crossAxisAlignment:
-      isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        /// 🔹 Header
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 24.w),
-          child: Row(
-            textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                l10n.heroGrowthJourney,
-                style: AppTextStyle.medium16TextHeading(context),
-              ),
-              Text(
-                l10n.viewAll,
-                style: AppTextStyle.regular12TextBody(context),
-              ),
-            ],
+          child: Text(
+            sectionTitle,
+            style: AppTextStyle.medium16TextHeading(context),
           ),
         ),
+
         SizedBox(height: 12.h),
+
+        /// 🔹 Grid
         GridView.builder(
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: 8.w,
             mainAxisSpacing: 8.h,
-            childAspectRatio: 192 / 230, // ✅ قللنا من 260 لـ 230
+            childAspectRatio: 192 / 230,
           ),
           itemCount: videos.length,
-          itemBuilder: (context, index) => VideoCard(
-            video: videos[index],
-            imageWidth: imageWidth ?? 192.w,
-            relatedVideos: videos
-                .where((v) => v.title != videos[index].title)
-                .toList(),
-          ),
+          itemBuilder: (context, index) {
+            final video = videos[index];
+
+            return VideoCard(
+              video: video,
+              imageWidth: imageWidth ?? 192.w,
+
+              // ❌ removed O(n²) logic
+              relatedVideos: const [],
+            );
+          },
         ),
       ],
     );

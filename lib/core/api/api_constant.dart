@@ -1,3 +1,3 @@
 class ApiConstant {
-  static const String baseUrl = 'https://ca29-196-139-178-175.ngrok-free.app/api';
+  static const String baseUrl = 'http://3.75.188.99:3000/api';
 }

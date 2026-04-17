@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
     final languageProvider = Provider.of<AppLanguageProvider>(context);
     var themeProvider= Provider.of<AppThemeProvider>(context);
 
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: MyThemeData.lightTheme,
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
         locale: Locale(languageProvider.appLanguage),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
-      initialRoute: AppRoutes.splash,
+      initialRoute: AppRoutes.home,
       routes: AppRouter.routes,
     );
   }

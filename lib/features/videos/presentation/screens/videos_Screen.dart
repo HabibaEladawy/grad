@@ -1,5 +1,6 @@
 import 'package:dana_graduation_project/features/videos/presentation/screens/search_Screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../../../../core/utils/app_assets.dart';
@@ -7,44 +8,14 @@ import '../../../../../core/utils/app_colors.dart';
 
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../providers/app_theme_provider.dart';
-import '../../data/model/video_Model.dart';
+import '../cubit/video_cubit.dart';
 import '../widgets/custom_appbar.dart';
 import '../widgets/section_Row.dart';
 import '../widgets/videos_TabBar.dart';
 
-List<VideoSection> getVideoSections(BuildContext context) {
-  final l10n = AppLocalizations.of(context)!;
-  return [
-    VideoSection(
-      title: l10n.understandSPD,
-      videos: [
-        VideoModel(title: l10n.sensoryActivities, duration: '24:00', imageUrl: AppAssets.image_v3),
-        VideoModel(title: l10n.angerManagement, duration: '24:00', imageUrl: AppAssets.image_v2),
-        VideoModel(title: l10n.sensoryDisorder, duration: '24:00', imageUrl: AppAssets.image_v1),
-      ],
-    ),
-    VideoSection(
-      title: l10n.babyGrowth,
-      videos: [
-        VideoModel(title: l10n.motorDevelopment, duration: '24:00', imageUrl: AppAssets.image_v6),
-        VideoModel(title: l10n.firstWords, duration: '24:00', imageUrl: AppAssets.image_v5),
-        VideoModel(title: l10n.motorDevelopment, duration: '24:00', imageUrl: AppAssets.image_v4),
-      ],
-    ),
-    VideoSection(
-      title: l10n.healthCapsules,
-      videos: [
-        VideoModel(title: l10n.sleepCapsule, duration: '24:00', imageUrl: AppAssets.image_v2),
-        VideoModel(title: l10n.nutritionCapsule, duration: '24:00', imageUrl: AppAssets.image_v8),
-        VideoModel(title: l10n.nutritionCapsule, duration: '24:00', imageUrl: AppAssets.image_v2),
-
-      ],
-    ),
-  ];
-}
-
 class VideosScreen extends StatefulWidget {
   static const String routeName = 'VideosScreen';
+
   const VideosScreen({super.key});
 
   @override
@@ -60,12 +31,18 @@ class _VideosScreenState extends State<VideosScreen> {
     super.didChangeDependencies();
     if (_initialized) return;
     _initialized = true;
+
     _activeTab = AppLocalizations.of(context)!.videos;
+
+    // ✅ أول ما الشاشة تفتح نجيب كل الفيديوهات
+    context.read<VideoCubit>().getAllVideos();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
+    final isDark =
+        context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
+
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -75,29 +52,97 @@ class _VideosScreenState extends State<VideosScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // CustomAppbar(
+            //   title: l10n.videos,
+            //   // 👇 لو عندك search فعلًا اربطه هنا
+            //   onSearchChanged: (value) {
+            //     context.read<VideoCubit>().searchVideos(value);
+            //   },
+            // ),
             CustomAppbar(
               title: l10n.videos,
-              searchType: SearchType.videos,
+              onSearchTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (_) => const SearchScreen(),
+                );
+              },
             ),
+            SizedBox(height: 12.h),
+
+            VideosTabBar(
+              activeTab: _activeTab,
+              onTabChanged: (t) => setState(() => _activeTab = t),
+            ),
+
+            SizedBox(height: 12.h),
+
             Expanded(
-              child: Column(
-                children: [
-                  SizedBox(height: 12.h),
-                  VideosTabBar(
-                    activeTab: _activeTab,
-                    onTabChanged: (t) => setState(() => _activeTab = t),
-                  ),
-                  SizedBox(height: 12.h),
-                  Expanded(
-                    child: SingleChildScrollView(
+              child: BlocBuilder<VideoCubit, VideoState>(
+                builder: (context, state) {
+                  /// 🔄 Loading (get all)
+                  if (state is VideoLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  /// 🔄 Loading (search)
+                  if (state is VideoSearchLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  /// ❌ Error
+                  if (state is VideoError) {
+                    return Center(
+                      child: Text(state.message),
+                    );
+                  }
+
+                  /// 🔍 Search Empty
+                  if (state is VideoSearchEmpty) {
+                    return const Center(
+                      child: Text("No results found"),
+                    );
+                  }
+
+                  /// 🔍 Search Loaded
+                  if (state is VideoSearchLoaded) {
+                    final videos = state.videos;
+
+                    return SingleChildScrollView(
                       child: Column(
-                        children: getVideoSections(context)
-                            .map((section) => SectionRow(section: section))
-                            .toList(),
+                        children: [
+                          SectionRow(
+                            title: l10n.videos,
+                            videos: videos,
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
-                ],
+                    );
+                  }
+
+                  /// 📺 Get All Loaded
+                  if (state is VideoLoaded) {
+                    final videos = state.videos;
+
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          SectionRow(
+                            title: l10n.videos,
+                            videos: videos,
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return const SizedBox();
+                },
               ),
             ),
           ],

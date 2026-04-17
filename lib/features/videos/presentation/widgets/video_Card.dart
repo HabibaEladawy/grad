@@ -7,47 +7,50 @@ import '../../../../../core/utils/app_colors.dart';
 import '../../../../../core/utils/app_raduis.dart';
 import '../../../../../providers/app_theme_provider.dart';
 
-import '../../data/model/video_Model.dart';
+import '../../domain/entity/Video_Entity.dart';
 import '../screens/video_details_screen.dart';
 
 class VideoCard extends StatelessWidget {
-  final VideoModel video;
-  final List<VideoModel> relatedVideos;
-  final double? imageWidth; // ✅ بتتحكمي في العرض من بره
+  final VideoEntity video;
+  final List<VideoEntity> relatedVideos;
+  final VoidCallback? onTap;
+  final double? imageWidth;
 
   const VideoCard({
     super.key,
     required this.video,
-    this.relatedVideos = const [],
-    this.imageWidth, // ✅
+    required this.relatedVideos,
+    this.onTap,
+    this.imageWidth,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
-    final isRtl = Localizations.localeOf(context).languageCode == 'ar';
-    final width = imageWidth ?? 142.w; // ✅ default 142 للهوم
+    final isDark = context.select<AppThemeProvider, bool>(
+          (p) => p.appTheme == ThemeMode.dark,
+    );
 
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => VideoDetailsScreen(
-              video: video,
-              relatedVideos: relatedVideos,
-            ),
-          ),
-        );
-      },
+    final width = imageWidth ?? 142.w;
+
+    return InkWell(
+      onTap: onTap ??
+              () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => VideoDetailsScreen(
+                  video: video,
+                  relatedVideos: relatedVideos, // ✅ الربط هنا
+                ),
+              ),
+            );
+          },
       child: SizedBox(
         width: width,
         child: Column(
-          crossAxisAlignment: isRtl
-              ? CrossAxisAlignment.end
-              : CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 12.h),
+            /// 🔹 Image
             Container(
               width: width,
               height: 180.h,
@@ -64,31 +67,41 @@ class VideoCard extends StatelessWidget {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(AppRadius.radius_md),
-                child: Image.asset(
-                  video.imageUrl,
+                child: Image.network(
+                  video.cover,
                   width: width,
                   height: 180.h,
-                  fit: BoxFit.fill,
+                  fit: BoxFit.cover,
+
+                  loadingBuilder: (context, child, progress) {
+                    if (progress == null) return child;
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  },
+
                   errorBuilder: (context, error, stackTrace) =>
-                  const SizedBox.shrink(),
+                  const Center(
+                    child: Icon(Icons.broken_image),
+                  ),
                 ),
               ),
             ),
+
             SizedBox(height: 8.h),
-            SizedBox(
-              width: width,
-              child: Text(
-                video.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: isRtl ? TextAlign.right : TextAlign.left,
-                textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-                style: AppTextStyle.medium12TextHeading(context),
-              ),
+
+            /// 🔹 Title
+            Text(
+              video.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyle.medium12TextHeading(context),
             ),
+
             SizedBox(height: 4.h),
+
+            /// 🔹 Time
             Row(
-              textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
@@ -100,13 +113,10 @@ class VideoCard extends StatelessWidget {
                 ),
                 SizedBox(width: 2.w),
                 Text(
-                  video.duration,
+                  video.time,
                   style: AppTextStyle.medium12TextBody(context).copyWith(
                     fontSize: 8.sp,
                     fontWeight: FontWeight.w400,
-                    color: isDark
-                        ? AppColors.text_body_dark
-                        : AppColors.text_body_light,
                   ),
                 ),
               ],

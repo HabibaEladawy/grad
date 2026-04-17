@@ -1,0 +1,157 @@
+// ============================================================
+// MODEL
+// ============================================================
+import 'package:flutter/cupertino.dart';
+
+import '../../../../core/utils/app_assets.dart';
+import '../../../../l10n/app_localizations.dart';
+
+
+class BookModelUi {
+  final String title;
+  final String author;
+  final String imageUrl;
+  final String? description;
+  final List<BookChapter> chapters;
+  final String? publishYear;
+
+  const BookModelUi({
+    required this.title,
+    required this.author,
+    required this.imageUrl,
+    this.description,
+    this.chapters = const [],
+    this.publishYear,
+  });
+}
+
+class BookChapter {
+  final String title;
+  final String body;
+
+  const BookChapter({required this.title, required this.body});
+}
+
+List<BookModelUi> getFeaturedBooks(BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
+  return [
+    BookModelUi(
+      title: l10n.bookSensoryIntegrationTitle,
+      author: l10n.bookSensoryIntegrationAuthor,
+      imageUrl: AppAssets.book_3,
+      publishYear: '2020',
+      description: l10n.bookSensoryIntegrationDesc,
+      chapters: [
+        BookChapter(
+          title: l10n.bookSensoryChapter1Title,
+          body: l10n.bookSensoryChapter1Body,
+        ),
+        BookChapter(
+          title: l10n.bookSensoryChapter2Title,
+          body: l10n.bookSensoryChapter2Body,
+        ),
+      ],
+    ),
+    BookModelUi(
+      title: l10n.bookAsyncChildTitle,
+      author: l10n.bookAsyncChildAuthor,
+      imageUrl: AppAssets.book_two,
+      publishYear: '2021',
+      description: l10n.bookAsyncChildDesc,
+      chapters: [
+        BookChapter(
+          title: l10n.bookAsyncChapter1Title,
+          body: l10n.bookAsyncChapter1Body,
+        ),
+        BookChapter(
+          title: l10n.bookAsyncChapter2Title,
+          body: l10n.bookAsyncChapter2Body,
+        ),
+      ],
+    ),
+    BookModelUi(
+      title: l10n.bookSensorySignalsTitle,
+      author: l10n.bookSensorySignalsAuthor,
+      imageUrl: AppAssets.book_one,
+      publishYear: '2022',
+      description: l10n.bookSensorySignalsDesc,
+      chapters: [
+        BookChapter(
+          title: l10n.bookSensorySignalsChapter1Title,
+          body: l10n.bookSensorySignalsChapter1Body,
+        ),
+        BookChapter(
+          title: l10n.bookSensorySignalsChapter2Title,
+          body: l10n.bookSensorySignalsChapter2Body,
+        ),
+      ],
+    ),
+  ];
+}
+
+List<BookModelUi> getGuideBooks(BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
+  return [
+    BookModelUi(
+      title: l10n.bookSensorySignalsTitle,
+      author: l10n.bookGuide1Author,
+      imageUrl: AppAssets.book_4,
+      publishYear: '2022',
+      description: l10n.bookGuide1Desc,
+      chapters: [
+        BookChapter(
+          title: l10n.bookGuide1Chapter1Title,
+          body: l10n.bookGuide1Chapter1Body,
+        ),
+        BookChapter(
+          title: l10n.bookGuide1Chapter2Title,
+          body: l10n.bookGuide1Chapter2Body,
+        ),
+      ],
+    ),
+    BookModelUi(
+      title: l10n.bookBodyLanguageTitle,
+      author: l10n.bookBodyLanguageAuthor,
+      imageUrl: AppAssets.book_5,
+      publishYear: '2021',
+      description: l10n.bookBodyLanguageDesc,
+      chapters: [
+        BookChapter(
+          title: l10n.bookBodyLanguageChapter1Title,
+          body: l10n.bookBodyLanguageChapter1Body,
+        ),
+      ],
+    ),
+    BookModelUi(
+      title: l10n.bookAngerTitle,
+      author: l10n.bookAngerAuthor,
+      imageUrl: AppAssets.book_6,
+      publishYear: '2023',
+      description: l10n.bookAngerDesc,
+      chapters: [
+        BookChapter(
+          title: l10n.bookAngerChapter1Title,
+          body: l10n.bookAngerChapter1Body,
+        ),
+      ],
+    ),
+    BookModelUi(
+      title: l10n.bookEmotionsTitle,
+      author: l10n.bookEmotionsAuthor,
+      imageUrl: AppAssets.book_7,
+      publishYear: '2022',
+      description: l10n.bookEmotionsDesc,
+      chapters: [
+        BookChapter(
+          title: l10n.bookEmotionsChapter1Title,
+          body: l10n.bookEmotionsChapter1Body,
+        ),
+      ],
+    ),
+  ];
+}
+
+List<BookModelUi> getAllBooks(BuildContext context) => [
+  ...getFeaturedBooks(context),
+  ...getGuideBooks(context),
+];

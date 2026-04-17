@@ -54,7 +54,7 @@ class VideosTabBar extends StatelessWidget {
                   onTabChanged(tab['label'] as String);
                   switch (tab['key']) {
                     case 'books':
-                      Navigator.pushReplacementNamed(context, AppRoutes.books);
+                      // Navigator.pushReplacementNamed(context, AppRoutes.books);
                       break;
                     case 'videos':
                       Navigator.pushReplacementNamed(context, AppRoutes.videos);

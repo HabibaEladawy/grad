@@ -1,31 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../data/model/video_Model.dart';
+import '../../domain/entity/Video_Entity.dart';
 import 'video_card.dart';
 
 class VideoHorizontalList extends StatelessWidget {
-  final List<VideoModel> videos;
+  final List<VideoEntity> videos;
+  final List<VideoEntity> relatedVideos;
 
-  const VideoHorizontalList({super.key, required this.videos});
+  const VideoHorizontalList({
+    super.key,
+    required this.videos,
+    required this.relatedVideos,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final isRtl = Localizations.localeOf(context).languageCode == 'ar';
-
     return SizedBox(
-      height: 260.h,
+      height: 220.h,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        reverse: isRtl,
-        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        padding: EdgeInsets.symmetric(horizontal: 24.w),
         itemCount: videos.length,
-        separatorBuilder: (_, __) => SizedBox(width: 8.w),
-        itemBuilder: (context, index) => VideoCard(
-          video: videos[index],
-          relatedVideos: videos
-              .where((v) => v.title != videos[index].title)
-              .toList(),
-        ),
+        separatorBuilder: (_, __) => SizedBox(width: 12.w),
+        itemBuilder: (context, index) {
+          final video = videos[index];
+          return VideoCard(
+            video: video,
+            relatedVideos: relatedVideos
+                .where((v) => v.id != video.id)
+                .toList(),
+          );
+        },
       ),
     );
   }

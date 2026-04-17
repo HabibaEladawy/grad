@@ -31,13 +31,14 @@ class LoginBody extends StatelessWidget {
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
           Navigator.pushReplacementNamed(context, AppRoutes.home);
         } else if (state is SignInFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.red,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //     content: Text(state.message),
+          //     backgroundColor: Colors.red,
+          //     behavior: SnackBarBehavior.floating,
+          //   ),
+          // );
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
         }
       },
       child: SingleChildScrollView(

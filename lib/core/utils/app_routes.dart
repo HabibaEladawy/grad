@@ -1,10 +1,10 @@
 
 import 'package:dana_graduation_project/features/auth/login/presentation/views/screens/login/screens/login_screen.dart';
-import 'package:dana_graduation_project/features/home/presentation/views/screens/home_screen.dart';
 
 import 'package:dana_graduation_project/features/onboarding/presentation/views/screens/onboard_screen.dart';
 import 'package:dana_graduation_project/features/splash/views/screens/splash_screen.dart';
 
+import '../../features/ Vaccine/presentation/screens/Vaccine_Screen.dart';
 import '../../features/Appointment/presentation/screens/Appointments_Screen.dart';
 import '../../features/Chat_bot/presentation/views/screens/aI_Chat_Screen.dart';
 import '../../features/Chat_with_doctor/presentation/views/screens/Doctor_chat/screens/chat_screen.dart';
@@ -18,6 +18,9 @@ import '../../features/booking/presentation/views/BookingScreen/screens/Payment_
 import '../../features/booking/presentation/views/OnlinePayment/screens/Online_Payment_Screen.dart';
 import '../../features/booking/presentation/views/OnlinePayment/screens/payment_Add_Screen.dart';
 import '../../features/books/presentation/views/screens/books_screen.dart';
+import '../../features/child_profile/screens/child_profile_page.dart';
+import '../../features/home/presentation/screens/doctors_page.dart';
+import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/videos/presentation/screens/search_Screen.dart';
 import '../../features/videos/presentation/screens/videos_Screen.dart';
 
@@ -35,13 +38,9 @@ class AppRoutes {
 
   /// Home
   static const String home          = HomeScreen.routeName;
-
   /// Booking
-
   static const String doctorTime    = 'DoctorTimeScreen';
   // static const String reviewBooking = ReviewBookingScreen.routeName;
-
-
   /// Appointments
   static const String appointments = AppointmentsScreen.routeName;
   /// Chat
@@ -52,8 +51,13 @@ class AppRoutes {
   static const String videos        = VideosScreen.routeName;
   static const String search        = SearchScreen.routeName;
 
+  /// Child Profile
+  static const String childProfile = ChildProfileScreen.routeName;
+  /// Doctors
+  static const String doctors = DoctorsScreen.routeName;
+
   /// Books
-  static const String books         = BooksScreen.routeName;
+  // static const String books         = BooksScreen.routeName;
 
   /// Examination
   static const String examination = ExaminationScreen.routeName;
@@ -61,6 +65,8 @@ class AppRoutes {
   static const String notification = NotificationScreen.routeName;
   /// Booking
   // static const String doctorTime = DoctorTimeScreen.routeName;
+  /// Vaccine
+  static const String vaccine = VaccineScreen.routeName;
 
 /// Payment
   static const String paymentMethod = PaymentMethodScreen.routeName;

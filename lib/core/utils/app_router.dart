@@ -1,6 +1,7 @@
 // lib/core/router/app_router.dart
 
 import 'package:flutter/material.dart';
+import '../../features/ Vaccine/presentation/screens/Vaccine_Screen.dart';
 import '../../features/Appointment/presentation/screens/Appointments_Screen.dart';
 import '../../features/Chat_bot/presentation/controller/data/model/message_model.dart';
 import '../../features/Chat_bot/presentation/views/screens/aI_Chat_Screen.dart';
@@ -20,7 +21,9 @@ import '../../features/booking/presentation/views/DoctorTime/screens/doctor_Time
 import '../../features/booking/presentation/views/OnlinePayment/screens/Online_Payment_Screen.dart';
 import '../../features/booking/presentation/views/OnlinePayment/screens/payment_Add_Screen.dart';
 import '../../features/books/presentation/views/screens/books_screen.dart';
-import '../../features/home/presentation/views/screens/home_screen.dart';
+import '../../features/home/presentation/screens/doctors_page.dart';
+import '../../features/home/presentation/screens/home_screen.dart';
+
 import '../../features/onboarding/presentation/views/screens/onboard_screen.dart';
 import '../../features/splash/views/screens/splash_screen.dart';
 import '../../features/videos/presentation/screens/search_Screen.dart';
@@ -57,7 +60,7 @@ class AppRouter {
     AppRoutes.search:       (_) => const SearchScreen(),
 
     /// Books
-    AppRoutes.books: (_) => const BooksScreen(),
+    // AppRoutes.books: (_) => const BooksScreen(),
 
     /// Examination
     AppRoutes.examination: (_) => const ExaminationScreen(),
@@ -66,7 +69,9 @@ class AppRouter {
     AppRoutes.doctorTime: (_) => DoctorTimeScreen(),
     // AppRoutes.reviewBooking: (_) => ReviewBookingScreen(),
     /// Doctors
-
+    AppRoutes.doctors: (_) => DoctorsScreen(),
+    /// Vaccine
+    AppRoutes.vaccine: (_) => const VaccineScreen(),
     /// Appointments
     AppRoutes.appointments: (_) => AppointmentsScreen(),
     /// Notification

@@ -13,16 +13,18 @@ class CustomAppbar extends StatelessWidget {
     super.key,
     this.onSearchTap,
     this.title,
-    this.searchType = SearchType.videos,
   });
+
   final VoidCallback? onSearchTap;
   final String? title;
-  final SearchType searchType;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
-    final isRtl = Localizations.localeOf(context).languageCode == 'ar';
+    final isDark =
+        context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
+
+    final isRtl =
+        Localizations.localeOf(context).languageCode == 'ar';
 
     return Container(
       width: 440.w,
@@ -36,6 +38,7 @@ class CustomAppbar extends StatelessWidget {
         textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
         children: [
 
+          /// 🔹 Back Button
           GestureDetector(
             onTap: () => Navigator.pop(context),
             child: Container(
@@ -65,19 +68,20 @@ class CustomAppbar extends StatelessWidget {
             ),
           ),
 
-
+          /// 🔹 Title
           if (title != null)
-            Text(title!, style: AppTextStyle.medium16TextHeading(context)),
+            Expanded(
+              child: Text(
+                title!,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyle.medium16TextHeading(context),
+              ),
+            ),
 
-
+          /// 🔹 Search Button
           GestureDetector(
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                builder: (_) => SearchScreen(searchType: searchType),
-              );
-            },
+            onTap: onSearchTap, // ✅ FIXED
             child: Container(
               width: 40.w,
               height: 40.h,

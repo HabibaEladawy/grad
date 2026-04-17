@@ -7,32 +7,39 @@ import '../../../../../core/utils/app_raduis.dart';
 import '../../../../../core/utils/app_text_style.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../providers/app_theme_provider.dart';
-import '../../data/model/video_Model.dart';
+import '../../domain/entity/Video_Entity.dart';
 
 
 
 class VideoInfoWidget extends StatelessWidget {
-  final VideoModel video;
+  final VideoEntity video;
 
-  const VideoInfoWidget({super.key, required this.video});
+  const VideoInfoWidget({
+    super.key,
+    required this.video,
+  });
 
-  @override
-  Widget build(BuildContext context) {
-    final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
-    final isRtl = Localizations.localeOf(context).languageCode == 'ar';
-    final l10n = AppLocalizations.of(context)!;
-
-    final views = (video.views ?? 125908)
-        .toString()
-        .replaceAllMapped(
+  String formatViews(int? views) {
+    final value = views ?? 125908;
+    return value.toString().replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (m) => '${m[1]},',
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = context.select<AppThemeProvider, bool>(
+          (p) => p.appTheme == ThemeMode.dark,
+    );
+
+    final l10n = AppLocalizations.of(context)!;
+    final views = formatViews(video.views);
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Container(
-        width: 392.w,
+        width: double.infinity,
         decoration: BoxDecoration(
           color: isDark
               ? AppColors.bg_card_default_dark
@@ -43,39 +50,33 @@ class VideoInfoWidget extends StatelessWidget {
               color: isDark
                   ? AppColors.border_card_default_dark
                   : AppColors.border_card_default_light,
-              width: AppRadius.stroke_thin, // ✅ stroke-thin = 0.6
+              width: AppRadius.stroke_thin,
             ),
           ),
         ),
-        padding: EdgeInsets.all(AppRadius.space_lg), // ✅ space-lg
+        padding: EdgeInsets.all(AppRadius.space_lg),
         child: Column(
-          crossAxisAlignment:
-          isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              width: 360.w,
-              child: Text(
-                video.title,
-                textAlign: isRtl ? TextAlign.right : TextAlign.left,
-                textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-                style: AppTextStyle.semibold24TextHeading(context),
-              ),
+            /// 🔹 Title
+            Text(
+              video.title,
+              style: AppTextStyle.semibold24TextHeading(context),
             ),
-            SizedBox(height: AppRadius.space_md),
-            SizedBox(
-              width: 360.w,
-              child: Text(
-                video.description ?? l10n.noDescription,
-                textAlign: isRtl ? TextAlign.right : TextAlign.left,
-                textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-                style: AppTextStyle.medium12TextBody(context),
-              ),
-            ),
+
             SizedBox(height: AppRadius.space_md),
 
+            /// 🔹 Description
+            Text(
+              video.description ?? l10n.noDescription,
+              style: AppTextStyle.medium12TextBody(context),
+            ),
+
+            SizedBox(height: AppRadius.space_md),
+
+            /// 🔹 Views
             Row(
-              textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
                   Icons.remove_red_eye,
@@ -86,15 +87,10 @@ class VideoInfoWidget extends StatelessWidget {
                 ),
                 SizedBox(width: 4.w),
                 Text(
-                  isRtl ? '$views ${l10n.views}' : '${l10n.views} $views',
+                  '${l10n.views} $views',
                   style: AppTextStyle.regular12TextBody(context).copyWith(
-
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w400,
-                    letterSpacing: 0.5,
-                    color: isDark
-                        ? AppColors.text_button_disabled_dark
-                        : AppColors.text_button_disabled_light,
                   ),
                 ),
               ],

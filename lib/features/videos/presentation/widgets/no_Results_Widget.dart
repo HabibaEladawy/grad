@@ -10,32 +10,41 @@ class NoResultsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isRtl = Localizations.localeOf(context).languageCode == 'ar';
 
     return Center(
-      child: Column(
-        children: [
-          SizedBox(height: 92.h),
-          Image.asset(
-            AppAssets.empty_search,
-            width: 192.w,
-            height: 160.h,
-            errorBuilder: (context, error, stackTrace) =>
-            const SizedBox.shrink(),
-          ),
-          SizedBox(height: 40.h),
-          Text(
-            l10n.noResults,
-            style: AppTextStyle.semibold16TextHeading(context),
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            l10n.searchHint,
-            textAlign: TextAlign.center,
-            textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-            style: AppTextStyle.medium12TextBody(context),
-          ),
-        ],
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Flexible(
+              child: Image.asset(
+                AppAssets.empty_search,
+                width: 192.w,
+                height: 160.h,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) =>
+                const SizedBox.shrink(),
+              ),
+            ),
+
+            SizedBox(height: 24.h),
+
+            Text(
+              l10n.noResults,
+              textAlign: TextAlign.center,
+              style: AppTextStyle.semibold16TextHeading(context),
+            ),
+
+            SizedBox(height: 8.h),
+
+            Text(
+              l10n.searchHint,
+              textAlign: TextAlign.center,
+              style: AppTextStyle.medium12TextBody(context),
+            ),
+          ],
+        ),
       ),
     );
   }

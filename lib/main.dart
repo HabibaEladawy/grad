@@ -3,10 +3,12 @@ import 'package:dana_graduation_project/providers/app_language_provider.dart';
 import 'package:dana_graduation_project/providers/app_theme_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import 'core/di/injection_container.dart' as di;
+import 'features/videos/presentation/cubit/video_cubit.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.init();
@@ -16,18 +18,34 @@ void main() async {
     print('Stack: ${details.stack}');
   };
 
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+
   SystemChrome.setEnabledSystemUIMode(
     SystemUiMode.edgeToEdge,
   );
 
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(create: (context) => AppLanguageProvider()),
-      ChangeNotifierProvider(create: (context) => AppThemeProvider()),
-    ],
-    child: const Dana(),
-  ));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => AppLanguageProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AppThemeProvider(),
+        ),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => di.sl<VideoCubit>(),
+          ),
+        ],
+        child: const Dana(),
+      ),
+    ),
+  );
 }
 
 class Dana extends StatelessWidget {

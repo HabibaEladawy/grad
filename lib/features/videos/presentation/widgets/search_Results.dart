@@ -4,19 +4,21 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/utils/app_text_style.dart';
 import '../../../../../l10n/app_localizations.dart';
-import '../../data/model/video_Model.dart';
+import '../../domain/entity/Video_Entity.dart';
 import 'no_Results_Widget.dart';
 
 
 class SearchResults extends StatelessWidget {
-  final List<VideoModel> results;
+  final List<VideoEntity> results;
 
-  const SearchResults({super.key, required this.results});
+  const SearchResults({
+    super.key,
+    required this.results,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isRtl = Localizations.localeOf(context).languageCode == 'ar';
 
     if (results.isEmpty) {
       return const NoResultsWidget();
@@ -25,17 +27,20 @@ class SearchResults extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Column(
-        crossAxisAlignment:
-        isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 20.h),
+
           Text(
             l10n.searchResults,
             style: AppTextStyle.medium16TextHeading(context),
           ),
+
           SizedBox(height: 12.h),
+
           Expanded(
             child: GridView.builder(
+              physics: const BouncingScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 8.w,
@@ -43,13 +48,17 @@ class SearchResults extends StatelessWidget {
                 childAspectRatio: 192 / 230,
               ),
               itemCount: results.length,
-              itemBuilder: (context, index) => VideoCard(
-                video: results[index],
-                imageWidth: 192.w,
-                relatedVideos: results
-                    .where((v) => v.title != results[index].title)
-                    .toList(),
-              ),
+              itemBuilder: (context, index) {
+                final current = results[index];
+
+                return VideoCard(
+                  video: current,
+                  imageWidth: 192.w,
+
+                  // optional: لو مش مهم performance
+                  relatedVideos: const [],
+                );
+              },
             ),
           ),
         ],
