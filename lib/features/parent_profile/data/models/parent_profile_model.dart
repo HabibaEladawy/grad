@@ -2,21 +2,38 @@ class ParentProfileModel {
   final String id;
   final String parentName;
   final String phone;
+  final String email;
+  final String government;
+  final String address;
+  final String? profileImageUrl;
   final List<ParentChildModel> children;
 
   ParentProfileModel({
     required this.id,
     required this.parentName,
     required this.phone,
+    this.email = '',
+    this.government = '',
+    this.address = '',
+    this.profileImageUrl,
     required this.children,
   });
 
   factory ParentProfileModel.fromJson(Map<String, dynamic> json) {
     final childrenJson = (json['children'] as List?) ?? const [];
+    final rawImg = json['profileImage']?.toString();
     return ParentProfileModel(
       id: json['_id']?.toString() ?? '',
       parentName: json['parentName']?.toString() ?? '',
       phone: json['phone']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      government: json['government']?.toString() ?? '',
+      address: json['address']?.toString() ?? '',
+      profileImageUrl: (rawImg != null &&
+              rawImg.isNotEmpty &&
+              rawImg.startsWith('http'))
+          ? rawImg
+          : null,
       children: _childrenFromList(childrenJson),
     );
   }
@@ -33,6 +50,7 @@ class ParentProfileModel {
             childName: 'طفل ···$tail',
             gender: 'male',
             birthDate: null,
+            profileImageUrl: null,
           ),
         );
       } else if (c is Map) {
@@ -48,12 +66,14 @@ class ParentChildModel {
   final String childName;
   final String gender;
   final DateTime? birthDate;
+  final String? profileImageUrl;
 
   ParentChildModel({
     required this.id,
     required this.childName,
     required this.gender,
     required this.birthDate,
+    this.profileImageUrl,
   });
 
   factory ParentChildModel.fromJson(Map<String, dynamic> json) {
@@ -62,11 +82,17 @@ class ParentChildModel {
     if (rawBirth != null && rawBirth.isNotEmpty) {
       parsed = DateTime.tryParse(rawBirth);
     }
+    final rawImg = json['profileImage']?.toString();
     return ParentChildModel(
       id: json['_id']?.toString() ?? '',
       childName: json['childName']?.toString() ?? '',
       gender: json['gender']?.toString() ?? '',
       birthDate: parsed,
+      profileImageUrl: (rawImg != null &&
+              rawImg.isNotEmpty &&
+              rawImg.startsWith('http'))
+          ? rawImg
+          : null,
     );
   }
 }

@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     switch (_selectedIndex) {
       case 3:
-        return const ProfileSection();
+        return ProfileSection(cubit: _parentProfileCubit);
       case 0:
         return MultiBlocProvider(
           providers: [

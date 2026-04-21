@@ -6,12 +6,16 @@ import 'package:dana/features/auth/login/presentation/views/screens/forget_passw
 import 'package:dana/providers/app_theme_provider.dart';
 import 'package:dana/core/widgets/home_indicator.dart';
 import 'package:dana/features/parent_profile/presentation/bottom_sheets/edit_profile_bottom_sheet.dart';
+import 'package:dana/features/parent_profile/presentation/cubit/parent_profile_cubit.dart';
+import 'package:dana/features/parent_profile/presentation/cubit/parent_profile_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
 
 class SettingsBottomSheet extends StatelessWidget {
-  const SettingsBottomSheet({super.key});
+  const SettingsBottomSheet({super.key, required this.cubit});
+
+  final ParentProfileCubit cubit;
 
   @override
   Widget build(BuildContext context) {
@@ -59,8 +63,9 @@ class SettingsBottomSheet extends StatelessWidget {
                   ? const Color.fromARGB(255, 63, 157, 168)
                   : AppColors.icon_onLight_light,
               onTap: () {
+                final state = cubit.state;
                 Navigator.pop(context);
-
+                if (state is! ParentProfileLoaded) return;
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
@@ -72,7 +77,10 @@ class SettingsBottomSheet extends StatelessWidget {
                       top: Radius.circular(20.r),
                     ),
                   ),
-                  builder: (_) => EditProfileBottomSheet(),
+                  builder: (sheetCtx) => BlocProvider.value(
+                    value: cubit,
+                    child: EditProfileBottomSheet(initial: state.profile),
+                  ),
                 );
               },
             ),

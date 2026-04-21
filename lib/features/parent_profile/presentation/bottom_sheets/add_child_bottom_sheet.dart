@@ -32,6 +32,7 @@ class _AddChildBottomSheetState extends State<AddChildBottomSheet> {
   String? bloodType;
   int ageYears = 0;
   int ageMonths = 0;
+  DateTime? _birthDate;
 
   late int localSelectedIndex;
 
@@ -39,6 +40,13 @@ class _AddChildBottomSheetState extends State<AddChildBottomSheet> {
   void initState() {
     super.initState();
     localSelectedIndex = widget.selectedIndex ?? 1;
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    ageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -87,8 +95,9 @@ class _AddChildBottomSheetState extends State<AddChildBottomSheet> {
             SizedBox(height: 16.h),
             CustomDatePicker(
               controller: ageController,
-              onChanged: (years, months) {
+              onChanged: (birthDate, years, months) {
                 setState(() {
+                  _birthDate = birthDate;
                   ageYears = years;
                   ageMonths = months;
                 });
@@ -127,19 +136,26 @@ class _AddChildBottomSheetState extends State<AddChildBottomSheet> {
             CustomButton(
               text: context.l10n.add,
               onTap: () {
-                if (nameController.text.isNotEmpty &&
-                    ageController.text.isNotEmpty &&
-                    bloodType != null) {
-                  widget.onAddChild(
-                    ChildModel(
-                      name: nameController.text,
-                      years: ageYears,
-                      months: ageMonths,
-                      gender: localSelectedIndex,
+                if (nameController.text.trim().isEmpty ||
+                    _birthDate == null ||
+                    ageController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('أدخل اسم الطفل وتاريخ الميلاد'),
                     ),
                   );
-                  Navigator.pop(context);
+                  return;
                 }
+                widget.onAddChild(
+                  ChildModel(
+                    name: nameController.text.trim(),
+                    years: ageYears,
+                    months: ageMonths,
+                    gender: localSelectedIndex,
+                    birthDate: _birthDate,
+                  ),
+                );
+                Navigator.pop(context);
               },
             ),
             SizedBox(height: 20.h),

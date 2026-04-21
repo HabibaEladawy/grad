@@ -26,6 +26,24 @@ class ParentProfileRemoteDataSourceImpl implements ParentProfileRemoteDataSource
   }
 
   @override
+  Future<ParentProfileModel> patchMe(Map<String, dynamic> body) async {
+    try {
+      final res = await dio.patch(
+        ApiEndpoint.parentMe,
+        data: body,
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
+      final decoded = _decode(res.data);
+      final data = _unwrapData(decoded);
+      return ParentProfileModel.fromJson(data);
+    } on DioException catch (e) {
+      final decoded = _decode(e.response?.data);
+      final msg = (decoded is Map ? decoded['message'] : null)?.toString();
+      throw ServerException(message: msg ?? 'Failed to update profile');
+    }
+  }
+
+  @override
   Future<ParentProfileModel> getMe() async {
     try {
       final res = await dio.get(ApiEndpoint.parentMe);

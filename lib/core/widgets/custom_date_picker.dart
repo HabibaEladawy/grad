@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 
 class CustomDatePicker extends StatefulWidget {
   final TextEditingController controller;
-  final Function(int years, int months) onChanged;
+  /// Called with the calendar birth date and derived age parts.
+  final void Function(DateTime birthDate, int years, int months) onChanged;
 
   const CustomDatePicker({
     super.key,
@@ -99,7 +100,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
 
               widget.controller.text = _formatAge(context, years, months);
 
-              widget.onChanged(years, months);
+              widget.onChanged(pickedDate, years, months);
             }
           },
         ),

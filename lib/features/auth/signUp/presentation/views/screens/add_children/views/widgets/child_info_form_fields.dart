@@ -31,7 +31,7 @@ class _ChildInfoFormFieldsState extends State<ChildInfoFormFields> {
 
         CustomDatePicker(
           controller: ageController,
-          onChanged: (years, months) {
+          onChanged: (birthDate, years, months) {
             setState(() {
               ageYears = years;
               ageMonths = months;

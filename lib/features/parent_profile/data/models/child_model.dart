@@ -4,6 +4,8 @@ class ChildModel {
   final int years;
   final int months;
   final int gender;
+  final DateTime? birthDate;
+  final String? profileImageUrl;
 
   ChildModel({
     this.id,
@@ -11,5 +13,7 @@ class ChildModel {
     required this.years,
     required this.months,
     required this.gender,
+    this.birthDate,
+    this.profileImageUrl,
   });
 }

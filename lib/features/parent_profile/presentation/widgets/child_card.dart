@@ -8,6 +8,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+ImageProvider _childAvatarImage(ChildModel child) {
+  final u = child.profileImageUrl;
+  if (u != null && u.isNotEmpty && u.startsWith('http')) {
+    return NetworkImage(u);
+  }
+  return AssetImage(
+    child.gender == 1
+        ? 'assets/Images/home/boy_child_photo.png'
+        : 'assets/Images/girl_child_photo.png',
+  );
+}
+
 class ChildCard extends StatelessWidget {
   final ChildModel child;
 
@@ -43,11 +55,7 @@ class ChildCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 24.r,
-              backgroundImage: AssetImage(
-                child.gender == 1
-                    ? "assets/Images/home/boy_child_photo.png"
-                    : "assets/Images/girl_child_photo.png",
-              ),
+              backgroundImage: _childAvatarImage(child),
             ),
             SizedBox(height: 12.h),
             Text(
