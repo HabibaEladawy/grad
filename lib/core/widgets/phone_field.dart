@@ -5,14 +5,55 @@ import 'package:dana/providers/app_theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl_phone_field/countries.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:intl_phone_field/phone_number.dart';
 import 'package:provider/provider.dart';
 
-class PhoneField extends StatelessWidget {
+class PhoneField extends StatefulWidget {
   const PhoneField({super.key, this.controller});
 
   final TextEditingController? controller;
+
+  @override
+  State<PhoneField> createState() => _PhoneFieldState();
+}
+
+class _PhoneFieldState extends State<PhoneField> {
+  /// Tracks selected country so national digit limit matches (EG: 11 for 01…).
+  String _countryIso = 'EG';
+
+  int _nationalMaxDigits() {
+    if (_countryIso == 'EG') return 11;
+    try {
+      return countries.firstWhere((e) => e.code == _countryIso).maxLength;
+    } catch (_) {
+      return 15;
+    }
+  }
+
+  String? _nationalValidator(PhoneNumber? pn) {
+    if (pn == null) return null;
+    final digits = pn.number.replaceAll(RegExp(r'\D'), '');
+    if (digits.isEmpty) return null;
+
+    if (pn.countryISOCode == 'EG') {
+      if (digits.length < 10 || digits.length > 11) {
+        return 'Enter 10–11 digits (e.g. 01xxxxxxxxx)';
+      }
+      return null;
+    }
+
+    final c = countries.firstWhere(
+      (e) => e.code == pn.countryISOCode,
+      orElse: () => countries.first,
+    );
+    if (digits.length < c.minLength || digits.length > c.maxLength) {
+      return 'Invalid mobile number';
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +64,17 @@ class PhoneField extends StatelessWidget {
             MediaQuery.of(context).platformBrightness == Brightness.dark);
 
     return IntlPhoneField(
-      controller: controller,
+      controller: widget.controller,
       initialCountryCode: 'EG',
 
-      textAlign: TextAlign.left, // 👈 يخلي الكتابة تبدأ من الشمال
+      textAlign: TextAlign.left,
+
+      /// Package limits EG to 10; Egyptian numbers are often 11 with leading 0.
+      disableLengthCheck: true,
+      validator: _nationalValidator,
+      onCountryChanged: (country) {
+        setState(() => _countryIso = country.code);
+      },
 
       decoration: InputDecoration(
         filled: true,
@@ -71,7 +119,10 @@ class PhoneField extends StatelessWidget {
       flagsButtonMargin: EdgeInsets.symmetric(vertical: 9.h),
       flagsButtonPadding: EdgeInsetsGeometry.symmetric(vertical: 10.h),
       keyboardType: TextInputType.number,
-      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+        LengthLimitingTextInputFormatter(_nationalMaxDigits()),
+      ],
       dropdownDecoration: BoxDecoration(
         color: isDark
             ? AppColors.border_card_default_dark

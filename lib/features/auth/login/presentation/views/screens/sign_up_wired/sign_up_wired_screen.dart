@@ -5,6 +5,7 @@ import 'package:dana/extensions/localization_extension.dart';
 import 'package:dana/features/auth/login/presentation/cubit/sign_up_cubit.dart';
 import 'package:dana/features/auth/login/presentation/cubit/sign_up_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// A backend-wired Sign Up screen that uses `SignUpCubit`.
@@ -161,9 +162,24 @@ class _SignUpWiredViewState extends State<_SignUpWiredView> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _phone,
-                  decoration: const InputDecoration(labelText: 'Phone'),
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Required' : null,
+                  decoration: const InputDecoration(
+                    labelText: 'Phone',
+                    hintText: '10 or 11 digits (e.g. 01xxxxxxxxx)',
+                    counterText: '',
+                  ),
+                  keyboardType: TextInputType.phone,
+                  maxLength: 11,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                  ],
+                  validator: (v) {
+                    final s = (v ?? '').replaceAll(RegExp(r'\D'), '');
+                    if (s.isEmpty) return 'Required';
+                    if (s.length < 10 || s.length > 11) {
+                      return 'Enter 10–11 digits';
+                    }
+                    return null;
+                  },
                 ),
                 TextFormField(
                   controller: _email,
