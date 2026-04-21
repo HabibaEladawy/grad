@@ -2,7 +2,7 @@ import 'package:dana/features/Appointments/presentation/views/appointments_scree
 import 'package:dana/features/booking/presentation/views/OnlinePayment/screens/payment_add_page.dart';
 import 'package:dana/features/booking/presentation/views/BookingScreen/screens/payment_method_page.dart';
 import 'package:dana/features/auth/login/presentation/views/screens/login/screens/login_screen.dart';
-import 'package:dana/features/auth/signUp/presentation/views/screens/sign_up/views/screens/signUp_screen.dart';
+import 'package:dana/features/auth/login/presentation/views/screens/sign_up_wired/sign_up_wired_screen.dart';
 import 'package:dana/features/home/presentation/views/screens/doctors_page.dart';
 import 'package:dana/features/home/presentation/views/screens/home_screen.dart';
 
@@ -31,7 +31,7 @@ class AppRoutes {
 
   /// Auth
   static const String login = LoginScreen.routeName;
-  static const String signup = SignUpScreen.routeName;
+  static const String signup = SignUpWiredScreen.routeName;
   static const String childInfo = ChildInfoScreen.routeName;
   static const String contactInfo = ContactInfoScreen.routeName;
   static const String createPassword = CreatePasswordScreen.routeName;
