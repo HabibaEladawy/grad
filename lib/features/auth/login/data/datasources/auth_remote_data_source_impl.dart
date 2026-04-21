@@ -50,14 +50,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     File? profileImage,
   }) async {
     try {
+      // Contract matches Postman `pre-SignUp`: multipart field `data` is JSON
+      // with nested `parent` + `children` (not flat parent fields at root).
       final payload = {
-        'role': 'parent',
-        'parentName': parentName,
-        'email': email,
-        'phone': phone,
-        'government': government,
-        'address': address,
-        'password': password,
+        'parent': {
+          'parentName': parentName,
+          'email': email,
+          'phone': phone,
+          'password': password,
+          'government': government,
+          'address': address,
+        },
         'children': children.map((c) => c.toJson()).toList(),
       };
 
