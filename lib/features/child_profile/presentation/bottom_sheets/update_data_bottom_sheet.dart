@@ -1,0 +1,155 @@
+import 'package:dana/core/widgets/custom_button.dart';
+import 'package:dana/core/widgets/custom_text_field.dart';
+import 'package:dana/core/utils/app_colors.dart';
+import 'package:dana/core/utils/app_text_style.dart';
+import 'package:dana/extensions/localization_extension.dart';
+import 'package:dana/providers/app_theme_provider.dart';
+import 'package:dana/features/child_profile/presentation/bottom_sheets/confirm_data_bottom_sheet.dart';
+import 'package:dana/core/widgets/home_indicator.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+
+import '../cubit/growth_cubit.dart';
+
+class UpdateDataBottomSheet extends StatefulWidget {
+  const UpdateDataBottomSheet({super.key});
+
+  @override
+  State<UpdateDataBottomSheet> createState() => _UpdateDataBottomSheetState();
+}
+
+class _UpdateDataBottomSheetState extends State<UpdateDataBottomSheet> {
+  double? childWeight;
+  double? childHeight;
+  double? headCircumference;
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = context.watch<AppThemeProvider>();
+    final isDark =
+        themeProvider.appTheme == ThemeMode.dark ||
+        (themeProvider.appTheme == ThemeMode.system &&
+            MediaQuery.of(context).platformBrightness == Brightness.dark);
+    final l10n = context.l10n;
+
+    final bool isButtonEnabled =
+        childWeight != null && childHeight != null && headCircumference != null;
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 24.w,
+        right: 24.w,
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(child: HomeIndicator()),
+            SizedBox(height: 20.h),
+            Text(
+              l10n.updateDataTitle,
+              style: AppTextStyle.medium20TextDisplay(context),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              l10n.updateDataDesc,
+              style: AppTextStyle.regular16TextBody(context),
+            ),
+            SizedBox(height: 24.h),
+
+            Text(l10n.weight, style: AppTextStyle.medium12TextBody(context)),
+            SizedBox(height: 8.h),
+            CustomTextField(
+              hintText: l10n.exampleValue,
+              suffixText: l10n.kg,
+              onChange: (value) {
+                setState(() {
+                  childWeight = double.tryParse(value);
+                });
+              },
+            ),
+
+            SizedBox(height: 16.h),
+            Text(l10n.height, style: AppTextStyle.medium12TextBody(context)),
+            SizedBox(height: 8.h),
+            CustomTextField(
+              hintText: l10n.exampleValue,
+              suffixText: l10n.cm,
+              onChange: (value) {
+                setState(() {
+                  childHeight = double.tryParse(value);
+                });
+              },
+            ),
+
+            SizedBox(height: 16.h),
+            Text(
+              l10n.headCircumference,
+              style: AppTextStyle.medium12TextBody(context),
+            ),
+            SizedBox(height: 8.h),
+            CustomTextField(
+              hintText: l10n.exampleValue,
+              suffixText: l10n.cm,
+              onChange: (value) {
+                setState(() {
+                  headCircumference = double.tryParse(value);
+                });
+              },
+            ),
+
+            SizedBox(height: 40.h),
+            CustomButton(
+              color: isButtonEnabled
+                  ? (isDark
+                        ? AppColors.button_primary_default_dark
+                        : AppColors.button_primary_default_light)
+                  : (isDark
+                        ? AppColors.bg_button_primary_disabled_dark
+                        : AppColors.bg_button_primary_disabled_light),
+              text: context.l10n.saveNewMeasurements,
+              borderColor: isDark
+                  ? AppColors.bg_button_primary_disabled_dark
+                  : AppColors.bg_button_primary_disabled_light,
+
+              textStyle: isButtonEnabled
+                  ? AppTextStyle.semibold16TextButton(context)
+                  : AppTextStyle.semibold16TextButtonDisabled(context),
+              onTap: isButtonEnabled
+                  ? () {
+                      context.read<GrowthCubit>().submit(
+                            height: childHeight!,
+                            weight: childWeight!,
+                            headCircumference: headCircumference!,
+                          );
+                      Navigator.pop(context);
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: isDark
+                            ? AppColors.bg_surface_default_dark
+                            : AppColors.bg_surface_default_light,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(20.r),
+                          ),
+                        ),
+                        builder: (_) => ConfirmDataBottomSheet(
+                          firstText: l10n.growthCelebrationTitle,
+                          secondText: l10n.growthSavedMessage,
+                        ),
+                      );
+                    }
+                  : () {},
+            ),
+            SizedBox(height: 20.h),
+          ],
+        ),
+      ),
+    );
+  }
+}
