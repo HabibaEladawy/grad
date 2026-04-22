@@ -15,12 +15,18 @@ class GrowthLoading extends GrowthState {
 class GrowthLoaded extends GrowthState {
   final String childId;
   final String childName;
+  final DateTime? birthDate;
+  final String gender;
+  final String? profileImageUrl;
   final List<GrowthRecord> records;
   final GrowthRecord? latest;
 
   const GrowthLoaded({
     required this.childId,
     required this.childName,
+    this.birthDate,
+    this.gender = '',
+    this.profileImageUrl,
     required this.records,
     required this.latest,
   });

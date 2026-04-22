@@ -15,6 +15,7 @@ import 'package:dana/features/splash/views/screens/splash_screen.dart';
 import 'package:dana/l10n/app_localizations.dart';
 import 'package:dana/providers/app_language_provider.dart';
 import 'package:dana/providers/app_theme_provider.dart';
+import 'package:dana/features/child_profile/child_profile_args.dart';
 import 'package:dana/features/child_profile/presentation/screens/child_profile_page.dart';
 import 'package:dana/features/booking/booking_flow_models.dart';
 import 'package:dana/features/booking/presentation/views/DoctorTime/screens/doctor_Time_screen.dart';
@@ -139,10 +140,18 @@ class MyApp extends StatelessWidget {
       AppRoutes.examination: (_) => const ExaminationScreen(),
 
       /// Child Profile
-      AppRoutes.childProfile: (_) => const ChildProfileScreen(),
+      AppRoutes.childProfile: (context) {
+        final raw = ModalRoute.of(context)?.settings.arguments;
+        return ChildProfileScreen(
+          args: raw is ChildProfileArgs ? raw : null,
+        );
+      },
 
       /// Vaccine
-      AppRoutes.vaccine: (_) => const VaccineScreen(),
+      AppRoutes.vaccine: (context) {
+        final id = ModalRoute.of(context)?.settings.arguments as String?;
+        return VaccineScreen(childId: id);
+      },
 
       /// Doctors
       AppRoutes.doctors: (_) => const DoctorsScreen(),

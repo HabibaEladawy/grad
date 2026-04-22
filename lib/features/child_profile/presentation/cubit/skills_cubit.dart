@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/errors/error_mapper.dart';
+import '../../../parent_profile/data/models/parent_profile_model.dart';
 import '../../../parent_profile/data/repo/parent_profile_repository.dart';
 import '../../data/repo/skills_repo.dart';
 import 'skills_state.dart';
@@ -12,14 +13,24 @@ class SkillsCubit extends Cubit<SkillsState> {
   SkillsCubit({required this.repo, required this.parentRepo})
       : super(const SkillsInitial());
 
-  Future<void> loadSkills() async {
+  ParentChildModel? _pickChild(ParentProfileModel me, String? preferredId) {
+    if (preferredId != null && preferredId.isNotEmpty) {
+      for (final c in me.children) {
+        if (c.id == preferredId) return c;
+      }
+    }
+    return me.children.isNotEmpty ? me.children.first : null;
+  }
+
+  Future<void> loadSkills({String? childId}) async {
     emit(const SkillsLoading());
     try {
       final me = await parentRepo.getMe();
-      final childId = me.children.isNotEmpty ? me.children.first.id : '';
-      if (childId.isEmpty) throw Exception('No child found');
+      final child = _pickChild(me, childId);
+      final resolvedId = child?.id ?? '';
+      if (resolvedId.isEmpty) throw Exception('No child found');
       final skills = await repo.getSkills();
-      emit(SkillsLoaded(childId: childId, skills: skills));
+      emit(SkillsLoaded(childId: resolvedId, skills: skills));
     } catch (e) {
       emit(SkillsError(ErrorMapper.message(e)));
     }

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../parent_profile/data/models/parent_profile_model.dart';
 import '../../../parent_profile/data/repo/parent_profile_repository.dart';
 import '../../data/repo/child_vaccination_repo.dart';
 import '../../data/repo/child_vaccination_schedule_repo.dart';
@@ -16,32 +17,43 @@ class VaccinationScheduleCubit extends Cubit<VaccinationScheduleState> {
     required this.vaccinationRepo,
   }) : super(const VaccinationScheduleInitial());
 
-  Future<void> load() async {
+  ParentChildModel? _pickChild(ParentProfileModel me, String? preferredId) {
+    if (preferredId != null && preferredId.isNotEmpty) {
+      for (final c in me.children) {
+        if (c.id == preferredId) return c;
+      }
+    }
+    return me.children.isNotEmpty ? me.children.first : null;
+  }
+
+  Future<void> load({String? childId}) async {
     emit(const VaccinationScheduleLoading());
     try {
       final me = await parentRepo.getMe();
-      final childId = me.children.isNotEmpty ? me.children.first.id : '';
-      if (childId.isEmpty) {
+      final child = _pickChild(me, childId);
+      final resolvedId = child?.id ?? '';
+      if (resolvedId.isEmpty) {
         throw Exception('No child found for this parent');
       }
-      final items = await scheduleRepo.getSchedule(childId: childId);
-      emit(VaccinationScheduleLoaded(childId: childId, items: items));
+      final items = await scheduleRepo.getSchedule(childId: resolvedId);
+      emit(VaccinationScheduleLoaded(childId: resolvedId, items: items));
     } catch (e) {
       emit(VaccinationScheduleError(e.toString()));
     }
   }
 
-  Future<void> generateAndLoad() async {
+  Future<void> generateAndLoad({String? childId}) async {
     emit(const VaccinationScheduleLoading());
     try {
       final me = await parentRepo.getMe();
-      final childId = me.children.isNotEmpty ? me.children.first.id : '';
-      if (childId.isEmpty) {
+      final child = _pickChild(me, childId);
+      final resolvedId = child?.id ?? '';
+      if (resolvedId.isEmpty) {
         throw Exception('No child found for this parent');
       }
-      await scheduleRepo.generateSchedule(childId: childId);
-      final items = await scheduleRepo.getSchedule(childId: childId);
-      emit(VaccinationScheduleLoaded(childId: childId, items: items));
+      await scheduleRepo.generateSchedule(childId: resolvedId);
+      final items = await scheduleRepo.getSchedule(childId: resolvedId);
+      emit(VaccinationScheduleLoaded(childId: resolvedId, items: items));
     } catch (e) {
       emit(VaccinationScheduleError(e.toString()));
     }

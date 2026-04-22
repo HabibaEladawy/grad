@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/errors/error_mapper.dart';
+import '../../../parent_profile/data/models/parent_profile_model.dart';
 import '../../../parent_profile/data/repo/parent_profile_repository.dart';
 import '../../data/models/growth_record_model.dart';
 import '../../data/repo/growth_repo.dart';
@@ -13,26 +14,38 @@ class GrowthCubit extends Cubit<GrowthState> {
   GrowthCubit({required this.repo, required this.parentRepo})
       : super(const GrowthInitial());
 
-  Future<void> load() async {
+  ParentChildModel? _pickChild(ParentProfileModel me, String? preferredId) {
+    if (preferredId != null && preferredId.isNotEmpty) {
+      for (final c in me.children) {
+        if (c.id == preferredId) return c;
+      }
+    }
+    return me.children.isNotEmpty ? me.children.first : null;
+  }
+
+  Future<void> load({String? childId}) async {
     emit(const GrowthLoading());
     try {
       final me = await parentRepo.getMe();
-      final child = me.children.isNotEmpty ? me.children.first : null;
-      final childId = child?.id ?? '';
+      final child = _pickChild(me, childId);
+      final resolvedId = child?.id ?? '';
       final childName = child?.childName ?? '';
-      if (childId.isEmpty) throw Exception('No child found');
+      if (resolvedId.isEmpty) throw Exception('No child found');
 
-      final records = await repo.getRecords(childId: childId);
+      final records = await repo.getRecords(childId: resolvedId);
       GrowthRecord? latest;
       try {
-        latest = await repo.getLatest(childId: childId);
+        latest = await repo.getLatest(childId: resolvedId);
       } catch (_) {
         latest = records.isNotEmpty ? (records..sort((a, b) => a.recordDate.compareTo(b.recordDate))).last : null;
       }
       emit(
         GrowthLoaded(
-          childId: childId,
+          childId: resolvedId,
           childName: childName,
+          birthDate: child?.birthDate,
+          gender: child?.gender ?? '',
+          profileImageUrl: child?.profileImageUrl,
           records: records,
           latest: latest,
         ),
@@ -75,6 +88,9 @@ class GrowthCubit extends Cubit<GrowthState> {
         GrowthLoaded(
           childId: st.childId,
           childName: st.childName,
+          birthDate: st.birthDate,
+          gender: st.gender,
+          profileImageUrl: st.profileImageUrl,
           records: records,
           latest: latest,
         ),

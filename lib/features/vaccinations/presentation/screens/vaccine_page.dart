@@ -18,7 +18,10 @@ import '../cubit/vaccination_schedule_state.dart';
 import '../../data/models/child_vaccination_schedule_model.dart';
 
 class VaccineScreen extends StatefulWidget {
-  const VaccineScreen({super.key});
+  const VaccineScreen({super.key, this.childId});
+
+  /// When null, the schedule uses the first child from the parent profile.
+  final String? childId;
 
   static const String routeName = 'VaccineScreen';
 
@@ -32,7 +35,7 @@ class _VaccineScreenState extends State<VaccineScreen> {
   @override
   void initState() {
     super.initState();
-    _cubit = sl<VaccinationScheduleCubit>()..load();
+    _cubit = sl<VaccinationScheduleCubit>()..load(childId: widget.childId);
   }
 
   @override
@@ -160,8 +163,9 @@ class _VaccineScreenState extends State<VaccineScreen> {
                           Center(child: Text(state.message)),
                           SizedBox(height: 12.h),
                           ElevatedButton(
-                            onPressed: () =>
-                                context.read<VaccinationScheduleCubit>().generateAndLoad(),
+                            onPressed: () => context
+                                .read<VaccinationScheduleCubit>()
+                                .generateAndLoad(childId: widget.childId),
                             child: const Text('Generate schedule'),
                           ),
                         ],
@@ -180,8 +184,9 @@ class _VaccineScreenState extends State<VaccineScreen> {
                           .toList();
                       if (items.isEmpty) {
                         return ElevatedButton(
-                          onPressed: () =>
-                              context.read<VaccinationScheduleCubit>().generateAndLoad(),
+                          onPressed: () => context
+                              .read<VaccinationScheduleCubit>()
+                              .generateAndLoad(childId: widget.childId),
                           child: const Text('Generate schedule'),
                         );
                       }

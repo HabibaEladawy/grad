@@ -2,7 +2,11 @@ import 'package:dana/core/widgets/custom_text_frame.dart';
 import 'package:dana/core/utils/app_colors.dart';
 import 'package:dana/core/utils/app_routes.dart';
 import 'package:dana/extensions/localization_extension.dart';
+import 'package:dana/features/child_profile/child_profile_args.dart';
+import 'package:dana/features/parent_profile/presentation/cubit/parent_profile_cubit.dart';
+import 'package:dana/features/parent_profile/presentation/cubit/parent_profile_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProfileQuickAccess extends StatelessWidget {
@@ -42,7 +46,18 @@ class ProfileQuickAccess extends StatelessWidget {
                         ? AppColors.primary_50_dark
                         : AppColors.primary_50_light,
                     onTap: () {
-                      Navigator.of(context).pushNamed(AppRoutes.childProfile);
+                      final s = context.read<ParentProfileCubit>().state;
+                      if (s is! ParentProfileLoaded || s.profile.children.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(context.l10n.addChildDesc)),
+                        );
+                        return;
+                      }
+                      final c = s.profile.children.first;
+                      Navigator.of(context).pushNamed(
+                        AppRoutes.childProfile,
+                        arguments: ChildProfileArgs.fromParentChild(c),
+                      );
                     },
                   ),
                 ),
@@ -63,7 +78,14 @@ class ProfileQuickAccess extends StatelessWidget {
                         ? AppColors.primary_50_dark
                         : AppColors.primary_50_light,
                     onTap: () {
-                      Navigator.of(context).pushNamed(AppRoutes.vaccine);
+                      final s = context.read<ParentProfileCubit>().state;
+                      final id = s is ParentProfileLoaded && s.profile.children.isNotEmpty
+                          ? s.profile.children.first.id
+                          : null;
+                      Navigator.of(context).pushNamed(
+                        AppRoutes.vaccine,
+                        arguments: id,
+                      );
                     },
                   ),
                 ),

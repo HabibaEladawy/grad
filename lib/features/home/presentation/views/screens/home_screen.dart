@@ -5,6 +5,7 @@ import 'package:dana/core/widgets/custom_frame.dart';
 import 'package:dana/core/utils/app_colors.dart';
 import 'package:dana/core/utils/app_raduis.dart';
 import 'package:dana/core/utils/app_routes.dart';
+import 'package:dana/features/child_profile/child_profile_args.dart';
 import 'package:dana/core/utils/app_text_style.dart';
 import 'package:dana/extensions/localization_extension.dart';
 import 'package:dana/features/Chat_bot/presentation/controller/data/model/message_model.dart';
@@ -151,8 +152,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     icon: Icons.arrow_forward_ios_rounded,
                                     iconSize: 14.w,
                                     onTap: () {
-                                      Navigator.of(context).pushNamed(
-                                        AppRoutes.childProfile,
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(context.l10n.addChildDesc),
+                                        ),
                                       );
                                     },
                                   ),
@@ -225,6 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     onTap: () {
                                       Navigator.of(context).pushNamed(
                                         AppRoutes.childProfile,
+                                        arguments: ChildProfileArgs.fromParentChild(c),
                                       );
                                     },
                                   ),
