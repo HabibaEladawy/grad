@@ -11,7 +11,7 @@ import '../../../../../providers/app_theme_provider.dart';
 import '../../../data/model/video_Model.dart';
 import '../widgets/video_player_widget.dart';
 import '../widgets/video_info_widget.dart';
-import '../widgets/video_Card.dart';
+import '../widgets/video_card.dart';
 
 class VideoDetailsScreen extends StatelessWidget {
   static const String routeName = 'VideoDetailsScreen';

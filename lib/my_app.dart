@@ -20,7 +20,7 @@ import 'package:dana/providers/app_theme_provider.dart';
 import 'package:dana/features/child_profile/child_profile_args.dart';
 import 'package:dana/features/child_profile/presentation/screens/child_profile_page.dart';
 import 'package:dana/features/booking/booking_flow_models.dart';
-import 'package:dana/features/booking/presentation/views/DoctorTime/screens/doctor_Time_screen.dart';
+import 'package:dana/features/booking/presentation/views/DoctorTime/screens/doctor_time_screen.dart';
 import 'package:dana/features/booking/presentation/views/OnlinePayment/screens/Online_Payment_Screen.dart';
 import 'package:dana/features/booking/presentation/views/BookingScreen/screens/Payment_Confirm_Screen.dart';
 import 'package:dana/features/notification/presentation/screens/notification_screen.dart';

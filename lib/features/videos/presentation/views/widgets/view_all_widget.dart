@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../data/model/video_Model.dart';
-import 'video_Card.dart';
+import 'video_card.dart';
 
 class ViewAllWidget extends StatelessWidget {
   final List<VideoModel> videos;
