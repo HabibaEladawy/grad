@@ -25,18 +25,25 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final PageController _controller = PageController();
   int _currentIndex = 0;
+  late final SignUpCubit _cubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _cubit = sl<SignUpCubit>();
+  }
 
   @override
   void dispose() {
     _controller.dispose();
+    _cubit.close();
     super.dispose();
   }
 
   void _goToNextPage() {
-    final cubit = context.read<SignUpCubit>();
     final ok = switch (_currentIndex) {
-      0 => cubit.onStep1Next(),
-      1 => cubit.onStep2Next(),
+      0 => _cubit.onStep1Next(),
+      1 => _cubit.onStep2Next(),
       _ => true,
     };
     if (!ok) return;
@@ -60,8 +67,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         themeProvider.appTheme == ThemeMode.dark ||
         (themeProvider.appTheme == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
-    return BlocProvider(
-      create: (_) => sl<SignUpCubit>(),
+    return BlocProvider.value(
+      value: _cubit,
       child: BlocListener<SignUpCubit, SignUpState>(
         listener: (context, state) async {
           if (state is SignUpOtpSent) {
