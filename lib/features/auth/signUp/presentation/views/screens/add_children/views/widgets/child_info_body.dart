@@ -12,6 +12,7 @@ class ChildInfoBody extends StatefulWidget {
   final ValueChanged<int> onGenderSelect;
   final TextEditingController childNameController;
   final ValueChanged<DateTime> onBirthDateChanged;
+  final ValueChanged<String?> onBloodTypeChanged;
 
   const ChildInfoBody({
     super.key,
@@ -19,6 +20,7 @@ class ChildInfoBody extends StatefulWidget {
     required this.onGenderSelect,
     required this.childNameController,
     required this.onBirthDateChanged,
+    required this.onBloodTypeChanged,
   });
 
   @override
@@ -58,6 +60,7 @@ class _ChildInfoBodyState extends State<ChildInfoBody> {
                 setState(() {
                   bloodType = val;
                 });
+                widget.onBloodTypeChanged(val);
               },
             ),
           ],

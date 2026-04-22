@@ -97,6 +97,17 @@ class SignUpCubit extends Cubit<SignUpState> {
     return true;
   }
 
+  // ── Step 3 Next ───────────────────────────────────────────────────────────
+  bool onStep3Next() {
+    final error = validateStep3();
+    if (error != null) {
+      emit(SignUpFailure(message: error));
+      emit(const SignUpInitial());
+      return false;
+    }
+    return true;
+  }
+
   // ── Step 3+4: إرسال البيانات كلها وطلب OTP ────────────────────────────────
   Future<void> preSignUp() async {
     final step3Error = validateStep3();

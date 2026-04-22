@@ -23,6 +23,7 @@ class _ChildInfoScreenState extends State<ChildInfoScreen> {
 
   final _childName = TextEditingController();
   DateTime? _selectedBirthDate;
+  String? _bloodType;
 
   @override
   void dispose() {
@@ -38,6 +39,16 @@ class _ChildInfoScreenState extends State<ChildInfoScreen> {
   }
 
   void _onNext() {
+    if (_bloodType == null || _bloodType!.trim().isEmpty) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.bloodTypeHint),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
     final cubit = context.read<SignUpCubit>();
     cubit.updateChildName(_childName.text);
     final bd = _selectedBirthDate;
@@ -65,6 +76,7 @@ class _ChildInfoScreenState extends State<ChildInfoScreen> {
           onGenderSelect: (i) => setState(() => selectedIndex = i),
           childNameController: _childName,
           onBirthDateChanged: (d) => _selectedBirthDate = d,
+          onBloodTypeChanged: (v) => _bloodType = v,
         ),
       ),
     );

@@ -33,6 +33,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
     final cubit = context.read<SignUpCubit>();
     cubit.updatePhone(_phoneController.text);
     cubit.updateEmail(_emailController.text);
+    if (!cubit.onStep3Next()) return;
     widget.onNext?.call();
   }
 

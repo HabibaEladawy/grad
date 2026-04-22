@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../../../../../providers/app_theme_provider.dart';
-import '../widgets/sign_up_indicator_row.dart';
 import '../widgets/sign_up_page_view.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -108,7 +107,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Column(
               children: [
                 SizedBox(height: AppSizes.h24),
-                SignUpIndicatorRow(currentIndex: _currentIndex),
                 Expanded(
                   child: SignUpPageView(
                     controller: _controller,
