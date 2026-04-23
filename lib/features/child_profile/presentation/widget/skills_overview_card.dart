@@ -7,6 +7,7 @@ import 'package:dana/features/child_profile/data/models/skill_api_models.dart';
 import 'package:dana/features/child_profile/presentation/cubit/skills_cubit.dart';
 import 'package:dana/features/child_profile/presentation/cubit/skills_state.dart';
 import 'package:dana/features/child_profile/presentation/widget/skill_row.dart';
+import 'package:dana/features/child_profile/presentation/widget/skill_ui_utils.dart';
 import 'package:dana/providers/app_theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -123,10 +124,7 @@ class SkillsOverviewCard extends StatelessWidget {
                     return const SizedBox.shrink();
                   }
 
-                  final visibleSkills = skills
-                      .where((s) => (total[s.id] ?? 0) > 0)
-                      .take(4)
-                      .toList();
+                  final visibleSkills = visibleSkillsUpToFour(skills, total);
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

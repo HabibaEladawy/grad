@@ -1,6 +1,7 @@
 import 'package:dana/core/di/injection_container.dart';
 import 'package:dana/core/utils/app_routes.dart';
 import 'package:dana/core/widgets/otp_bottom_sheet.dart';
+import 'package:dana/core/auth/auth_session.dart';
 import 'package:dana/extensions/localization_extension.dart';
 import 'package:dana/features/auth/login/presentation/cubit/sign_up_cubit.dart';
 import 'package:dana/features/auth/login/presentation/cubit/sign_up_state.dart';
@@ -90,13 +91,10 @@ class _SignUpWiredViewState extends State<_SignUpWiredView> {
           );
         } else if (state is SignUpVerified) {
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Account verified. Please login.'),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-          Navigator.pushReplacementNamed(context, AppRoutes.login);
+          // Persist session token so the user is actually signed in post-OTP.
+          await sl<AuthSession>().setToken(state.token);
+          if (!mounted) return;
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
         } else if (state is SignUpFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

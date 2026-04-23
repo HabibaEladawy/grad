@@ -19,9 +19,11 @@ import 'package:dana/features/booking/booking_flow_models.dart';
 import 'package:dana/core/di/injection_container.dart';
 import 'package:dana/features/home/presentation/cubit/doctors_list_cubit.dart';
 import 'package:dana/features/home/presentation/cubit/doctors_list_state.dart';
+import 'package:dana/features/parent_profile/data/models/parent_profile_model.dart';
 import 'package:dana/features/parent_profile/presentation/cubit/parent_profile_cubit.dart';
 import 'package:dana/features/parent_profile/presentation/cubit/parent_profile_state.dart';
 import 'package:dana/features/parent_profile/presentation/screens/profile_section.dart';
+import 'package:dana/features/child_profile/domain/growth_monthly.dart';
 import 'package:dana/features/child_profile/presentation/cubit/growth_cubit.dart';
 import 'package:dana/features/child_profile/presentation/cubit/growth_state.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final DoctorsListCubit _doctorsListCubit;
   late final GrowthCubit _growthCubit;
   String? _growthChildId;
+  String? _homeSelectedChildId;
 
   final List<String> _icons = [
     'assets/Icons/home_icon.svg',
@@ -118,7 +121,16 @@ class _HomeScreenState extends State<HomeScreen> {
             listener: (context, pState) {
               if (pState is ParentProfileLoaded &&
                   pState.profile.children.isNotEmpty) {
-                _ensureGrowthLoadedForChild(pState.profile.children.first.id);
+                final ids = pState.profile.children.map((e) => e.id).toSet();
+                var id = _homeSelectedChildId;
+                if (id == null || !ids.contains(id)) {
+                  id = pState.profile.children.first.id;
+                  setState(() => _homeSelectedChildId = id);
+                }
+                _ensureGrowthLoadedForChild(id);
+              } else if (pState is ParentProfileLoaded &&
+                  pState.profile.children.isEmpty) {
+                setState(() => _homeSelectedChildId = null);
               }
             },
             child: Stack(
@@ -190,7 +202,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 }
                                 if (pState is ParentProfileLoaded &&
                                     pState.profile.children.isNotEmpty) {
-                                  final c = pState.profile.children.first;
+                                  final children = pState.profile.children;
+                                  final resolvedId =
+                                      _homeSelectedChildId ?? children.first.id;
+                                  ParentChildModel c = children.firstWhere(
+                                    (e) => e.id == resolvedId,
+                                    orElse: () => children.first,
+                                  );
                                   final age = _ageFromBirth(c.birthDate);
                                   final isBoy =
                                       c.gender.toLowerCase() != 'female';
@@ -205,44 +223,102 @@ class _HomeScreenState extends State<HomeScreen> {
                                         width: 48.w,
                                       ),
                                       SizedBox(width: 12.w),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          vertical: 3.5.h,
-                                        ),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  c.childName,
-                                                  style:
-                                                      AppTextStyle.semibold16TextHeading(
+                                      Expanded(
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 3.5.h,
+                                          ),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Flexible(
+                                                    child: Text(
+                                                      c.childName,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: AppTextStyle
+                                                          .semibold16TextHeading(
                                                         context,
                                                       ),
-                                                ),
-                                                SizedBox(width: 2.w),
-                                                SvgPicture.asset(
-                                                  'assets/Icons/arrow_drop_icon.svg',
-                                                  width: 16.w,
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(height: 4.h),
-                                            Text(
-                                              context.formatAge(age.$1, age.$2),
-                                              style:
-                                                  AppTextStyle.medium12TextBody(
-                                                    context,
+                                                    ),
                                                   ),
-                                            ),
-                                          ],
+                                                  if (children.length > 1)
+                                                    Theme(
+                                                      data: Theme.of(context)
+                                                          .copyWith(
+                                                        dividerColor:
+                                                            Colors.transparent,
+                                                      ),
+                                                      child: DropdownButton<
+                                                          String>(
+                                                        isDense: true,
+                                                        underline: const SizedBox
+                                                            .shrink(),
+                                                        value: c.id,
+                                                        items: children
+                                                            .map(
+                                                              (ch) =>
+                                                                  DropdownMenuItem<
+                                                                      String>(
+                                                                value: ch.id,
+                                                                child:
+                                                                    ConstrainedBox(
+                                                                  constraints:
+                                                                      BoxConstraints(
+                                                                    maxWidth:
+                                                                        100.w,
+                                                                  ),
+                                                                  child: Text(
+                                                                    ch.childName,
+                                                                    maxLines: 1,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                    style: AppTextStyle
+                                                                        .medium12TextBody(
+                                                                      context,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            )
+                                                            .toList(),
+                                                        onChanged: (newId) {
+                                                          if (newId == null) {
+                                                            return;
+                                                          }
+                                                          setState(() =>
+                                                              _homeSelectedChildId =
+                                                                  newId,);
+                                                          _ensureGrowthLoadedForChild(
+                                                            newId,
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                              SizedBox(height: 4.h),
+                                              Text(
+                                                context.formatAge(
+                                                  age.$1,
+                                                  age.$2,
+                                                ),
+                                                style: AppTextStyle
+                                                    .medium12TextBody(
+                                                  context,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                      Spacer(),
                                       CustomButton(
                                         borderRadius: AppRadius.radius_full,
                                         height: 32.w,
@@ -312,13 +388,39 @@ class _HomeScreenState extends State<HomeScreen> {
                               padding: EdgeInsets.only(top: 12.h),
                               child: BlocBuilder<GrowthCubit, GrowthState>(
                                 builder: (context, gState) {
+                                  final chartHeight =
+                                      MediaQuery.of(context).size.width > 600
+                                      ? 248.h
+                                      : 208.h;
+                                  if (gState is GrowthLoading ||
+                                      gState is GrowthInitial) {
+                                    return SizedBox(
+                                      height: chartHeight,
+                                      child: const Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    );
+                                  }
                                   if (gState is GrowthLoaded) {
-                                    final sorted = [...gState.records]
-                                      ..sort(
-                                        (a, b) => a.recordDate.compareTo(
-                                          b.recordDate,
+                                    final sorted = growthRecordsOnePerMonth(
+                                      gState.records,
+                                    );
+                                    if (sorted.isEmpty) {
+                                      return SizedBox(
+                                        height: chartHeight,
+                                        child: Center(
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 24.w,
+                                            ),
+                                            child: Image.asset(
+                                              'assets/Images/exam_1.png',
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
                                         ),
                                       );
+                                    }
                                     return StatisticsChart(
                                       xDates: sorted
                                           .map((e) => e.recordDate)
@@ -334,7 +436,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                           .toList(),
                                     );
                                   }
-                                  return const StatisticsChart();
+                                  return SizedBox(
+                                    height: chartHeight,
+                                    child: Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 24.w,
+                                        ),
+                                        child: Image.asset(
+                                          'assets/Images/exam_1.png',
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ),
+                                  );
                                 },
                               ),
                             ),
@@ -452,12 +567,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   BookingDoctorArgs.fromPublicDoctor(
                                                     d,
                                                   ),
-                                            );
-                                          },
-                                          onOpenChat: () {
-                                            Navigator.of(context).pushNamed(
-                                              AppRoutes.chatDoctor,
-                                              arguments: d.toChatDoctor(),
                                             );
                                           },
                                         ),

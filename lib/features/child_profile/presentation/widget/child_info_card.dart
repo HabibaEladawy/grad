@@ -12,6 +12,7 @@ import 'package:dana/features/child_profile/presentation/cubit/growth_cubit.dart
 import 'package:dana/features/child_profile/presentation/cubit/growth_state.dart';
 import 'package:dana/features/child_profile/presentation/cubit/skills_cubit.dart';
 import 'package:dana/features/child_profile/presentation/cubit/skills_state.dart';
+import 'package:dana/features/child_profile/domain/growth_monthly.dart';
 import 'package:dana/features/child_profile/presentation/widget/custom_stat_card.dart';
 import 'package:dana/providers/app_theme_provider.dart';
 import 'package:flutter/material.dart';
@@ -39,18 +40,14 @@ String _statValue(double v, String unit) {
   return '$s $unit';
 }
 
-String _deltaFor(
-  GrowthRecord? latest,
-  List<GrowthRecord> records,
+String _deltaMonthly(
+  GrowthRecord? latestMonth,
+  GrowthRecord? previousMonth,
   double Function(GrowthRecord) pick,
   String unit,
 ) {
-  if (latest == null || records.length < 2) return '—';
-  final sorted = [...records]
-    ..sort((a, b) => a.recordDate.compareTo(b.recordDate));
-  final prev = sorted.length >= 2 ? sorted[sorted.length - 2] : null;
-  if (prev == null) return '—';
-  final d = pick(latest) - pick(prev);
+  if (latestMonth == null || previousMonth == null) return '—';
+  final d = pick(latestMonth) - pick(previousMonth);
   if (d.abs() < 1e-6) return '—';
   final sign = d > 0 ? '+' : '';
   final val = d == d.roundToDouble()
@@ -94,10 +91,17 @@ int? _averageSkillDevelopmentPercent(SkillsState s) {
 }
 
 class ChildInfoCard extends StatelessWidget {
-  const ChildInfoCard({super.key, this.headerSnapshot});
+  const ChildInfoCard({
+    super.key,
+    this.headerSnapshot,
+    this.onSelectChild,
+  });
 
   /// Shown while growth is loading; usually route [ChildProfileArgs].
   final ChildProfileArgs? headerSnapshot;
+
+  /// When the parent has multiple children, switches the active child (reload cubits from screen).
+  final ValueChanged<String>? onSelectChild;
 
   @override
   Widget build(BuildContext context) {
@@ -114,28 +118,49 @@ class ChildInfoCard extends StatelessWidget {
 
         final name = loaded?.childName ?? snap?.childName ?? '';
         final birth = loaded?.birthDate ?? snap?.birthDate;
-        final genderRaw = (loaded?.gender ?? snap?.gender ?? '').toLowerCase();
+        final genderRaw = (loaded != null
+                ? loaded.gender
+                : (snap?.gender ?? ''))
+            .toLowerCase();
         final isGirl = genderRaw == 'female';
         final profileUrl = loaded?.profileImageUrl ?? snap?.profileImageUrl;
 
         final age = _ageFromBirth(birth);
         final ageText = context.formatAge(age.$1, age.$2);
 
-        final latest = loaded?.latest;
         final records = loaded?.records ?? const <GrowthRecord>[];
+        final monthlyPair = growthLatestTwoMonths(records);
+        final latestMonth = monthlyPair.$1;
+        final prevMonth = monthlyPair.$2;
 
-        final heightVal = _statValue(latest?.height ?? 0, context.l10n.cm);
-        final weightVal = _statValue(latest?.weight ?? 0, context.l10n.kg);
+        final heightVal = _statValue(
+          latestMonth?.height ?? 0,
+          context.l10n.cm,
+        );
+        final weightVal = _statValue(
+          latestMonth?.weight ?? 0,
+          context.l10n.kg,
+        );
         final headVal = _statValue(
-          latest?.headCircumference ?? 0,
+          latestMonth?.headCircumference ?? 0,
           context.l10n.cm,
         );
 
-        final dh = _deltaFor(latest, records, (e) => e.height, context.l10n.cm);
-        final dw = _deltaFor(latest, records, (e) => e.weight, context.l10n.kg);
-        final dhc = _deltaFor(
-          latest,
-          records,
+        final dh = _deltaMonthly(
+          latestMonth,
+          prevMonth,
+          (e) => e.height,
+          context.l10n.cm,
+        );
+        final dw = _deltaMonthly(
+          latestMonth,
+          prevMonth,
+          (e) => e.weight,
+          context.l10n.kg,
+        );
+        final dhc = _deltaMonthly(
+          latestMonth,
+          prevMonth,
           (e) => e.headCircumference,
           context.l10n.cm,
         );
@@ -176,134 +201,184 @@ class ChildInfoCard extends StatelessWidget {
             children: [
               Material(
                 color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(AppRadius.radius_sm),
-                  onTap: headerInk,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 4.h),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        avatar(48.w),
-                        Expanded(
-                          child: Container(
-                            margin: EdgeInsetsDirectional.only(start: 12.w),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4.h),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          borderRadius:
+                              BorderRadius.circular(AppRadius.radius_sm),
+                          onTap: headerInk,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 2.h),
                             child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      name.isEmpty ? '…' : name,
-                                      style: AppTextStyle.semibold16TextHeading(
-                                        context,
-                                      ),
+                                avatar(48.w),
+                                Expanded(
+                                  child: Container(
+                                    margin: EdgeInsetsDirectional.only(
+                                      start: 12.w,
                                     ),
-                                    SizedBox(height: 4.h),
-                                    Text(
-                                      ageText.isEmpty ? '—' : ageText,
-                                      style: AppTextStyle.medium12TextBody(
-                                        context,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(top: 12.h),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                              vertical: 4.h,
-                                              horizontal: 16.w,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: isDark
-                                                  ? AppColors.primary_50_dark
-                                                  : AppColors.primary_50_light,
-                                              borderRadius:
-                                                  BorderRadius.circular(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          name.isEmpty ? '…' : name,
+                                          style:
+                                              AppTextStyle.semibold16TextHeading(
+                                                context,
+                                              ),
+                                        ),
+                                        SizedBox(height: 4.h),
+                                        Text(
+                                          ageText.isEmpty ? '—' : ageText,
+                                          style: AppTextStyle.medium12TextBody(
+                                            context,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 12.h),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.symmetric(
+                                                  vertical: 4.h,
+                                                  horizontal: 16.w,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: isDark
+                                                      ? AppColors
+                                                          .primary_50_dark
+                                                      : AppColors
+                                                          .primary_50_light,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
                                                     AppRadius.radius_full,
                                                   ),
-                                              border: Border.all(
-                                                width: AppRadius.stroke_thin,
-                                                color: isDark
-                                                    ? AppColors.primary_200_dark
-                                                    : AppColors
-                                                          .primary_200_light,
-                                              ),
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                isGirl
-                                                    ? context.l10n.girl
-                                                    : context.l10n.boy,
-                                                style:
-                                                    AppTextStyle.medium12Primary(
+                                                  border: Border.all(
+                                                    width:
+                                                        AppRadius.stroke_thin,
+                                                    color: isDark
+                                                        ? AppColors
+                                                              .primary_200_dark
+                                                        : AppColors
+                                                              .primary_200_light,
+                                                  ),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    isGirl
+                                                        ? context.l10n.girl
+                                                        : context.l10n.boy,
+                                                    style: AppTextStyle
+                                                        .medium12Primary(
                                                       context,
                                                     ),
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                          ),
-                                          Container(
-                                            margin: EdgeInsetsDirectional.only(
-                                              start: 8.w,
-                                            ),
-                                            padding: EdgeInsets.symmetric(
-                                              vertical: 4.h,
-                                              horizontal: 16.w,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: isDark
-                                                  ? AppColors
-                                                        .bg_success_subtle_dark
-                                                  : AppColors
-                                                        .bg_success_subtle_light,
-                                              borderRadius:
-                                                  BorderRadius.circular(
+                                              Container(
+                                                margin:
+                                                    EdgeInsetsDirectional.only(
+                                                  start: 8.w,
+                                                ),
+                                                padding: EdgeInsets.symmetric(
+                                                  vertical: 4.h,
+                                                  horizontal: 16.w,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: isDark
+                                                      ? AppColors
+                                                          .bg_success_subtle_dark
+                                                      : AppColors
+                                                          .bg_success_subtle_light,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
                                                     AppRadius.radius_full,
                                                   ),
-                                              border: Border.all(
-                                                width: AppRadius.stroke_thin,
-                                                color: isDark
-                                                    ? AppColors
-                                                          .success_default_dark
-                                                    : AppColors
-                                                          .success_default_light,
-                                              ),
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                context
-                                                    .l10n
-                                                    .growthStatusHealthy,
-                                                style:
-                                                    AppTextStyle.medium12Succes(
+                                                  border: Border.all(
+                                                    width:
+                                                        AppRadius.stroke_thin,
+                                                    color: isDark
+                                                        ? AppColors
+                                                              .success_default_dark
+                                                        : AppColors
+                                                              .success_default_light,
+                                                  ),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    context.l10n
+                                                        .growthStatusHealthy,
+                                                    style: AppTextStyle
+                                                        .medium12Succes(
                                                       context,
                                                     ),
+                                                  ),
+                                                ),
                                               ),
-                                            ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                Icon(
-                                  loaded != null
-                                      ? Icons.edit_outlined
-                                      : Icons.info_outline,
-                                  size: 20.w,
-                                  color: isDark
-                                      ? AppColors.text_heading_dark
-                                      : AppColors.text_heading_light,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                      if (loaded != null &&
+                          loaded.children.length > 1 &&
+                          onSelectChild != null)
+                        Theme(
+                          data: Theme.of(context).copyWith(
+                            dividerColor: Colors.transparent,
+                          ),
+                          child: DropdownButton<String>(
+                            isDense: true,
+                            underline: const SizedBox.shrink(),
+                            value: loaded.childId,
+                            items: loaded.children
+                                .map(
+                                  (c) => DropdownMenuItem<String>(
+                                    value: c.id,
+                                    child: ConstrainedBox(
+                                      constraints: BoxConstraints(maxWidth: 120.w),
+                                      child: Text(
+                                        c.childName,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: AppTextStyle.medium12TextBody(
+                                          context,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (id) {
+                              if (id == null || id == loaded.childId) return;
+                              onSelectChild!(id);
+                            },
+                          ),
+                        )
+                      else if (loaded == null)
+                        Icon(
+                          Icons.info_outline,
+                          size: 20.w,
+                          color: isDark
+                              ? AppColors.text_heading_dark
+                              : AppColors.text_heading_light,
+                        )
+                      else
+                        SizedBox(width: 4.w),
+                    ],
                   ),
                 ),
               ),

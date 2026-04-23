@@ -13,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../data/models/growth_record_model.dart';
+import '../../domain/growth_monthly.dart';
 import '../cubit/growth_cubit.dart';
 import '../cubit/growth_state.dart';
 
@@ -41,8 +42,7 @@ class GrowthCurveSection extends StatelessWidget {
             child: BlocBuilder<GrowthCubit, GrowthState>(
               builder: (context, state) {
                 final List<GrowthRecord> records = state is GrowthLoaded
-                    ? (List<GrowthRecord>.of(state.records)
-                        ..sort((a, b) => a.recordDate.compareTo(b.recordDate)))
+                    ? growthRecordsOnePerMonth(state.records)
                     : <GrowthRecord>[];
                 final List<DateTime> xDates = records
                     .map((r) => r.recordDate)

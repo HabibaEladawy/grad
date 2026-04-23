@@ -6,6 +6,8 @@ class SkillCardData {
   final String bottomSheetTitle;
   final String bottomSheetDescription;
   final List<String> bottomSheetItems;
+  final int progressDone;
+  final int progressTotal;
 
   const SkillCardData({
     required this.title,
@@ -15,5 +17,7 @@ class SkillCardData {
     required this.bottomSheetTitle,
     required this.bottomSheetDescription,
     required this.bottomSheetItems,
+    this.progressDone = 0,
+    this.progressTotal = 0,
   });
 }

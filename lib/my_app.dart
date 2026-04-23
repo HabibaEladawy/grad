@@ -7,7 +7,6 @@ import 'package:dana/core/utils/app_theme.dart';
 import 'package:dana/features/auth/login/presentation/views/screens/forget_password/screens/forget_password_page.dart';
 import 'package:dana/features/auth/login/presentation/views/screens/login/screens/login_screen.dart';
 import 'package:dana/features/auth/login/presentation/views/screens/new_password/screens/new_password_screen.dart';
-import 'package:dana/features/auth/login/presentation/views/screens/sign_up_wired/sign_up_wired_screen.dart';
 import 'package:dana/features/auth/signUp/presentation/views/screens/sign_up/views/screens/signUp_screen.dart';
 import 'package:dana/features/home/presentation/views/screens/doctors_page.dart';
 import 'package:dana/features/home/presentation/views/screens/home_screen.dart';
@@ -34,6 +33,7 @@ import 'features/Chat_with_doctor/presentation/views/screens/Doctor_chat/screens
 import 'features/Examination/presentation/views/screens/examination_screen.dart';
 import 'features/auth/signUp/presentation/views/screens/add_children/views/screens/child_info_screen.dart';
 import 'features/auth/signUp/presentation/views/screens/contact_info/presentation/views/screens/contant_Info_screen.dart';
+import 'features/auth/signUp/presentation/views/screens/create_password/views/screens/create_password_screen.dart';
 import 'features/books/presentation/views/screens/books_screen.dart';
 import 'features/videos/presentation/views/screens/search_Screen.dart';
 import 'features/videos/presentation/views/screens/videos_Screen.dart';
@@ -102,8 +102,7 @@ class MyApp extends StatelessWidget {
 
       /// Sign Up
       AppRoutes.signup: (_) => const SignUpScreen(),
-      AppRoutes.signupWired: (_) => const SignUpWiredScreen(),
-      AppRoutes.createPassword: (_) => const SignUpScreen(),
+      AppRoutes.createPassword: (_) => CreatePasswordScreen(onNext: () {}),
       AppRoutes.childInfo: (ctx) => ChildInfoScreen(
         onNext: () => Navigator.pushNamed(ctx, AppRoutes.contactInfo),
       ),

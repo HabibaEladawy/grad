@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dana/core/errors/exceptions.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../data/models/parent_profile_model.dart';
 import '../../data/repo/parent_profile_repository.dart';
 import 'parent_profile_state.dart';
 
@@ -11,19 +12,26 @@ class ParentProfileCubit extends Cubit<ParentProfileState> {
 
   ParentProfileCubit(this.repo) : super(const ParentProfileInitial());
 
+  ParentProfileModel? _lastGoodProfile;
+
   String _errMsg(Object e) => e is ServerException ? e.message : e.toString();
 
   Future<void> loadMe({bool silent = false}) async {
     if (!silent) emit(const ParentProfileLoading());
     try {
       final profile = await repo.getMe();
+      _lastGoodProfile = profile;
       emit(ParentProfileLoaded(profile));
     } catch (e) {
+      if (silent && _lastGoodProfile != null) {
+        emit(ParentProfileLoaded(_lastGoodProfile!));
+        return;
+      }
       emit(ParentProfileError(_errMsg(e)));
     }
   }
 
-  /// Updates parent fields via `PATCH /v1/parentMe`. Returns `null` on success.
+  /// Updates parent fields via `PATCH /v1/parentMe` then refetches profile. Returns `null` on success.
   Future<String?> updateProfile({
     required String parentName,
     required String email,
@@ -39,21 +47,28 @@ class ParentProfileCubit extends Cubit<ParentProfileState> {
         government: government,
         address: address,
       );
+      _lastGoodProfile = profile;
       emit(ParentProfileLoaded(profile));
       return null;
     } catch (e) {
       final msg = _errMsg(e);
       try {
         final profile = await repo.getMe();
+        _lastGoodProfile = profile;
         emit(ParentProfileLoaded(profile));
       } catch (_) {
-        emit(ParentProfileError(msg));
+        if (_lastGoodProfile != null) {
+          emit(ParentProfileLoaded(_lastGoodProfile!));
+        } else {
+          emit(ParentProfileError(msg));
+        }
       }
       return msg;
     }
   }
 
-  Future<void> addChild({
+  /// Returns `null` on success, otherwise an error message for a SnackBar.
+  Future<String?> addChild({
     required String childName,
     required String gender,
     required DateTime birthDate,
@@ -65,8 +80,15 @@ class ParentProfileCubit extends Cubit<ParentProfileState> {
         birthDate: birthDate,
       );
       await loadMe(silent: true);
+      return null;
     } catch (e) {
-      emit(ParentProfileError(_errMsg(e)));
+      final msg = _errMsg(e);
+      if (_lastGoodProfile != null) {
+        emit(ParentProfileLoaded(_lastGoodProfile!));
+      } else {
+        emit(ParentProfileError(msg));
+      }
+      return msg;
     }
   }
 
@@ -91,11 +113,32 @@ class ParentProfileCubit extends Cubit<ParentProfileState> {
       final msg = _errMsg(e);
       try {
         final profile = await repo.getMe();
+        _lastGoodProfile = profile;
         emit(ParentProfileLoaded(profile));
       } catch (_) {
-        emit(ParentProfileError(msg));
+        if (_lastGoodProfile != null) {
+          emit(ParentProfileLoaded(_lastGoodProfile!));
+        } else {
+          emit(ParentProfileError(msg));
+        }
       }
       return msg;
+    }
+  }
+
+  /// Updates parent profile photo via multipart `PATCH /v1/parentMe`. Returns `null` on success.
+  Future<String?> updateProfilePhoto(File photo) async {
+    final cur = _lastGoodProfile;
+    if (cur == null) {
+      return 'noProfile';
+    }
+    try {
+      final profile = await repo.updateProfilePhoto(current: cur, photo: photo);
+      _lastGoodProfile = profile;
+      emit(ParentProfileLoaded(profile));
+      return null;
+    } catch (e) {
+      return _errMsg(e);
     }
   }
 }

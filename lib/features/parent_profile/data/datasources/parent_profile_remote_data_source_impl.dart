@@ -38,6 +38,34 @@ class ParentProfileRemoteDataSourceImpl
   }
 
   @override
+  Future<ParentProfileModel> patchMeWithOptionalFile({
+    required Map<String, dynamic> bodyJson,
+    File? file,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        'data': jsonEncode(bodyJson),
+        if (file != null)
+          'file': await MultipartFile.fromFile(
+            file.path,
+            filename: file.path.split(RegExp(r'[\\/]')).last,
+          ),
+      });
+      final res = await dio.patch(ApiEndpoint.parentMe, data: formData);
+      final decoded = ApiResponse.decode(res.data);
+      final data = ApiResponse.unwrapMap(decoded);
+      return ParentProfileModel.fromJson(data);
+    } on DioException catch (e) {
+      final msg = ApiError.messageFromDio(
+        e,
+        fallback: 'Failed to update profile',
+        decode: ApiResponse.decode,
+      );
+      throw ServerException(message: msg);
+    }
+  }
+
+  @override
   Future<ParentProfileModel> getMe() async {
     try {
       final res = await dio.get(ApiEndpoint.parentMe);

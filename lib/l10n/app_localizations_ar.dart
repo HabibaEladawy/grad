@@ -603,6 +603,23 @@ class AppLocalizationsAr extends AppLocalizations {
       'تسلم إيديكم.. قياسات الطفل الجديدة اتسجلت في ملفه بأمان. متابعتكم المستمرة لوزنه وطوله هي أهم خطوة عشان نطمن على صحته ونموه السليم.';
 
   @override
+  String get growthDuplicateMonth =>
+      'تم تسجيل بيانات النمو لهذا الشهر بالفعل. يمكنك إضافة قياس جديد الشهر القادم.';
+
+  @override
+  String get growthNotLoaded => 'بيانات الطفل غير جاهزة. حاول مرة أخرى.';
+
+  @override
+  String get addChildMissingFields => 'أدخل اسم الطفل وتاريخ الميلاد.';
+
+  @override
+  String get addChildMinimumAge => 'يجب أن يكون عمر الطفل شهراً على الأقل.';
+
+  @override
+  String get parentPhotoNoProfile =>
+      'لم يتم تحميل الملف الشخصي. افتح تبويب الحساب وحاول مرة أخرى.';
+
+  @override
   String get newSkills => 'مهاراته الجديدة';
 
   @override

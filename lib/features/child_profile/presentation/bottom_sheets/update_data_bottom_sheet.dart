@@ -165,12 +165,32 @@ class _UpdateDataBottomSheetState extends State<UpdateDataBottomSheet> {
                   ? AppTextStyle.semibold16TextButton(context)
                   : AppTextStyle.semibold16TextButtonDisabled(context),
               onTap: isButtonEnabled
-                  ? () {
-                      context.read<GrowthCubit>().submit(
+                  ? () async {
+                      final err = await context.read<GrowthCubit>().submit(
                         height: childHeight!,
                         weight: childWeight!,
                         headCircumference: headCircumference!,
                       );
+                      if (!context.mounted) return;
+                      if (err == 'growthDuplicateMonth') {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(context.l10n.growthDuplicateMonth),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                        return;
+                      }
+                      if (err == 'growthNotLoaded') {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(context.l10n.growthNotLoaded),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                        return;
+                      }
+                      if (err != null) return;
                       Navigator.pop(context);
                       widget.onSaved?.call();
                     }

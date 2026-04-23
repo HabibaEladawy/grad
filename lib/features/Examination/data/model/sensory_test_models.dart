@@ -15,12 +15,16 @@ class SensoryQuestionOption {
 class SensoryQuestion {
   final String id;
   final String text;
+  final String? textEn;
+  final String? textAr;
   final String category; // seeking | avoiding | sensitivity | registration
   final List<SensoryQuestionOption> options;
 
   SensoryQuestion({
     required this.id,
     required this.text,
+    this.textEn,
+    this.textAr,
     required this.category,
     required this.options,
   });
@@ -30,6 +34,8 @@ class SensoryQuestion {
     return SensoryQuestion(
       id: json['_id']?.toString() ?? '',
       text: json['text']?.toString() ?? '',
+      textEn: json['textEn']?.toString(),
+      textAr: json['textAr']?.toString(),
       category: json['category']?.toString() ?? '',
       options: opts
           .whereType<Map>()

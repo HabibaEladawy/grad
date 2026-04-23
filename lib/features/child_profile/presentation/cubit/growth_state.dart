@@ -1,3 +1,4 @@
+import '../../../parent_profile/data/models/parent_profile_model.dart';
 import '../../data/models/growth_record_model.dart';
 
 sealed class GrowthState {
@@ -20,6 +21,7 @@ class GrowthLoaded extends GrowthState {
   final String? profileImageUrl;
   final List<GrowthRecord> records;
   final GrowthRecord? latest;
+  final List<ParentChildModel> children;
 
   const GrowthLoaded({
     required this.childId,
@@ -29,6 +31,7 @@ class GrowthLoaded extends GrowthState {
     this.profileImageUrl,
     required this.records,
     required this.latest,
+    this.children = const [],
   });
 }
 

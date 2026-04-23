@@ -1190,6 +1190,36 @@ abstract class AppLocalizations {
   /// **'Great job! The child\'s new measurements have been safely saved. Regular tracking of weight and height is important for healthy growth.'**
   String get growthSavedMessage;
 
+  /// No description provided for @growthDuplicateMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Growth data for this calendar month is already saved. You can add a new measurement next month.'**
+  String get growthDuplicateMonth;
+
+  /// No description provided for @growthNotLoaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Child data is not ready. Please try again.'**
+  String get growthNotLoaded;
+
+  /// No description provided for @addChildMissingFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the child\'s name and birth date.'**
+  String get addChildMissingFields;
+
+  /// No description provided for @addChildMinimumAge.
+  ///
+  /// In en, this message translates to:
+  /// **'The child must be at least one month old.'**
+  String get addChildMinimumAge;
+
+  /// No description provided for @parentPhotoNoProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile is not loaded. Open the profile tab and try again.'**
+  String get parentPhotoNoProfile;
+
   /// No description provided for @newSkills.
   ///
   /// In en, this message translates to:

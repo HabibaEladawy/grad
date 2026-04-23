@@ -5,6 +5,7 @@ import '../../../parent_profile/data/models/parent_profile_model.dart';
 import '../../../parent_profile/data/repo/parent_profile_repository.dart';
 import '../../data/models/growth_record_model.dart';
 import '../../data/repo/growth_repo.dart';
+import '../../domain/growth_monthly.dart';
 import 'growth_state.dart';
 
 class GrowthCubit extends Cubit<GrowthState> {
@@ -51,6 +52,7 @@ class GrowthCubit extends Cubit<GrowthState> {
           profileImageUrl: child?.profileImageUrl,
           records: records,
           latest: latest,
+          children: me.children,
         ),
       );
     } catch (e) {
@@ -58,7 +60,8 @@ class GrowthCubit extends Cubit<GrowthState> {
     }
   }
 
-  Future<void> submit({
+  /// Returns `null` on success, or a stable error code for the UI to localize.
+  Future<String?> submit({
     required double height,
     required double weight,
     required double headCircumference,
@@ -69,7 +72,12 @@ class GrowthCubit extends Cubit<GrowthState> {
       await load();
     }
     final st = state;
-    if (st is! GrowthLoaded) return;
+    if (st is! GrowthLoaded) return 'growthNotLoaded';
+
+    final day = recordDate ?? DateTime.now();
+    if (growthMonthlyBucketExists(st.records, day)) {
+      return 'growthDuplicateMonth';
+    }
 
     emit(const GrowthLoading());
     try {
@@ -78,7 +86,7 @@ class GrowthCubit extends Cubit<GrowthState> {
         height: height,
         weight: weight,
         headCircumference: headCircumference,
-        recordDate: recordDate ?? DateTime.now(),
+        recordDate: day,
       );
       final records = await repo.getRecords(childId: st.childId);
       GrowthRecord? latest;
@@ -90,6 +98,7 @@ class GrowthCubit extends Cubit<GrowthState> {
                   .last
             : null;
       }
+      final me = await parentRepo.getMe();
       emit(
         GrowthLoaded(
           childId: st.childId,
@@ -99,10 +108,13 @@ class GrowthCubit extends Cubit<GrowthState> {
           profileImageUrl: st.profileImageUrl,
           records: records,
           latest: latest,
+          children: me.children,
         ),
       );
+      return null;
     } catch (e) {
       emit(GrowthError(ErrorMapper.message(e)));
+      return 'growthSubmitFailed';
     }
   }
 }

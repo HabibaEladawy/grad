@@ -305,6 +305,11 @@
 
 "growthCelebrationTitle": "Growing before our eyes!",
 "growthSavedMessage": "Great job! The child's new measurements have been safely saved. Regular tracking of weight and height is important for healthy growth.",
+  "growthDuplicateMonth": "Growth data for this calendar month is already saved. You can add a new measurement next month.",
+  "growthNotLoaded": "Child data is not ready. Please try again.",
+  "addChildMissingFields": "Enter the child's name and birth date.",
+  "addChildMinimumAge": "The child must be at least one month old.",
+  "parentPhotoNoProfile": "Profile is not loaded. Open the profile tab and try again.",
 
 "newSkills": "New Skills",
 "childGrowthTitle": "Growing and learning every day",

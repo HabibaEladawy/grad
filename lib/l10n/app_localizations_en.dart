@@ -605,6 +605,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'Great job! The child\'s new measurements have been safely saved. Regular tracking of weight and height is important for healthy growth.';
 
   @override
+  String get growthDuplicateMonth =>
+      'Growth data for this calendar month is already saved. You can add a new measurement next month.';
+
+  @override
+  String get growthNotLoaded => 'Child data is not ready. Please try again.';
+
+  @override
+  String get addChildMissingFields => 'Enter the child\'s name and birth date.';
+
+  @override
+  String get addChildMinimumAge => 'The child must be at least one month old.';
+
+  @override
+  String get parentPhotoNoProfile =>
+      'Profile is not loaded. Open the profile tab and try again.';
+
+  @override
   String get newSkills => 'New Skills';
 
   @override

@@ -11,6 +11,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../data/model/skill_card_model.dart';
 import '../cubit/skills_cubit.dart';
 import '../cubit/skills_state.dart';
+import 'skill_ui_utils.dart';
 
 void _openSkillChecklist(
   BuildContext hostContext, {
@@ -102,9 +103,11 @@ class SkillsHorizontalList extends StatelessWidget {
 
             final cubit = context.read<SkillsCubit>();
 
+            final visible = visibleSkillsUpToFour(skillList, total);
+
             final cards = <SkillCardData>[];
-            for (var i = 0; i < skillList.length; i++) {
-              final s = skillList[i];
+            for (var i = 0; i < visible.length; i++) {
+              final s = visible[i];
               final done = checked[s.id] ?? 0;
               final tot = total[s.id] ?? 0;
               final countLabel = tot > 0 ? '$done/$tot' : '—';
@@ -118,6 +121,8 @@ class SkillsHorizontalList extends StatelessWidget {
                   bottomSheetTitle: s.name,
                   bottomSheetDescription: '',
                   bottomSheetItems: const [],
+                  progressDone: done,
+                  progressTotal: tot,
                 ),
               );
             }
@@ -127,7 +132,7 @@ class SkillsHorizontalList extends StatelessWidget {
                 for (var i = 0; i < cards.length; i++) ...[
                   GestureDetector(
                     onTap: () {
-                      final s = skillList[i];
+                      final s = visible[i];
                       _openSkillChecklist(
                         context,
                         cubit: cubit,
@@ -138,7 +143,7 @@ class SkillsHorizontalList extends StatelessWidget {
                     child: SkillCard(
                       data: cards[i],
                       onExpandTap: () {
-                        final s = skillList[i];
+                        final s = visible[i];
                         _openSkillChecklist(
                           context,
                           cubit: cubit,

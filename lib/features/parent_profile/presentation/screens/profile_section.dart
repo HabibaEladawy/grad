@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dana/core/widgets/custom_frame.dart';
 import 'package:dana/core/widgets/custom_text_frame.dart';
 import 'package:dana/core/utils/app_colors.dart';
@@ -7,6 +9,7 @@ import 'package:dana/extensions/localization_extension.dart';
 import 'package:dana/features/parent_profile/presentation/widgets/profile_quick_access.dart';
 import 'package:dana/features/parent_profile/data/models/child_model.dart';
 import 'package:dana/providers/app_theme_provider.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:dana/features/parent_profile/presentation/bottom_sheets/add_child_bottom_sheet.dart';
 import 'package:dana/features/parent_profile/presentation/bottom_sheets/change_language_bottom_sheet.dart';
 import 'package:dana/features/parent_profile/presentation/bottom_sheets/change_theme_bottom_sheet.dart';
@@ -35,6 +38,32 @@ class ProfileSection extends StatefulWidget {
 
 class _ProfileSectionState extends State<ProfileSection> {
   int? selectedIndex = 1;
+
+  Future<void> _pickParentProfilePhoto(BuildContext context) async {
+    final picker = ImagePicker();
+    final file = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1600,
+      imageQuality: 88,
+    );
+    if (file == null || !context.mounted) return;
+    final err = await context.read<ParentProfileCubit>().updateProfilePhoto(
+          File(file.path),
+        );
+    if (!context.mounted) return;
+    if (err != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            err == 'noProfile'
+                ? context.l10n.parentPhotoNoProfile
+                : err,
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
 
   ChildModel _mapApiChildToUi(ParentChildModel apiChild) {
     final birthDate = apiChild.birthDate;
@@ -110,16 +139,46 @@ class _ProfileSectionState extends State<ProfileSection> {
                     children: [
                       Column(
                         children: [
-                          CircleAvatar(
-                            radius: 36.r,
-                            backgroundImage:
-                                (img != null &&
-                                    img.isNotEmpty &&
-                                    img.startsWith('http'))
-                                ? NetworkImage(img)
-                                : const AssetImage(
-                                    'assets/Images/parent_photo.png',
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              CircleAvatar(
+                                radius: 36.r,
+                                backgroundImage:
+                                    (img != null &&
+                                        img.isNotEmpty &&
+                                        img.startsWith('http'))
+                                    ? NetworkImage(img)
+                                    : const AssetImage(
+                                        'assets/Images/parent_photo.png',
+                                      ),
+                              ),
+                              if (loaded != null)
+                                Positioned(
+                                  right: -2,
+                                  bottom: -2,
+                                  child: Material(
+                                    color: isDark
+                                        ? AppColors.primary_600_dark
+                                        : AppColors.primary_600_light,
+                                    shape: const CircleBorder(),
+                                    child: InkWell(
+                                      customBorder: const CircleBorder(),
+                                      onTap: () => _pickParentProfilePhoto(
+                                        context,
+                                      ),
+                                      child: Padding(
+                                        padding: EdgeInsets.all(6.r),
+                                        child: Icon(
+                                          Icons.camera_alt_rounded,
+                                          size: 18.r,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
                                   ),
+                                ),
+                            ],
                           ),
                           SizedBox(height: 12.h),
                           if (state is ParentProfileLoading &&
@@ -193,13 +252,15 @@ class _ProfileSectionState extends State<ProfileSection> {
                                           ),
                                         ),
                                         builder: (_) => AddChildBottomSheet(
-                                          onAddChild: (child) {
+                                          onAddChild: (child) async {
                                             final gender = child.gender == 1
                                                 ? 'male'
                                                 : 'female';
                                             final birth = child.birthDate;
-                                            if (birth == null) return;
-                                            context
+                                            if (birth == null) {
+                                              return 'Missing birth date';
+                                            }
+                                            return context
                                                 .read<ParentProfileCubit>()
                                                 .addChild(
                                                   childName: child.name,

@@ -135,7 +135,14 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
                 }
                 return ListView(
                   children: [
-                    ChildInfoCard(headerSnapshot: widget.args),
+                    ChildInfoCard(
+                      headerSnapshot: widget.args,
+                      onSelectChild: (id) {
+                        _growthCubit.load(childId: id);
+                        _skillsCubit.loadSkills(childId: id);
+                        _vaccinationCubit.load(childId: id);
+                      },
+                    ),
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 12.h),
                       child: CustomToggleSelector(

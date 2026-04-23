@@ -7,6 +7,11 @@ abstract class ParentProfileRemoteDataSource {
 
   Future<ParentProfileModel> patchMe(Map<String, dynamic> body);
 
+  Future<ParentProfileModel> patchMeWithOptionalFile({
+    required Map<String, dynamic> bodyJson,
+    File? file,
+  });
+
   Future<ParentChildModel> addChild({
     required String childName,
     required String gender,

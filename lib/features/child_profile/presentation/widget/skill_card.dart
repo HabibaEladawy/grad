@@ -63,6 +63,23 @@ class SkillCard extends StatelessWidget {
           ),
           Text(data.subtitle, style: AppTextStyle.medium12TextBody(context)),
 
+          if (data.progressTotal > 0) ...[
+            SizedBox(height: 8.h),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4.r),
+              child: LinearProgressIndicator(
+                value: (data.progressDone / data.progressTotal).clamp(0.0, 1.0),
+                minHeight: 6.h,
+                backgroundColor: isDark
+                    ? AppColors.border_card_default_dark
+                    : AppColors.border_card_default_light,
+                color: isDark
+                    ? AppColors.secondary_default_dark
+                    : AppColors.secondary_default_light,
+              ),
+            ),
+          ],
+
           const Spacer(),
           SizedBox(height: 12.h),
 

@@ -18,13 +18,33 @@ class ParentProfileRepository {
     required String phone,
     required String government,
     required String address,
-  }) => remote.patchMe({
-    'parentName': parentName.trim(),
-    'email': email.trim().toLowerCase(),
-    'phone': ParentPhoneUtils.normalizeForApi(phone),
-    'government': government.trim(),
-    'address': address.trim(),
-  });
+  }) async {
+    await remote.patchMe({
+      'parentName': parentName.trim(),
+      'email': email.trim(),
+      'phone': ParentPhoneUtils.normalizeForApi(phone),
+      'government': government.trim(),
+      'address': address.trim(),
+    });
+    return remote.getMe();
+  }
+
+  Future<ParentProfileModel> updateProfilePhoto({
+    required ParentProfileModel current,
+    required File photo,
+  }) async {
+    await remote.patchMeWithOptionalFile(
+      bodyJson: {
+        'parentName': current.parentName.trim(),
+        'email': current.email.trim(),
+        'phone': ParentPhoneUtils.normalizeForApi(current.phone),
+        'government': current.government.trim(),
+        'address': current.address.trim(),
+      },
+      file: photo,
+    );
+    return remote.getMe();
+  }
 
   Future<ParentChildModel> addChild({
     required String childName,

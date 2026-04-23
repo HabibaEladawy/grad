@@ -1,3 +1,4 @@
+import 'package:dana/core/utils/child_age_utils.dart';
 import 'package:dana/core/widgets/blood_type_selector.dart';
 import 'package:dana/core/widgets/custom_button.dart';
 import 'package:dana/core/widgets/custom_date_picker.dart';
@@ -12,7 +13,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AddChildBottomSheet extends StatefulWidget {
-  final Function(ChildModel) onAddChild;
+  /// Returns `null` on success, or an error message to show (e.g. from API).
+  final Future<String?> Function(ChildModel child) onAddChild;
   final int? selectedIndex;
 
   const AddChildBottomSheet({
@@ -33,6 +35,7 @@ class _AddChildBottomSheetState extends State<AddChildBottomSheet> {
   int ageYears = 0;
   int ageMonths = 0;
   DateTime? _birthDate;
+  bool _submitting = false;
 
   late int localSelectedIndex;
 
@@ -134,29 +137,49 @@ class _AddChildBottomSheetState extends State<AddChildBottomSheet> {
             SizedBox(height: 150.h),
 
             CustomButton(
-              text: context.l10n.add,
-              onTap: () {
-                if (nameController.text.trim().isEmpty ||
-                    _birthDate == null ||
-                    ageController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('أدخل اسم الطفل وتاريخ الميلاد'),
-                    ),
-                  );
-                  return;
-                }
-                widget.onAddChild(
-                  ChildModel(
-                    name: nameController.text.trim(),
-                    years: ageYears,
-                    months: ageMonths,
-                    gender: localSelectedIndex,
-                    birthDate: _birthDate,
-                  ),
-                );
-                Navigator.pop(context);
-              },
+              text: _submitting ? '…' : context.l10n.add,
+              onTap: _submitting
+                  ? () {}
+                  : () async {
+                      if (nameController.text.trim().isEmpty ||
+                          _birthDate == null ||
+                          ageController.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(context.l10n.addChildMissingFields),
+                          ),
+                        );
+                        return;
+                      }
+                      final birth = _birthDate!;
+                      if (!isAtLeastMinimumChildAge(birth)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(context.l10n.addChildMinimumAge),
+                          ),
+                        );
+                        return;
+                      }
+                      setState(() => _submitting = true);
+                      final err = await widget.onAddChild(
+                        ChildModel(
+                          name: nameController.text.trim(),
+                          years: ageYears,
+                          months: ageMonths,
+                          gender: localSelectedIndex,
+                          birthDate: birth,
+                        ),
+                      );
+                      if (!mounted) return;
+                      setState(() => _submitting = false);
+                      if (err != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(err)),
+                        );
+                        return;
+                      }
+                      Navigator.pop(context);
+                    },
             ),
             SizedBox(height: 20.h),
           ],
