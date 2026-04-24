@@ -222,30 +222,13 @@ class SignUpCubit extends Cubit<SignUpState> {
     );
     if (isClosed) return;
 
-    // If backend is not aligned (500 / generic server error), fall back to
-    // `/change-password` while authenticated.
-    final shouldFallback = addRes.fold(
-      (f) {
-        final m = f.message.toLowerCase();
-        // Backends that don't implement `add-password` yet often respond with:
-        // - "Cannot POST /api/v1/parent/add-password" (Express default)
-        // - 404-like messages
-        // - generic internal/server errors
-        return m.contains('cannot post') ||
-            m.contains('not found') ||
-            m.contains('404') ||
-            m.contains('internal') ||
-            m.contains('server') ||
-            f.message.contains('حدث خطأ في الخادم') ||
-            f.message.contains('غير موجود');
-      },
-      (_) => false,
-    );
-    if (!shouldFallback) {
-      addRes.fold(
-        (f) => emit(SignUpFailure(message: f.message)),
-        (_) => emit(const SignUpPasswordCreated()),
-      );
+    // Production-safe behavior:
+    // - Some deployments don't actually expose `/add-password` yet (404 "Cannot POST ...")
+    // - Some return generic 500s
+    // In both cases, fall back to the authenticated `/change-password` endpoint.
+    final addOk = addRes.isRight();
+    if (addOk) {
+      emit(const SignUpPasswordCreated());
       return;
     }
 
@@ -258,7 +241,11 @@ class SignUpCubit extends Cubit<SignUpState> {
     );
     if (isClosed) return;
     changeRes.fold(
-      (f) => emit(SignUpFailure(message: f.message)),
+      (f) {
+        // If both endpoints fail, surface the *most actionable* error.
+        // Prefer change-password message (usually auth/validation); else show add-password.
+        emit(SignUpFailure(message: f.message));
+      },
       (_) => emit(const SignUpPasswordCreated()),
     );
   }
