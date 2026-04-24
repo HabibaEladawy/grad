@@ -1,5 +1,6 @@
 import 'package:dana/core/widgets/custom_frame.dart';
 import 'package:dana/core/utils/app_colors.dart';
+import 'package:dana/core/utils/display_name_utils.dart';
 import 'package:dana/core/utils/app_raduis.dart';
 import 'package:dana/core/utils/app_text_style.dart';
 import 'package:dana/extensions/localization_extension.dart';
@@ -14,6 +15,7 @@ import 'package:dana/features/child_profile/presentation/cubit/skills_cubit.dart
 import 'package:dana/features/child_profile/presentation/cubit/skills_state.dart';
 import 'package:dana/features/child_profile/domain/growth_monthly.dart';
 import 'package:dana/features/child_profile/presentation/widget/custom_stat_card.dart';
+import 'package:dana/features/parent_profile/data/models/parent_profile_model.dart';
 import 'package:dana/providers/app_theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -90,7 +92,39 @@ int? _averageSkillDevelopmentPercent(SkillsState s) {
   return (sum / n).round();
 }
 
-class ChildInfoCard extends StatelessWidget {
+Widget _childProfileAvatar({
+  required bool isGirl,
+  required String? profileUrl,
+  required double side,
+}) {
+  final u = profileUrl;
+  if (u != null && u.isNotEmpty && u.startsWith('http')) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8.r),
+      child: Image.network(
+        u,
+        width: side,
+        height: side,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Image.asset(
+          isGirl
+              ? 'assets/Images/girl_child_photo.png'
+              : 'assets/Images/home/boy_child_photo.png',
+          width: side,
+        ),
+      ),
+    );
+  }
+  return Image.asset(
+    isGirl
+        ? 'assets/Images/girl_child_photo.png'
+        : 'assets/Images/home/boy_child_photo.png',
+    width: side,
+    height: side,
+  );
+}
+
+class ChildInfoCard extends StatefulWidget {
   const ChildInfoCard({
     super.key,
     this.headerSnapshot,
@@ -104,6 +138,14 @@ class ChildInfoCard extends StatelessWidget {
   final ValueChanged<String>? onSelectChild;
 
   @override
+  State<ChildInfoCard> createState() => _ChildInfoCardState();
+}
+
+class _ChildInfoCardState extends State<ChildInfoCard> {
+  bool _pickerExpanded = false;
+  String? _lastSyncedChildId;
+
+  @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<AppThemeProvider>();
     final isDark =
@@ -114,9 +156,10 @@ class ChildInfoCard extends StatelessWidget {
     return BlocBuilder<GrowthCubit, GrowthState>(
       builder: (context, growth) {
         final loaded = growth is GrowthLoaded ? growth : null;
-        final snap = headerSnapshot;
+        final snap = widget.headerSnapshot;
 
         final name = loaded?.childName ?? snap?.childName ?? '';
+        final displayName = DisplayNameUtils.dedupeRepeatedPhrase(name);
         final birth = loaded?.birthDate ?? snap?.birthDate;
         final genderRaw = (loaded != null
                 ? loaded.gender
@@ -165,32 +208,28 @@ class ChildInfoCard extends StatelessWidget {
           context.l10n.cm,
         );
 
-        Widget avatar(double w) {
-          final u = profileUrl;
-          if (u != null && u.isNotEmpty && u.startsWith('http')) {
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(8.r),
-              child: Image.network(
-                u,
-                width: w,
-                height: w,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Image.asset(
-                  isGirl
-                      ? 'assets/Images/girl_child_photo.png'
-                      : 'assets/Images/home/boy_child_photo.png',
-                  width: w,
-                ),
-              ),
-            );
+        if (loaded != null) {
+          final cid = loaded.childId;
+          if (_lastSyncedChildId != cid) {
+            final hadPrevious = _lastSyncedChildId != null;
+            _lastSyncedChildId = cid;
+            if (hadPrevious && _pickerExpanded) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) setState(() => _pickerExpanded = false);
+              });
+            }
           }
-          return Image.asset(
-            isGirl
-                ? 'assets/Images/girl_child_photo.png'
-                : 'assets/Images/home/boy_child_photo.png',
-            width: w,
-          );
         }
+
+        final showChildPicker = loaded != null &&
+            loaded.children.length > 1 &&
+            widget.onSelectChild != null;
+
+        final otherChildren = loaded == null
+            ? const <ParentChildModel>[]
+            : loaded.children
+                .where((c) => c.id != loaded.childId)
+                .toList(growable: false);
 
         final headerInk = loaded != null
             ? () => showUpdateMeasurementsBottomSheet(context)
@@ -216,7 +255,11 @@ class ChildInfoCard extends StatelessWidget {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                avatar(48.w),
+                                _childProfileAvatar(
+                                  isGirl: isGirl,
+                                  profileUrl: profileUrl,
+                                  side: 48.w,
+                                ),
                                 Expanded(
                                   child: Container(
                                     margin: EdgeInsetsDirectional.only(
@@ -227,7 +270,7 @@ class ChildInfoCard extends StatelessWidget {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          name.isEmpty ? '…' : name,
+                                          displayName.isEmpty ? '…' : displayName,
                                           style:
                                               AppTextStyle.semibold16TextHeading(
                                                 context,
@@ -333,39 +376,24 @@ class ChildInfoCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (loaded != null &&
-                          loaded.children.length > 1 &&
-                          onSelectChild != null)
-                        Theme(
-                          data: Theme.of(context).copyWith(
-                            dividerColor: Colors.transparent,
+                      if (showChildPicker)
+                        IconButton(
+                          onPressed: () => setState(
+                            () => _pickerExpanded = !_pickerExpanded,
                           ),
-                          child: DropdownButton<String>(
-                            isDense: true,
-                            underline: const SizedBox.shrink(),
-                            value: loaded.childId,
-                            items: loaded.children
-                                .map(
-                                  (c) => DropdownMenuItem<String>(
-                                    value: c.id,
-                                    child: ConstrainedBox(
-                                      constraints: BoxConstraints(maxWidth: 120.w),
-                                      child: Text(
-                                        c.childName,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: AppTextStyle.medium12TextBody(
-                                          context,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: (id) {
-                              if (id == null || id == loaded.childId) return;
-                              onSelectChild!(id);
-                            },
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsetsDirectional.only(start: 4.w),
+                          constraints: BoxConstraints(
+                            minWidth: 40.w,
+                            minHeight: 40.h,
+                          ),
+                          icon: Icon(
+                            _pickerExpanded
+                                ? Icons.expand_less
+                                : Icons.expand_more,
+                            color: isDark
+                                ? AppColors.text_heading_dark
+                                : AppColors.text_heading_light,
                           ),
                         )
                       else if (loaded == null)
@@ -382,6 +410,107 @@ class ChildInfoCard extends StatelessWidget {
                   ),
                 ),
               ),
+              if (showChildPicker && _pickerExpanded && otherChildren.isNotEmpty)
+                Padding(
+                  padding: EdgeInsets.only(bottom: 8.h),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? AppColors.bg_surface_subtle_dark
+                          : AppColors.bg_surface_subtle_light,
+                      borderRadius:
+                          BorderRadius.circular(AppRadius.radius_md),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (var i = 0; i < otherChildren.length; i++) ...[
+                          if (i > 0)
+                            Divider(
+                              height: 1,
+                              thickness: 0.5.h,
+                              color: isDark
+                                  ? AppColors.border_card_default_dark
+                                  : AppColors.border_card_default_light,
+                            ),
+                          InkWell(
+                            onTap: () {
+                              final id = otherChildren[i].id;
+                              setState(() => _pickerExpanded = false);
+                              widget.onSelectChild!(id);
+                            },
+                            borderRadius: i == 0
+                                ? BorderRadius.vertical(
+                                    top: Radius.circular(AppRadius.radius_md),
+                                  )
+                                : i == otherChildren.length - 1
+                                    ? BorderRadius.vertical(
+                                        bottom: Radius.circular(
+                                          AppRadius.radius_md,
+                                        ),
+                                      )
+                                    : null,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12.w,
+                                vertical: 12.h,
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  _childProfileAvatar(
+                                    isGirl: otherChildren[i]
+                                            .gender
+                                            .toLowerCase() ==
+                                        'female',
+                                    profileUrl:
+                                        otherChildren[i].profileImageUrl,
+                                    side: 44.w,
+                                  ),
+                                  SizedBox(width: 12.w),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          DisplayNameUtils
+                                              .dedupeRepeatedPhrase(
+                                            otherChildren[i].childName,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: AppTextStyle
+                                              .semibold16TextHeading(
+                                            context,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4.h),
+                                        Text(
+                                          context.formatAge(
+                                            _ageFromBirth(
+                                              otherChildren[i].birthDate,
+                                            ).$1,
+                                            _ageFromBirth(
+                                              otherChildren[i].birthDate,
+                                            ).$2,
+                                          ),
+                                          style: AppTextStyle.medium12TextBody(
+                                            context,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
               Divider(
                 height: 28.h,
                 thickness: 0.5.h,

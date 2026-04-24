@@ -14,4 +14,18 @@ class DisplayNameUtils {
     if (first == second) return first;
     return t;
   }
+
+  /// Removes common API duplication: twin substring, or the same phrase twice
+  /// with whitespace (`نوح عبدالرحمن نوح عبدالرحمن` → `نوح عبدالرحمن`).
+  static String dedupeRepeatedPhrase(String raw) {
+    final twin = dedupeTwinRepeated(raw.trim());
+    final words = twin.split(RegExp(r'\s+'));
+    if (words.length >= 2 && words.length.isEven) {
+      final mid = words.length ~/ 2;
+      final first = words.sublist(0, mid).join(' ');
+      final second = words.sublist(mid).join(' ');
+      if (first == second) return first;
+    }
+    return twin;
+  }
 }

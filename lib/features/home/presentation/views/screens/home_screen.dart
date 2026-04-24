@@ -3,6 +3,7 @@ import 'package:dana/core/widgets/custom_app_bar_button.dart';
 import 'package:dana/core/widgets/custom_button.dart';
 import 'package:dana/core/widgets/custom_frame.dart';
 import 'package:dana/core/utils/app_colors.dart';
+import 'package:dana/core/utils/display_name_utils.dart';
 import 'package:dana/core/utils/app_raduis.dart';
 import 'package:dana/core/utils/app_routes.dart';
 import 'package:dana/features/child_profile/child_profile_args.dart';
@@ -49,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final GrowthCubit _growthCubit;
   String? _growthChildId;
   String? _homeSelectedChildId;
+  bool _homeChildPickerExpanded = false;
 
   final List<String> _icons = [
     'assets/Icons/home_icon.svg',
@@ -125,12 +127,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 var id = _homeSelectedChildId;
                 if (id == null || !ids.contains(id)) {
                   id = pState.profile.children.first.id;
-                  setState(() => _homeSelectedChildId = id);
+                  setState(() {
+                    _homeSelectedChildId = id;
+                    _homeChildPickerExpanded = false;
+                  });
                 }
                 _ensureGrowthLoadedForChild(id);
               } else if (pState is ParentProfileLoaded &&
                   pState.profile.children.isEmpty) {
-                setState(() => _homeSelectedChildId = null);
+                setState(() {
+                  _homeSelectedChildId = null;
+                  _homeChildPickerExpanded = false;
+                });
               }
             },
             child: Stack(
@@ -169,7 +177,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             vertical: 3.5.h,
                                           ),
                                           child: Text(
-                                            pState.profile.parentName,
+                                            DisplayNameUtils.dedupeRepeatedPhrase(
+                                              pState.profile.parentName,
+                                            ),
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             style:
@@ -212,129 +222,243 @@ class _HomeScreenState extends State<HomeScreen> {
                                   final age = _ageFromBirth(c.birthDate);
                                   final isBoy =
                                       c.gender.toLowerCase() != 'female';
-                                  return Row(
+                                  final showPicker = children.length > 1;
+                                  final otherChildren = children
+                                      .where((ch) => ch.id != c.id)
+                                      .toList(growable: false);
+                                  return Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                        CrossAxisAlignment.stretch,
                                     children: [
-                                      Image.asset(
-                                        isBoy
-                                            ? 'assets/Images/home/boy_child_photo.png'
-                                            : 'assets/Images/girl_child_photo.png',
-                                        width: 48.w,
-                                      ),
-                                      SizedBox(width: 12.w),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                            vertical: 3.5.h,
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Image.asset(
+                                            isBoy
+                                                ? 'assets/Images/home/boy_child_photo.png'
+                                                : 'assets/Images/girl_child_photo.png',
+                                            width: 48.w,
                                           ),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
+                                          SizedBox(width: 12.w),
+                                          Expanded(
+                                            child: Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                vertical: 3.5.h,
+                                              ),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
-                                                  Flexible(
-                                                    child: Text(
-                                                      c.childName,
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: AppTextStyle
-                                                          .semibold16TextHeading(
-                                                        context,
+                                                  Row(
+                                                    children: [
+                                                      Flexible(
+                                                        child: Text(
+                                                          DisplayNameUtils
+                                                              .dedupeRepeatedPhrase(
+                                                            c.childName,
+                                                          ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: AppTextStyle
+                                                              .semibold16TextHeading(
+                                                            context,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      if (showPicker)
+                                                        IconButton(
+                                                          onPressed: () =>
+                                                              setState(() {
+                                                            _homeChildPickerExpanded =
+                                                                !_homeChildPickerExpanded;
+                                                          }),
+                                                          visualDensity:
+                                                              VisualDensity
+                                                                  .compact,
+                                                          padding:
+                                                              EdgeInsetsDirectional
+                                                                  .only(
+                                                            start: 4.w,
+                                                          ),
+                                                          constraints:
+                                                              BoxConstraints(
+                                                            minWidth: 40.w,
+                                                            minHeight: 40.h,
+                                                          ),
+                                                          icon: Icon(
+                                                            _homeChildPickerExpanded
+                                                                ? Icons
+                                                                    .expand_less
+                                                                : Icons
+                                                                    .expand_more,
+                                                            color: isDark
+                                                                ? AppColors
+                                                                    .text_heading_dark
+                                                                : AppColors
+                                                                    .text_heading_light,
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 4.h),
+                                                  Text(
+                                                    context.formatAge(
+                                                      age.$1,
+                                                      age.$2,
+                                                    ),
+                                                    style: AppTextStyle
+                                                        .medium12TextBody(
+                                                      context,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          CustomButton(
+                                            borderRadius:
+                                                AppRadius.radius_full,
+                                            height: 32.w,
+                                            width: 32.w,
+                                            icon: Icons
+                                                .arrow_forward_ios_rounded,
+                                            iconSize: 14.w,
+                                            onTap: () {
+                                              Navigator.of(context).pushNamed(
+                                                AppRoutes.childProfile,
+                                                arguments: ChildProfileArgs
+                                                    .fromParentChild(c),
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      if (showPicker &&
+                                          _homeChildPickerExpanded &&
+                                          otherChildren.isNotEmpty)
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 8.h),
+                                          child: DecoratedBox(
+                                            decoration: BoxDecoration(
+                                              color: isDark
+                                                  ? AppColors
+                                                      .bg_surface_subtle_dark
+                                                  : AppColors
+                                                      .bg_surface_subtle_light,
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                AppRadius.radius_md,
+                                              ),
+                                            ),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                for (var i = 0;
+                                                    i < otherChildren.length;
+                                                    i++) ...[
+                                                  if (i > 0)
+                                                    Divider(
+                                                      height: 1,
+                                                      thickness: 0.5.h,
+                                                      color: isDark
+                                                          ? AppColors
+                                                              .border_card_default_dark
+                                                          : AppColors
+                                                              .border_card_default_light,
+                                                    ),
+                                                  InkWell(
+                                                    onTap: () {
+                                                      final newId =
+                                                          otherChildren[i].id;
+                                                      setState(() {
+                                                        _homeChildPickerExpanded =
+                                                            false;
+                                                        _homeSelectedChildId =
+                                                            newId;
+                                                      });
+                                                      _ensureGrowthLoadedForChild(
+                                                        newId,
+                                                      );
+                                                    },
+                                                    child: Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                        horizontal: 12.w,
+                                                        vertical: 12.h,
+                                                      ),
+                                                      child: Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Image.asset(
+                                                            otherChildren[i]
+                                                                        .gender
+                                                                        .toLowerCase() ==
+                                                                    'female'
+                                                                ? 'assets/Images/girl_child_photo.png'
+                                                                : 'assets/Images/home/boy_child_photo.png',
+                                                            width: 44.w,
+                                                          ),
+                                                          SizedBox(width: 12.w),
+                                                          Expanded(
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  DisplayNameUtils
+                                                                      .dedupeRepeatedPhrase(
+                                                                    otherChildren[i]
+                                                                        .childName,
+                                                                  ),
+                                                                  maxLines: 1,
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  style: AppTextStyle
+                                                                      .semibold16TextHeading(
+                                                                    context,
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                    height:
+                                                                        4.h,
+                                                                ),
+                                                                Text(
+                                                                  context
+                                                                      .formatAge(
+                                                                    _ageFromBirth(
+                                                                      otherChildren[i]
+                                                                          .birthDate,
+                                                                    ).$1,
+                                                                    _ageFromBirth(
+                                                                      otherChildren[i]
+                                                                          .birthDate,
+                                                                    ).$2,
+                                                                  ),
+                                                                  style: AppTextStyle
+                                                                      .medium12TextBody(
+                                                                    context,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
                                                   ),
-                                                  if (children.length > 1)
-                                                    Theme(
-                                                      data: Theme.of(context)
-                                                          .copyWith(
-                                                        dividerColor:
-                                                            Colors.transparent,
-                                                      ),
-                                                      child: DropdownButton<
-                                                          String>(
-                                                        isDense: true,
-                                                        underline: const SizedBox
-                                                            .shrink(),
-                                                        value: c.id,
-                                                        items: children
-                                                            .map(
-                                                              (ch) =>
-                                                                  DropdownMenuItem<
-                                                                      String>(
-                                                                value: ch.id,
-                                                                child:
-                                                                    ConstrainedBox(
-                                                                  constraints:
-                                                                      BoxConstraints(
-                                                                    maxWidth:
-                                                                        100.w,
-                                                                  ),
-                                                                  child: Text(
-                                                                    ch.childName,
-                                                                    maxLines: 1,
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                    style: AppTextStyle
-                                                                        .medium12TextBody(
-                                                                      context,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            )
-                                                            .toList(),
-                                                        onChanged: (newId) {
-                                                          if (newId == null) {
-                                                            return;
-                                                          }
-                                                          setState(() =>
-                                                              _homeSelectedChildId =
-                                                                  newId,);
-                                                          _ensureGrowthLoadedForChild(
-                                                            newId,
-                                                          );
-                                                        },
-                                                      ),
-                                                    ),
                                                 ],
-                                              ),
-                                              SizedBox(height: 4.h),
-                                              Text(
-                                                context.formatAge(
-                                                  age.$1,
-                                                  age.$2,
-                                                ),
-                                                style: AppTextStyle
-                                                    .medium12TextBody(
-                                                  context,
-                                                ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      CustomButton(
-                                        borderRadius: AppRadius.radius_full,
-                                        height: 32.w,
-                                        width: 32.w,
-                                        icon: Icons.arrow_forward_ios_rounded,
-                                        iconSize: 14.w,
-                                        onTap: () {
-                                          Navigator.of(context).pushNamed(
-                                            AppRoutes.childProfile,
-                                            arguments:
-                                                ChildProfileArgs.fromParentChild(
-                                                  c,
-                                                ),
-                                          );
-                                        },
-                                      ),
                                     ],
                                   );
                                 }

@@ -26,7 +26,7 @@ class ParentProfileModel {
     final rawImg = json['profileImage']?.toString();
     return ParentProfileModel(
       id: json['_id']?.toString() ?? '',
-      parentName: DisplayNameUtils.dedupeTwinRepeated(
+      parentName: DisplayNameUtils.dedupeRepeatedPhrase(
         json['parentName']?.toString() ?? '',
       ),
       phone: json['phone']?.toString() ?? '',
@@ -88,7 +88,7 @@ class ParentChildModel {
     final rawImg = json['profileImage']?.toString();
     return ParentChildModel(
       id: json['_id']?.toString() ?? '',
-      childName: DisplayNameUtils.dedupeTwinRepeated(
+      childName: DisplayNameUtils.dedupeRepeatedPhrase(
         json['childName']?.toString() ?? '',
       ),
       gender: json['gender']?.toString() ?? '',
