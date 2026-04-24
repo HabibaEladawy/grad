@@ -22,13 +22,18 @@ class SignUpOtpSent extends SignUpState {
   List<Object?> get props => [phone];
 }
 
-/// verifySignUp نجح – الحساب اتأكد
+/// verifySignUp نجح – جلسة مبدئية جاهزة لإكمال كلمة المرور
 class SignUpVerified extends SignUpState {
   final String token;
   const SignUpVerified({required this.token});
 
   @override
   List<Object?> get props => [token];
+}
+
+/// add-password نجح – إكمال التسجيل
+class SignUpPasswordCreated extends SignUpState {
+  const SignUpPasswordCreated();
 }
 
 class SignUpFailure extends SignUpState {

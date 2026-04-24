@@ -1138,6 +1138,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get confirmPasswordHint => 'اكتب كلمة المرور مرة أخرى';
 
   @override
+  String get passwordsMismatch => 'كلمتا السر غير متطابقتين';
+
+  @override
   String get createAccountButton => 'إنشاء حساب';
 
   @override

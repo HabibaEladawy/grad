@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/api/api_endpoint.dart';
+
 class ChildVaccinationService {
   final Dio dio;
 
@@ -11,7 +13,7 @@ class ChildVaccinationService {
     required DateTime takenDate,
   }) {
     return dio.patch(
-      '/v1/child/$childId/childVaccinations/$vaccinationId/take',
+      ApiEndpoint.childVaccinationTakePath(childId, vaccinationId),
       data: {'takenDate': takenDate.toUtc().toIso8601String()},
       options: Options(headers: {'Content-Type': 'application/json'}),
     );

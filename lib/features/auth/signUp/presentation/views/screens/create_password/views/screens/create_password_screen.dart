@@ -4,6 +4,7 @@ import 'package:dana/extensions/localization_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dana/features/auth/login/presentation/cubit/sign_up_cubit.dart';
+import 'package:dana/features/auth/login/presentation/cubit/sign_up_state.dart';
 import '../widgets/create_password_body.dart';
 
 class CreatePasswordScreen extends StatefulWidget {
@@ -32,13 +33,29 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
     return Scaffold(
       bottomNavigationBar: Padding(
         padding: EdgeInsets.all(AppRadius.radius_xl),
-        child: CustomButton(
-          onTap: () async {
-            final cubit = context.read<SignUpCubit>();
-            cubit.updatePassword(passwordController.text);
-            await cubit.preSignUp();
+        child: BlocBuilder<SignUpCubit, SignUpState>(
+          buildWhen: (p, n) => n is SignUpLoading || p is SignUpLoading,
+          builder: (context, state) {
+            final loading = state is SignUpLoading;
+            return CustomButton(
+              onTap: () async {
+                if (loading) return;
+                if (passwordController.text !=
+                    confirmPasswordController.text) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(context.l10n.passwordsMismatch),
+                    ),
+                  );
+                  return;
+                }
+                final cubit = context.read<SignUpCubit>();
+                cubit.updatePassword(passwordController.text);
+                await cubit.addPassword();
+              },
+              text: context.l10n.createAccount,
+            );
           },
-          text: context.l10n.createAccount,
         ),
       ),
       body: SafeArea(

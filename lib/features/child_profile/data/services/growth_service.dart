@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/api/api_endpoint.dart';
 import '../models/growth_record_model.dart';
 
 class GrowthService {
@@ -8,7 +9,7 @@ class GrowthService {
   GrowthService(this.dio);
 
   Future<List<GrowthRecord>> getRecords({required String childId}) async {
-    final res = await dio.get('/v1/child/$childId/growth');
+    final res = await dio.get(ApiEndpoint.childGrowthRecords(childId));
     final data = res.data;
     final list = data is List
         ? data
@@ -26,7 +27,7 @@ class GrowthService {
   }
 
   Future<GrowthRecord> getLatest({required String childId}) async {
-    final res = await dio.get('/v1/child/$childId/growth/latest');
+    final res = await dio.get(ApiEndpoint.childGrowthLatest(childId));
     final data = res.data;
     if (data is Map && data['data'] is Map) {
       return GrowthRecord.fromJson(
@@ -45,7 +46,7 @@ class GrowthService {
     required DateTime recordDate,
   }) async {
     final res = await dio.post(
-      '/v1/child/$childId/growth',
+      ApiEndpoint.childGrowthRecords(childId),
       data: {
         'height': height,
         'weight': weight,

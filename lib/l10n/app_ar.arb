@@ -433,6 +433,7 @@
   "choosePasswordDesc": "خليها سهلة عليك وصعبة على غيرك، عشان تقدر تدخل بأمان في أي وقت.",
   "confirmPasswordLabel": "تأكيد كلمة السر",
   "confirmPasswordHint": "اكتب كلمة المرور مرة أخرى",
+  "passwordsMismatch": "كلمتا السر غير متطابقتين",
   "createAccountButton": "إنشاء حساب",
   "welcomeBackTitle": "أهلاً بيك من تاني!",
   "loginDesc": "دخل بياناتك عشان تكمل تعاملاتك لصحة صغيرك بسهولة وأمان.",

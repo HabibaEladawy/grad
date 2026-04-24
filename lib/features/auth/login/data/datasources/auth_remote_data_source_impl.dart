@@ -46,15 +46,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       // Contract matches Postman `pre-SignUp`: multipart field `data` is JSON
       // with nested `parent` + `children` (not flat parent fields at root).
+      final parentMap = <String, dynamic>{
+        'parentName': parentName,
+        'email': email,
+        'phone': phone,
+        'government': government,
+        'address': address,
+      };
+      if (password.isNotEmpty) {
+        parentMap['password'] = password;
+      }
       final payload = {
-        'parent': {
-          'parentName': parentName,
-          'email': email,
-          'phone': phone,
-          'password': password,
-          'government': government,
-          'address': address,
-        },
+        'parent': parentMap,
         'children': children.map((c) => c.toJson()).toList(),
       };
 
@@ -124,6 +127,30 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         message: ApiError.messageFromDecoded(
           data,
           fallback: 'فشل التحقق من الكود',
+        ),
+      );
+    } catch (e) {
+      if (e is ServerException) rethrow;
+      throw const ServerException(message: 'حدث خطأ غير متوقع');
+    }
+  }
+
+  @override
+  Future<void> addPassword({required String password}) async {
+    try {
+      final response = await dio.post(
+        ApiEndpoint.addPassword,
+        data: {'password': password},
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
+      final data = ApiResponse.decode(response.data);
+      _throwIfError(data, response.statusCode, 'فشل حفظ كلمة المرور');
+    } on DioException catch (e) {
+      final data = ApiResponse.decode(e.response?.data);
+      throw ServerException(
+        message: ApiError.messageFromDecoded(
+          data,
+          fallback: 'حدث خطأ في الخادم',
         ),
       );
     } catch (e) {

@@ -418,7 +418,10 @@ abstract class AuthRemoteDataSource {
   /// Step 2 – Verify sign-up OTP
   Future<String> verifySignUp({required String phone, required String otp});
 
-  /// Step 3 – Pre sign-in (sends OTP)
+  /// Set password after verify-signUp (Bearer token) — `/v1/parent/add-password`
+  Future<void> addPassword({required String password});
+
+  /// Pre sign-in (sends OTP)
   Future<void> preSignIn({required String phone, required String password});
 
   /// Step 4 – Verify sign-in OTP → returns token

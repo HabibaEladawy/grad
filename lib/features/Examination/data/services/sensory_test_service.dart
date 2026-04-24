@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/api/api_endpoint.dart';
 import '../model/sensory_test_models.dart';
 
 class SensoryTestService {
@@ -8,7 +9,7 @@ class SensoryTestService {
   SensoryTestService(this.dio);
 
   Future<List<SensoryQuestion>> getQuestions() async {
-    final res = await dio.get('/v1/sensory-test/');
+    final res = await dio.get(ApiEndpoint.sensoryTestList);
     final data = res.data;
     final list = data is List
         ? data
@@ -33,7 +34,7 @@ class SensoryTestService {
     required List<SensoryTestAnswer> answers,
   }) async {
     final res = await dio.post(
-      '/v1/sensory-test/$childId',
+      ApiEndpoint.sensoryTestSubmit(childId),
       data: {'answers': answers.map((a) => a.toJson()).toList()},
       options: Options(headers: {'Content-Type': 'application/json'}),
     );

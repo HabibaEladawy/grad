@@ -128,6 +128,7 @@ import '../../features/auth/login/data/repo/auth_repository_impl.dart';
 import '../../features/auth/login/domain/repo/auth_repository.dart';
 import '../../features/auth/login/domain/usecases/change_password_usecase.dart';
 import '../../features/auth/login/domain/usecases/create_doctor_usecase.dart';
+import '../../features/auth/login/domain/usecases/add_sign_up_password_usecase.dart';
 import '../../features/auth/login/domain/usecases/pre_sign_in_usecase.dart';
 import '../../features/auth/login/domain/usecases/pre_sign_up_usecase.dart';
 import '../../features/auth/login/domain/usecases/reset_password_usecase.dart';
@@ -148,8 +149,10 @@ import '../../features/parent_profile/data/repo/parent_profile_repository.dart';
 import '../../features/parent_profile/presentation/cubit/parent_profile_cubit.dart';
 import '../../features/vaccinations/data/repo/child_vaccination_repo.dart';
 import '../../features/vaccinations/data/repo/child_vaccination_schedule_repo.dart';
+import '../../features/vaccinations/data/repo/vaccinations_catalog_repo.dart';
 import '../../features/vaccinations/data/services/child_vaccination_service.dart';
 import '../../features/vaccinations/data/services/child_vaccination_schedule_service.dart';
+import '../../features/vaccinations/data/services/vaccinations_catalog_service.dart';
 import '../../features/vaccinations/presentation/cubit/vaccination_schedule_cubit.dart';
 import '../../features/Examination/data/repo/sensory_test_repo.dart';
 import '../../features/Examination/data/services/sensory_test_service.dart';
@@ -382,6 +385,13 @@ Future<void> init() async {
     () => ChildVaccinationScheduleRepo(sl()),
   );
 
+  sl.registerLazySingleton<VaccinationsCatalogService>(
+    () => VaccinationsCatalogService(sl()),
+  );
+  sl.registerLazySingleton<VaccinationsCatalogRepo>(
+    () => VaccinationsCatalogRepo(sl()),
+  );
+
   sl.registerLazySingleton<SensoryTestService>(() => SensoryTestService(sl()));
   sl.registerLazySingleton<SensoryTestRepo>(() => SensoryTestRepo(sl()));
 
@@ -415,6 +425,7 @@ Future<void> init() async {
 
   sl.registerLazySingleton(() => PreSignUpUseCase(repository: sl()));
   sl.registerLazySingleton(() => VerifySignUpUseCase(repository: sl()));
+  sl.registerLazySingleton(() => AddSignUpPasswordUseCase(repository: sl()));
   sl.registerLazySingleton(() => PreSignInUseCase(repository: sl()));
   sl.registerLazySingleton(() => VerifySignInUseCase(repository: sl()));
   sl.registerLazySingleton(() => ResetPasswordUseCase(repository: sl()));
@@ -443,7 +454,11 @@ Future<void> init() async {
   // ═══════════════════════════════════════
 
   sl.registerFactory(
-    () => SignUpCubit(preSignUpUseCase: sl(), verifySignUpUseCase: sl()),
+    () => SignUpCubit(
+      preSignUpUseCase: sl(),
+      verifySignUpUseCase: sl(),
+      addSignUpPasswordUseCase: sl(),
+    ),
   );
 
   sl.registerFactory(
@@ -469,6 +484,7 @@ Future<void> init() async {
       parentRepo: sl(),
       scheduleRepo: sl(),
       vaccinationRepo: sl(),
+      catalogRepo: sl(),
     ),
   );
 

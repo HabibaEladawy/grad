@@ -505,6 +505,7 @@
   "passwordHint": "Enter a strong password",
   "confirmPasswordLabel": "Confirm Password",
   "confirmPasswordHint": "Re-enter your password",
+  "passwordsMismatch": "Passwords do not match",
   "createAccountButton": "Create Account",
   "welcomeBackTitle": "Welcome Back!",
   "loginDesc": "Enter your details to continue managing your baby's health easily and securely.",

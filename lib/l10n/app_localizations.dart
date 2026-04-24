@@ -2186,6 +2186,12 @@ abstract class AppLocalizations {
   /// **'Re-enter your password'**
   String get confirmPasswordHint;
 
+  /// No description provided for @passwordsMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwordsMismatch;
+
   /// No description provided for @createAccountButton.
   ///
   /// In en, this message translates to:

@@ -1,5 +1,4 @@
 import 'package:dana/core/utils/app_colors.dart';
-import 'package:dana/extensions/localization_extension.dart';
 import 'package:flutter/material.dart';
 
 enum VaccineStatus { done, upcoming, delayed }
@@ -81,60 +80,4 @@ String getIconPath(VaccineType type) {
     case VaccineType.injection:
       return 'assets/Icons/vaccine/injection_icon.svg';
   }
-}
-
-List<VaccineItem> getVaccines(BuildContext context) {
-  final l10n = context.l10n;
-
-  return [
-    VaccineItem(
-      title: l10n.vaccinePolioZeroDose,
-      description: l10n.vaccineDescPolioZeroDose,
-      date: DateTime(2026, 2, 3),
-      status: VaccineStatus.done,
-      type: VaccineType.oral,
-    ),
-    VaccineItem(
-      title: l10n.vaccineHepBZeroDose,
-      description: l10n.vaccineDescHepBZeroDose,
-      date: DateTime(2026, 2, 3),
-      status: VaccineStatus.done,
-      type: VaccineType.injection,
-    ),
-    VaccineItem(
-      title: l10n.vaccineBCG,
-      description: l10n.vaccineDescBCG,
-      date: DateTime(2026, 2, 3),
-      status: VaccineStatus.delayed,
-      type: VaccineType.injection,
-    ),
-    VaccineItem(
-      title: l10n.vaccinePolioSabin,
-      description: l10n.vaccineDescPolioTwoMonths,
-      date: DateTime(2026, 2, 3),
-      status: VaccineStatus.done,
-      type: VaccineType.oral,
-    ),
-    VaccineItem(
-      title: l10n.vaccinePolioSalk,
-      description: l10n.vaccineDescSalk,
-      date: DateTime(2026, 2, 3),
-      status: VaccineStatus.delayed,
-      type: VaccineType.oral,
-    ),
-    VaccineItem(
-      title: l10n.vaccinePentavalent,
-      description: l10n.vaccineDescPentavalent,
-      date: DateTime(2026, 2, 3),
-      status: VaccineStatus.upcoming,
-      type: VaccineType.injection,
-    ),
-    VaccineItem(
-      title: l10n.vaccinePolioNineMonths,
-      description: l10n.vaccineDescNineMonths,
-      date: DateTime(2026, 2, 3),
-      status: VaccineStatus.upcoming,
-      type: VaccineType.injection,
-    ),
-  ];
 }

@@ -200,6 +200,57 @@ class _VaccineScreenState extends State<VaccineScreen> {
                             );
                           }
                           if (state is VaccinationScheduleLoaded) {
+                            final catalogHeader = state.catalog.isNotEmpty
+                                ? Padding(
+                                    padding: EdgeInsets.only(bottom: 12.h),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'مرجع التطعيمات',
+                                          style:
+                                              AppTextStyle.semibold16TextHeading(
+                                            context,
+                                          ),
+                                        ),
+                                        SizedBox(height: 8.h),
+                                        ...state.catalog.map(
+                                          (v) => Padding(
+                                            padding: EdgeInsets.only(
+                                              bottom: 8.h,
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  v.name,
+                                                  style: AppTextStyle
+                                                      .medium12TextButtonOutlined(
+                                                    context,
+                                                  ),
+                                                ),
+                                                if (v.description
+                                                    .isNotEmpty) ...[
+                                                  SizedBox(height: 2.h),
+                                                  Text(
+                                                    v.description,
+                                                    style: AppTextStyle
+                                                        .medium12TextButtonOutlined(
+                                                      context,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : const SizedBox.shrink();
+
                             final items = state.items
                                 .map(
                                   (e) => _mapScheduleToUi(
@@ -210,17 +261,31 @@ class _VaccineScreenState extends State<VaccineScreen> {
                                 )
                                 .toList();
                             if (items.isEmpty) {
-                              return ElevatedButton(
-                                onPressed: () => context
-                                    .read<VaccinationScheduleCubit>()
-                                    .generateAndLoad(childId: widget.childId),
-                                child: const Text('إنشاء جدول التطعيمات'),
+                              return Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.stretch,
+                                children: [
+                                  catalogHeader,
+                                  ElevatedButton(
+                                    onPressed: () => context
+                                        .read<VaccinationScheduleCubit>()
+                                        .generateAndLoad(
+                                          childId: widget.childId,
+                                        ),
+                                    child: const Text('إنشاء جدول التطعيمات'),
+                                  ),
+                                ],
                               );
                             }
                             return Column(
-                              children: items
-                                  .map((v) => VaccineItemWidget(item: v))
-                                  .toList(),
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.stretch,
+                              children: [
+                                catalogHeader,
+                                ...items.map(
+                                  (v) => VaccineItemWidget(item: v),
+                                ),
+                              ],
                             );
                           }
                           return const Center(

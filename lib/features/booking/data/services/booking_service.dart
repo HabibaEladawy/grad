@@ -48,18 +48,18 @@ class BookingService {
     required int rating,
   }) {
     return dio.post(
-      "/v1/booking/$bookingId/rate",
+      ApiEndpoint.bookingRatePath(bookingId),
       data: {"rating": rating},
       options: Options(headers: {"Content-Type": "application/json"}),
     );
   }
 
   Future<Response> getBookingById({required String bookingId}) {
-    return dio.get("/v1/booking/$bookingId");
+    return dio.get(ApiEndpoint.bookingDetail(bookingId));
   }
 
   Future<Response> cancelByChildId({required String childId}) {
-    return dio.delete("/v1/booking/cancel/child/$childId");
+    return dio.delete(ApiEndpoint.bookingCancelChildPath(childId));
   }
 
   Future<Response> changeBookedAppointment({
@@ -70,7 +70,7 @@ class BookingService {
     required String time,
   }) {
     return dio.patch(
-      "/v1/booking/$bookingId",
+      ApiEndpoint.bookingDetail(bookingId),
       data: {
         "doctorId": doctorId,
         "parentId": parentId,

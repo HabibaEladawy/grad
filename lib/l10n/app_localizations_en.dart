@@ -1149,6 +1149,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmPasswordHint => 'Re-enter your password';
 
   @override
+  String get passwordsMismatch => 'Passwords do not match';
+
+  @override
   String get createAccountButton => 'Create Account';
 
   @override

@@ -21,6 +21,7 @@ class ApiEndpoint {
   // ── Parent / Auth ────────────────────────────────────────────────────────────
   static const String preSignUp = '/v1/parent/pre-SignUp';
   static const String verifySignUp = '/v1/parent/verify-signUp';
+  static const String addPassword = '/v1/parent/add-password';
   static const String preSignIn = '/v1/parent/pre-signIn';
   static const String verifySignIn = '/v1/parent/verify-signIn';
   static const String resetPassword = '/v1/parent/reset-password';
@@ -58,6 +59,14 @@ class ApiEndpoint {
       '/v1/booking/myAppointment/'; // GET + parentId
   static const String bookingRate = '/v1/booking/'; // POST + bookingId + /rate
 
+  static String bookingDetail(String bookingId) => '$bookingById$bookingId';
+
+  static String bookingRatePath(String bookingId) =>
+      '$bookingById$bookingId/rate';
+
+  static String bookingCancelChildPath(String childId) =>
+      '/v1/booking/cancel/child/$childId';
+
   // ── Paymob ───────────────────────────────────────────────────────────────────
   static const String paymobCallback = '/v1/paymob/callback'; // GET (internal)
 
@@ -66,12 +75,36 @@ class ApiEndpoint {
   static const String bookById = '/v1/textBooks/'; // GET by id
   static const String textBooksSearch = '/v1/textBooks/search'; // GET ?q=
 
+  // ── Skills ───────────────────────────────────────────────────────────────────
+  static const String skills = '/v1/skills';
+
+  static String skillsChecklist(String skillId, String childId) =>
+      '/v1/skills/$skillId/child/$childId/checklist';
+
+  static String skillsToggleChild(String childId) =>
+      '/v1/skills/toggle/child/$childId';
+
+  // ── Sensory test ────────────────────────────────────────────────────────────
+  static const String sensoryTestList = '/v1/sensory-test/';
+
+  static String sensoryTestSubmit(String childId) => '/v1/sensory-test/$childId';
+
   // ── Child Vaccinations ───────────────────────────────────────────────────────
   static const String childVaccinationTake =
       '/v1/child/'; // PATCH childId/childVaccinations/vaccinationId/take
   static const String childVaccinations =
       '/v1/child/'; // GET childId/childVaccinations
   static const String childVaccinationsGenerate =
-      '/v1/child/'; // POST childId/vaccinations/generate
+      '/v1/child/'; // POST childId/childVaccinations/generate
   static const String vaccinations = '/v1/vaccinations'; // GET all vaccines
+
+  static String childVaccinationTakePath(String childId, String vaccinationId) =>
+      '$childVaccinationTake$childId/childVaccinations/$vaccinationId/take';
+
+  // ── Child growth (same /v1/child/:id prefix as [childVaccinations]) ───────────
+  static String childGrowthRecords(String childId) =>
+      '$childVaccinations$childId/growth';
+
+  static String childGrowthLatest(String childId) =>
+      '$childVaccinations$childId/growth/latest';
 }

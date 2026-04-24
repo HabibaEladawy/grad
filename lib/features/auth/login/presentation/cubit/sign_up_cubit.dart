@@ -3,16 +3,19 @@ import 'package:dana/features/auth/login/presentation/cubit/sign_up_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../data/datasources/auth_remote_data_source.dart';
+import '../../domain/usecases/add_sign_up_password_usecase.dart';
 import '../../domain/usecases/pre_sign_up_usecase.dart';
 import '../../domain/usecases/verify_sign_up_usecase.dart';
 
 class SignUpCubit extends Cubit<SignUpState> {
   final PreSignUpUseCase preSignUpUseCase;
   final VerifySignUpUseCase verifySignUpUseCase;
+  final AddSignUpPasswordUseCase addSignUpPasswordUseCase;
 
   SignUpCubit({
     required this.preSignUpUseCase,
     required this.verifySignUpUseCase,
+    required this.addSignUpPasswordUseCase,
   }) : super(const SignUpInitial());
 
   // ── Step 1: Personal Information ──────────────────────────────────────────
@@ -119,16 +122,21 @@ class SignUpCubit extends Cubit<SignUpState> {
     return true;
   }
 
-  // ── Step 3+4: إرسال البيانات كلها وطلب OTP ────────────────────────────────
+  // ── pre-SignUp: بيانات الأب والطفل + هاتف وبريد → إرسال OTP (بدون كلمة مرور)
   Future<void> preSignUp() async {
-    final step3Error = validateStep3();
-    if (step3Error != null) {
-      emit(SignUpFailure(message: step3Error));
+    final e1 = validateStep1();
+    if (e1 != null) {
+      emit(SignUpFailure(message: e1));
       return;
     }
-    final step4Error = validateStep4();
-    if (step4Error != null) {
-      emit(SignUpFailure(message: step4Error));
+    final e2 = validateStep2();
+    if (e2 != null) {
+      emit(SignUpFailure(message: e2));
+      return;
+    }
+    final e3 = validateStep3();
+    if (e3 != null) {
+      emit(SignUpFailure(message: e3));
       return;
     }
 
@@ -144,7 +152,7 @@ class SignUpCubit extends Cubit<SignUpState> {
         phone: apiPhone,
         government: _government.trim(),
         address: _address.trim(),
-        password: _password,
+        password: '',
         children: [
           ChildData(
             childName: _childName,
@@ -157,11 +165,14 @@ class SignUpCubit extends Cubit<SignUpState> {
 
     result.fold(
       (f) => emit(SignUpFailure(message: f.message)),
-      (_) => emit(SignUpOtpSent(phone: apiPhone)),
+      (_) {
+        if (isClosed) return;
+        emit(SignUpOtpSent(phone: apiPhone));
+      },
     );
   }
 
-  // ── Step 4: تأكيد OTP ─────────────────────────────────────────────────────
+  // ── verify-signUp: تأكيد OTP ─────────────────────────────────────────────
   Future<void> verifySignUp({required String otp}) async {
     emit(const SignUpLoading());
     final result = await verifySignUpUseCase(
@@ -172,7 +183,28 @@ class SignUpCubit extends Cubit<SignUpState> {
     );
     result.fold(
       (f) => emit(SignUpFailure(message: f.message)),
-      (token) => emit(SignUpVerified(token: token)),
+      (token) {
+        if (isClosed) return;
+        emit(SignUpVerified(token: token));
+      },
+    );
+  }
+
+  /// add-password (بعد حفظ التوكن من verify)
+  Future<void> addPassword() async {
+    final err = validateStep4();
+    if (err != null) {
+      emit(SignUpFailure(message: err));
+      return;
+    }
+    emit(const SignUpLoading());
+    final result = await addSignUpPasswordUseCase(
+      AddSignUpPasswordParams(password: _password.trim()),
+    );
+    if (isClosed) return;
+    result.fold(
+      (f) => emit(SignUpFailure(message: f.message)),
+      (_) => emit(const SignUpPasswordCreated()),
     );
   }
 }

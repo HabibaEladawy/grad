@@ -84,6 +84,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
             await sl<AuthSession>().setToken(state.token);
             if (!context.mounted) return;
+            _controller.jumpToPage(3);
+            setState(() => _currentIndex = 3);
+          } else if (state is SignUpPasswordCreated) {
+            if (!context.mounted) return;
             Navigator.pushReplacementNamed(context, AppRoutes.home);
           } else if (state is SignUpFailure) {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();

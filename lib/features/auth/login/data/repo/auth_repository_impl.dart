@@ -102,6 +102,13 @@ class AuthRepositoryImpl implements AuthRepository {
     return token;
   });
 
+  @override
+  Future<Either<Failure, Unit>> addPassword({required String password}) =>
+      _guard(() async {
+        await remoteDataSource.addPassword(password: password);
+        return unit;
+      });
+
   // ── Sign In ──────────────────────────────────────────────────────────────────
 
   @override

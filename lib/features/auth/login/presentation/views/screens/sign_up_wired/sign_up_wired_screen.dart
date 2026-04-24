@@ -91,8 +91,10 @@ class _SignUpWiredViewState extends State<_SignUpWiredView> {
           );
         } else if (state is SignUpVerified) {
           if (!mounted) return;
-          // Persist session token so the user is actually signed in post-OTP.
           await sl<AuthSession>().setToken(state.token);
+          if (!mounted) return;
+          await context.read<SignUpCubit>().addPassword();
+        } else if (state is SignUpPasswordCreated) {
           if (!mounted) return;
           Navigator.pushReplacementNamed(context, AppRoutes.home);
         } else if (state is SignUpFailure) {

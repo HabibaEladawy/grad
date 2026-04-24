@@ -2,19 +2,25 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../parent_profile/data/models/parent_profile_model.dart';
 import '../../../parent_profile/data/repo/parent_profile_repository.dart';
+import '../../data/models/child_vaccination_schedule_model.dart';
 import '../../data/repo/child_vaccination_repo.dart';
 import '../../data/repo/child_vaccination_schedule_repo.dart';
+import '../../data/repo/vaccinations_catalog_repo.dart';
 import 'vaccination_schedule_state.dart';
 
 class VaccinationScheduleCubit extends Cubit<VaccinationScheduleState> {
   final ParentProfileRepository parentRepo;
   final ChildVaccinationScheduleRepo scheduleRepo;
   final ChildVaccinationRepo vaccinationRepo;
+  final VaccinationsCatalogRepo catalogRepo;
+
+  List<VaccineDefinition> _cachedCatalog = [];
 
   VaccinationScheduleCubit({
     required this.parentRepo,
     required this.scheduleRepo,
     required this.vaccinationRepo,
+    required this.catalogRepo,
   }) : super(const VaccinationScheduleInitial());
 
   ParentChildModel? _pickChild(ParentProfileModel me, String? preferredId) {
@@ -36,7 +42,18 @@ class VaccinationScheduleCubit extends Cubit<VaccinationScheduleState> {
         throw Exception('No child found for this parent');
       }
       final items = await scheduleRepo.getSchedule(childId: resolvedId);
-      emit(VaccinationScheduleLoaded(childId: resolvedId, items: items));
+      var catalog = _cachedCatalog;
+      try {
+        catalog = await catalogRepo.getMasterVaccines();
+        _cachedCatalog = catalog;
+      } catch (_) {}
+      emit(
+        VaccinationScheduleLoaded(
+          childId: resolvedId,
+          items: items,
+          catalog: catalog,
+        ),
+      );
     } catch (e) {
       emit(VaccinationScheduleError(e.toString()));
     }
@@ -53,7 +70,18 @@ class VaccinationScheduleCubit extends Cubit<VaccinationScheduleState> {
       }
       await scheduleRepo.generateSchedule(childId: resolvedId);
       final items = await scheduleRepo.getSchedule(childId: resolvedId);
-      emit(VaccinationScheduleLoaded(childId: resolvedId, items: items));
+      var catalog = _cachedCatalog;
+      try {
+        catalog = await catalogRepo.getMasterVaccines();
+        _cachedCatalog = catalog;
+      } catch (_) {}
+      emit(
+        VaccinationScheduleLoaded(
+          childId: resolvedId,
+          items: items,
+          catalog: catalog,
+        ),
+      );
     } catch (e) {
       emit(VaccinationScheduleError(e.toString()));
     }
@@ -72,7 +100,13 @@ class VaccinationScheduleCubit extends Cubit<VaccinationScheduleState> {
         takenDate: takenDate,
       );
       final items = await scheduleRepo.getSchedule(childId: childId);
-      emit(VaccinationScheduleLoaded(childId: childId, items: items));
+      emit(
+        VaccinationScheduleLoaded(
+          childId: childId,
+          items: items,
+          catalog: _cachedCatalog,
+        ),
+      );
     } catch (e) {
       emit(VaccinationScheduleError(e.toString()));
     }

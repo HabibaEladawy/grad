@@ -65,6 +65,7 @@ Key files:
 ### Child vaccination schedule (mobile)
 - **GET** `/v1/child/:childId/childVaccinations` ✅ (wired + used in Vaccine screen)
 - **POST** `/v1/child/:childId/childVaccinations/generate` ✅ (wired + UI fallback button)
+- **GET** `/v1/vaccinations` ✅ (master catalog; reference section on Vaccine screen)
 
 Key files:
 - `lib/features/vaccinations/data/services/child_vaccination_service.dart`
@@ -103,8 +104,9 @@ Blockers:
 - Need to wire booking list to the appointments screens and map backend booking model → UI appointment model.
 
 ### Vaccinations UI
-- Current vaccinations UI uses local `getVaccines()` mock list (no `childId`/`vaccinationId`).
-- The “take” endpoint is wired but can’t be triggered meaningfully until we fetch real child vaccination schedule.
+- Per-child schedule comes from **GET** `/v1/child/:childId/childVaccinations` (and **POST** `.../childVaccinations/generate`); the vaccine screen maps schedule rows to UI.
+- **GET** `/v1/vaccinations` (master catalog) is wired for a parent-facing **reference** section on the vaccine screen (`VaccinationsCatalogService` / `VaccinationScheduleCubit.catalog`).
+- **PATCH** “take” is wired and used from the schedule UI when `vaccinationId` is available.
 
 ---
 
@@ -117,8 +119,7 @@ Blockers:
     - Child vaccination take is **PATCH**
 
 ### Paymob callback
-- Flutter constants comment says GET, Postman shows **POST**.
-- Needs backend confirmation for mobile flow (often callback is server-to-server, not mobile).
+- Contract is **GET** `/v1/paymob/callback` (see `ApiEndpoint.paymobCallback` and Postman collection); mobile rarely calls it directly (provider redirect / server).
 
 ### Duplicate API constants in codebase
 - `lib/core/api/api_constant.dart` vs `lib/core/constant/api_constants.dart` (older)
@@ -133,14 +134,13 @@ Blockers:
 - **GET** `/v1/booking/doctorAppointment/:doctorId` *(doctor panel may be web-only; confirm if needed for mobile)*
 - *(optional)* **GET** `/v1/booking/todayDoctorAppointment/:doctorId` *(if mobile needs it; Postman folder includes it but response examples missing)*
 
-### Child APIs (Postman folder: `child`) — big missing area
-Vaccinations:
-- **GET** `/v1/vaccinations`
+### Child APIs (Postman folder: `child`)
+Vaccinations (admin / not in parent mobile flow):
 - **POST** `/v1/vaccinations`
 - **POST** `/v1/vaccinations/bulk`
 
 Child vaccination schedule:
-- **POST** `/v1/child/:childId/vaccinations/generate` *(alt path in Postman; confirm with backend — app uses `/v1/child/:childId/childVaccinations/generate`)*
+- App uses **POST** `/v1/child/:childId/childVaccinations/generate` (Postman may show an older `vaccinations/generate` path in some exports; collection sync script corrects the live request.)
 
 Skills:
 - **POST** `/v1/skills/items/bulk`
@@ -170,8 +170,7 @@ Growth/records:
 ---
 
 ## Next wiring recommendations (mobile-first)
-1) **Growth**: `/v1/child/:childId/growth` (connect GrowthCurveSection to backend)
-2) **Vaccinations admin**: `/v1/vaccinations` (only if mobile needs it)
-3) **Skills bulk items**: `/v1/skills/items/bulk` (admin-only unless you need it in mobile)
-4) Google OAuth (only if you want in-app Google sign-in)
+1) **Skills bulk items**: `/v1/skills/items/bulk` (admin-only unless you need it in mobile)
+2) Google OAuth (only if you want in-app Google sign-in)
+3) **Vaccinations admin** POST endpoints (only if mobile needs catalog editing)
 

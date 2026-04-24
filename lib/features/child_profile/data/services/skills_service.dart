@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/api/api_endpoint.dart';
 import '../models/skill_api_models.dart';
 
 class SkillsService {
@@ -8,7 +9,7 @@ class SkillsService {
   SkillsService(this.dio);
 
   Future<List<SkillApiModel>> getSkills() async {
-    final res = await dio.get('/v1/skills');
+    final res = await dio.get(ApiEndpoint.skills);
     final data = res.data;
     final list = data is List
         ? data
@@ -29,7 +30,7 @@ class SkillsService {
     required String skillId,
     required String childId,
   }) async {
-    final res = await dio.get('/v1/skills/$skillId/child/$childId/checklist');
+    final res = await dio.get(ApiEndpoint.skillsChecklist(skillId, childId));
     final data = res.data;
     final list = data is List
         ? data
@@ -54,7 +55,7 @@ class SkillsService {
     required bool checked,
   }) async {
     await dio.post(
-      '/v1/skills/toggle/child/$childId',
+      ApiEndpoint.skillsToggleChild(childId),
       data: {'itemId': itemId, 'checked': checked},
       options: Options(headers: {'Content-Type': 'application/json'}),
     );

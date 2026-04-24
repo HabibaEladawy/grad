@@ -26,6 +26,9 @@ abstract class AuthRepository {
     required String otp,
   });
 
+  /// Step 3: حفظ كلمة المرور بعد verify-signUp (يحتاج Bearer)
+  Future<Either<Failure, Unit>> addPassword({required String password});
+
   // ── Sign In Flow (2 steps) ──────────────────────────────────────────────────
 
   /// Step 1: إرسال رقم الهاتف وكلمة المرور → يبعت OTP
