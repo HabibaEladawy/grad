@@ -37,7 +37,7 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
 
     _activeTab = AppLocalizations.of(context)!.videos;
 
-    // ✅ أول ما الشاشة تفتح نجيب الفيديوهات
+
     context.read<VideoCubit>().getAllVideos();
   }
 

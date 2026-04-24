@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-
 import '../../../../../core/utils/app_colors.dart';
 import '../../../../../core/utils/app_raduis.dart';
 import '../../../../../core/utils/app_text_style.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../providers/app_theme_provider.dart';
 import '../../domain/entity/Video_Entity.dart';
-
-
 
 class VideoInfoWidget extends StatelessWidget {
   final VideoEntity video;
@@ -39,7 +36,7 @@ class VideoInfoWidget extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Container(
-        width: double.infinity,
+        width: 392.w,
         decoration: BoxDecoration(
           color: isDark
               ? AppColors.bg_card_default_dark
@@ -57,41 +54,54 @@ class VideoInfoWidget extends StatelessWidget {
         padding: EdgeInsets.all(AppRadius.space_lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            /// 🔹 Title
+            /// Title
             Text(
               video.title,
+              textAlign: TextAlign.left,
               style: AppTextStyle.semibold24TextHeading(context),
             ),
 
-            SizedBox(height: AppRadius.space_md),
+            SizedBox(height: 10.h),
 
-            /// 🔹 Description
+            /// Description
             Text(
               video.description ?? l10n.noDescription,
+              textAlign: TextAlign.left,
               style: AppTextStyle.medium12TextBody(context),
             ),
 
-            SizedBox(height: AppRadius.space_md),
+            SizedBox(height: 10.h),
 
-            /// 🔹 Views
+            /// Views (يمين)
             Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.start,
+              textDirection: TextDirection.ltr,
               children: [
+                SizedBox(
+                  width: 92.w,
+                  height: 12.h,
+                  child: Text(
+                    '$views ${l10n.views}',
+                    style: AppTextStyle.regular12TextBody(context).copyWith(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w400,
+                      color:isDark
+                          ? AppColors.text_button_disabled_dark
+                          : AppColors.text_button_disabled_light,
+                    ),
+                  ),
+                ),
+
+                SizedBox(width: 4.w),
                 Icon(
                   Icons.remove_red_eye,
                   size: 14.w,
                   color: isDark
                       ? AppColors.text_button_disabled_dark
                       : AppColors.text_button_disabled_light,
-                ),
-                SizedBox(width: 4.w),
-                Text(
-                  '${l10n.views} $views',
-                  style: AppTextStyle.regular12TextBody(context).copyWith(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w400,
-                  ),
                 ),
               ],
             ),

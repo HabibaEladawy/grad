@@ -52,7 +52,7 @@ class ExaminationHeader extends StatelessWidget {
               ),
               child: Center(
                 child: Icon(
-                  isRtl ? Icons.arrow_back_ios : Icons.arrow_forward_ios,
+                  isRtl ? Icons.arrow_forward_ios : Icons.arrow_back_ios,
                   color: isDark
                       ? AppColors.text_heading_dark
                       : AppColors.text_heading_light,

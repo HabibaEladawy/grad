@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-
 import '../../../../../core/utils/app_colors.dart';
 import '../../../../../core/utils/app_raduis.dart';
 import '../../../../../core/utils/app_text_style.dart';
@@ -36,7 +34,7 @@ class CustomSectionHeader extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Row(
         children: [
-          /// 🔹 Title
+          ///  Title
           Expanded(
             child: Text(
               title,
@@ -46,7 +44,7 @@ class CustomSectionHeader extends StatelessWidget {
             ),
           ),
 
-          /// 🔹 Back Button
+          ///  Back Button
           GestureDetector(
             onTap: onBackTap ?? () => Navigator.pop(context),
             child: Container(
@@ -66,7 +64,7 @@ class CustomSectionHeader extends StatelessWidget {
               ),
               child: Center(
                 child: Icon(
-                  Icons.arrow_back_ios,
+                  Icons.arrow_forward_ios,
                   color: isDark
                       ? AppColors.text_heading_dark
                       : AppColors.text_heading_light,

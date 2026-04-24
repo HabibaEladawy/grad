@@ -16,7 +16,7 @@ class VideoHorizontalList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 220.h,
+      height: 260.h,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -24,14 +24,18 @@ class VideoHorizontalList extends StatelessWidget {
         separatorBuilder: (_, __) => SizedBox(width: 12.w),
         itemBuilder: (context, index) {
           final video = videos[index];
-          return VideoCard(
-            video: video,
-            relatedVideos: relatedVideos
-                .where((v) => v.id != video.id)
-                .toList(),
+
+          return SizedBox(
+            width: 160.w,
+            child: VideoCard(
+              video: video,
+              relatedVideos: relatedVideos
+                  .where((v) => v.id != video.id)
+                  .toList(),
+            ),
           );
         },
       ),
     );
   }
-}
+ }

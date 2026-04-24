@@ -39,28 +39,31 @@ class ViewAllWidget extends StatelessWidget {
         SizedBox(height: 12.h),
 
         /// 🔹 Grid
-        GridView.builder(
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 8.w,
-            mainAxisSpacing: 8.h,
-            childAspectRatio: 192 / 230,
-          ),
-          itemCount: videos.length,
-          itemBuilder: (context, index) {
-            final video = videos[index];
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 12.h),
 
-            return VideoCard(
-              video: video,
-              imageWidth: imageWidth ?? 192.w,
+            ///  Grid
+            GridView.builder(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12.w,
+                mainAxisSpacing: 8.h,
 
-              // ❌ removed O(n²) logic
-              relatedVideos: const [],
-            );
-          },
+                mainAxisExtent: 230.h,
+              ),
+              itemCount: videos.length,
+              itemBuilder: (context, index) {
+                final video = videos[index];
+
+                return VideoCard(video: video, relatedVideos: const []);
+              },
+            ),
+          ],
         ),
       ],
     );

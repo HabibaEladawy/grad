@@ -1,9 +1,7 @@
 
 import 'package:dana_graduation_project/core/utils/app_raduis.dart';
 import 'package:flutter/material.dart';
-
 import '../utils/app_colors.dart';
-
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomButton extends StatelessWidget {

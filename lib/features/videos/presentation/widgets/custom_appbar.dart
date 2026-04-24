@@ -1,12 +1,12 @@
-import 'package:dana_graduation_project/core/utils/app_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import '../../../../../core/utils/app_colors.dart';
 import '../../../../../core/utils/app_raduis.dart';
 import '../../../../../core/utils/app_text_style.dart';
-import '../../../../../providers/app_theme_provider.dart';
-import '../screens/search_Screen.dart';
+import '../../../../providers/app_theme_provider.dart';
+import 'app_bar_back_button.dart';
+import 'appbar_search_button.dart';
+
 
 class CustomAppbar extends StatelessWidget {
   const CustomAppbar({
@@ -37,38 +37,11 @@ class CustomAppbar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
         children: [
-
-          /// 🔹 Back Button
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 40.w,
-              height: 40.h,
-              decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.bg_surface_subtle_dark
-                    : AppColors.bg_surface_subtle_light,
-                borderRadius: BorderRadius.circular(AppRadius.radius_sm),
-                border: Border.all(
-                  color: isDark
-                      ? AppColors.border_card_default_dark
-                      : AppColors.border_card_default_light,
-                  width: AppRadius.stroke_thin,
-                ),
-              ),
-              child: Center(
-                child: Icon(
-                  isRtl ? Icons.arrow_forward_ios : Icons.arrow_back_ios,
-                  color: isDark
-                      ? AppColors.text_heading_dark
-                      : AppColors.text_heading_light,
-                  size: 24.w,
-                ),
-              ),
-            ),
+          AppBarSearchButton(
+            isDark: isDark,
+            onTap: onSearchTap,
           ),
 
-          /// 🔹 Title
           if (title != null)
             Expanded(
               child: Text(
@@ -79,34 +52,9 @@ class CustomAppbar extends StatelessWidget {
               ),
             ),
 
-          /// 🔹 Search Button
-          GestureDetector(
-            onTap: onSearchTap, // ✅ FIXED
-            child: Container(
-              width: 40.w,
-              height: 40.h,
-              decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.bg_surface_subtle_dark
-                    : AppColors.bg_surface_subtle_light,
-                borderRadius: BorderRadius.circular(AppRadius.radius_sm),
-                border: Border.all(
-                  color: isDark
-                      ? AppColors.border_card_default_dark
-                      : AppColors.border_card_default_light,
-                  width: AppRadius.stroke_thin,
-                ),
-              ),
-              child: Center(
-                child: ImageIcon(
-                  AssetImage(AppAssets.search_normal),
-                  color: isDark
-                      ? AppColors.text_heading_dark
-                      : AppColors.text_heading_light,
-                  size: 24.w,
-                ),
-              ),
-            ),
+          AppBarBackButton(
+            isDark: isDark,
+            isRtl: isRtl,
           ),
         ],
       ),

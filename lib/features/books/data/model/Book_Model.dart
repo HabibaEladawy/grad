@@ -2,7 +2,7 @@ import 'package:dana_graduation_project/features/books/domain/entity/book_entity
 
 
 class BookModel extends BookEntity {
-  const BookModel({
+  BookModel({
     required super.id,
     required super.title,
     required super.description,
@@ -10,19 +10,27 @@ class BookModel extends BookEntity {
     required super.cover,
     required super.link,
     required super.createdAt,
-    required super.updatedAt,
   });
 
   factory BookModel.fromJson(Map<String, dynamic> json) {
     return BookModel(
-      id: json['_id'],
-      title: json['title'],
+      id:          json['_id'],
+      title:       json['title'],
       description: json['description'],
-      author: json['author'],
-      cover: json['cover'],
-      link: json['link'],
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      author:      json['author'],
+      cover:       json['cover'],
+      link:        json['link'],
+      createdAt:   json['createdAt'],
     );
   }
+
+  BookEntity toEntity() => BookEntity(
+    id:          id,
+    title:       title,
+    description: description,
+    author:      author,
+    cover:       cover,
+    link:        link,
+    createdAt:   createdAt,
+  );
 }

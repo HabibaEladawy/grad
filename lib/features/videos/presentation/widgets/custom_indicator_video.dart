@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-
 import '../../../../../core/utils/app_colors.dart';
 import '../../../../../providers/app_theme_provider.dart';
 

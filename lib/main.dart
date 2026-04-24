@@ -8,6 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import 'core/di/injection_container.dart' as di;
+import 'features/books/presentation/cubit/books_cubit.dart';
 import 'features/videos/presentation/cubit/video_cubit.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,13 +42,17 @@ void main() async {
           BlocProvider(
             create: (_) => di.sl<VideoCubit>(),
           ),
+
+          // ✅ أضف BookCubit هنا
+          BlocProvider(
+            create: (_) => di.sl<BookCubit>(),
+          ),
         ],
         child: const Dana(),
       ),
     ),
   );
 }
-
 class Dana extends StatelessWidget {
   const Dana({super.key});
 

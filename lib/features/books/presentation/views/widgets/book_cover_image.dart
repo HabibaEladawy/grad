@@ -10,11 +10,16 @@ import '../../../../../providers/app_theme_provider.dart';
 
 class BookCoverImage extends StatelessWidget {
   final String imageUrl;
-  const BookCoverImage({super.key, required this.imageUrl});
+
+  const BookCoverImage({
+    super.key,
+    required this.imageUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
+    final isDark =
+        context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppRadius.radius_sm),
@@ -30,16 +35,21 @@ class BookCoverImage extends StatelessWidget {
 
   Widget _placeholder(bool isDark) {
     return Container(
-      width: 70.w,
-      height: 90.h,
-      color: isDark
-          ? AppColors.bg_card_default_dark
-          : AppColors.bg_card_default_light,
-      child: Icon(
-        Icons.book,
+      height: 120.h,
+      decoration: BoxDecoration(
         color: isDark
-            ? AppColors.primary_default_dark
-            : AppColors.primary_default_light,
+            ? AppColors.bg_card_default_dark
+            : AppColors.bg_card_default_light,
+        borderRadius: BorderRadius.circular(AppRadius.radius_sm),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.book,
+          size: 28.sp,
+          color: isDark
+              ? AppColors.primary_default_dark
+              : AppColors.primary_default_light,
+        ),
       ),
     );
   }

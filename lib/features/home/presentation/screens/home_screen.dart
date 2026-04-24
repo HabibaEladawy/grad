@@ -23,6 +23,7 @@ import '../../../parent_profile/views/profile_section.dart';
 import '../cubit/get_parent_profile_cubit.dart';
 import '../cubit/get_parent_profile_state.dart';
 import '../widgets/doctor_card_home.dart';
+
 import '../widgets/statistics_chart.dart';
 import 'doctors_page.dart';
 
@@ -85,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 textDirection: TextDirection.rtl,
                 child: BlocBuilder<ParentCubit, ParentState>(
                   builder: (context, state) {
-                    // ✅ جيب بيانات الـ parent من الـ state
+
                     final parent =
                     state is ParentLoaded ? state.parent : null;
                     final child =
@@ -310,11 +311,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                           168,
                                         )
                                             : AppColors.primary_default_light,
-                                        // onTap: () {
-                                        //   Navigator.of(context).pushNamed(
-                                        //     AppRoutes.books,
-                                        //   );
-                                        // },
+                                        onTap: () {
+                                          Navigator.of(context).pushNamed(
+                                            AppRoutes.books,
+                                          );
+                                        },
                                       ),
                                       CustomTextFrame(
                                         width: 192.w,
@@ -543,3 +544,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+

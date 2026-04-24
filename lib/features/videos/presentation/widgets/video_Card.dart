@@ -40,7 +40,7 @@ class VideoCard extends StatelessWidget {
               MaterialPageRoute(
                 builder: (_) => VideoDetailsScreen(
                   video: video,
-                  relatedVideos: relatedVideos, // ✅ الربط هنا
+                  relatedVideos: relatedVideos,
                 ),
               ),
             );
@@ -50,47 +50,39 @@ class VideoCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// 🔹 Image
+            /// Image
             Container(
-              width: width,
+              width: double.infinity,
               height: 180.h,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(AppRadius.radius_md),
-                border: Border(
-                  top: BorderSide(
-                    color: isDark
-                        ? AppColors.border_card_default_dark
-                        : AppColors.border_card_default_light,
-                    width: AppRadius.stroke_bold,
-                  ),
+                border: Border.all(
+                  color: isDark
+                      ? AppColors.border_card_default_dark
+                      : AppColors.border_card_default_light,
+                  width: AppRadius.stroke_bold,
                 ),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(AppRadius.radius_md),
                 child: Image.network(
                   video.cover,
-                  width: width,
-                  height: 180.h,
                   fit: BoxFit.cover,
-
+                  width: double.infinity,
+                  height: 180.h,
                   loadingBuilder: (context, child, progress) {
                     if (progress == null) return child;
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
+                    return const Center(child: CircularProgressIndicator());
                   },
-
                   errorBuilder: (context, error, stackTrace) =>
-                  const Center(
-                    child: Icon(Icons.broken_image),
-                  ),
+                  const Center(child: Icon(Icons.broken_image)),
                 ),
               ),
             ),
 
             SizedBox(height: 8.h),
 
-            /// 🔹 Title
+            /// Title
             Text(
               video.title,
               maxLines: 1,
@@ -100,23 +92,25 @@ class VideoCard extends StatelessWidget {
 
             SizedBox(height: 4.h),
 
-            /// 🔹 Time
+            /// Time
             Row(
-              mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
                   Icons.access_time,
-                  size: 10.w,
+                  size: 12.sp,
                   color: isDark
                       ? AppColors.icon_onLight_dark
                       : AppColors.icon_onLight_light,
                 ),
-                SizedBox(width: 2.w),
+                SizedBox(width: 4.w),
                 Text(
                   video.time,
                   style: AppTextStyle.medium12TextBody(context).copyWith(
-                    fontSize: 8.sp,
+                    fontSize: 10.sp,
                     fontWeight: FontWeight.w400,
+                    color: isDark
+                        ? AppColors.text_body_dark
+                        : AppColors.text_body_light,
                   ),
                 ),
               ],

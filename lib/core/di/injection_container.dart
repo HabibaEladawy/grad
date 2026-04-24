@@ -1,10 +1,8 @@
 
-
 import 'package:dana_graduation_project/core/api/api_constant.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-
 import '../../features/auth/login/data/datasources/auth_remote_data_source.dart';
 import '../../features/auth/login/data/datasources/auth_remote_data_source_impl.dart';
 import '../../features/auth/login/data/repo/auth_repository_impl.dart';
@@ -22,6 +20,11 @@ import '../../features/auth/login/presentation/cubit/create_doctor_cubit.dart';
 import '../../features/auth/login/presentation/cubit/reset_password_cubit.dart';
 import '../../features/auth/login/presentation/cubit/sign_in_cubit.dart';
 import '../../features/auth/login/presentation/cubit/sign_up_cubit.dart';
+import '../../features/books/data/datasource/Book_RemoteDataSource_Impl.dart';
+import '../../features/books/data/datasource/Book_Remote_DataSource.dart';
+import '../../features/books/data/repo/Book_RepositoryImpl.dart';
+import '../../features/books/domain/repo/Book_Repository.dart';
+import '../../features/books/presentation/cubit/books_cubit.dart';
 import '../../features/home/data/datasource/Parent_Remote_DataSource_Impl.dart';
 import '../../features/home/data/datasource/doctor_repository_impl.dart';
 import '../../features/home/data/repo/Parent_Remote_DataSource.dart';
@@ -46,108 +49,10 @@ import '../network/network_info.dart';
 import '../network/network_info_impl.dart';
 
 
-// final sl = GetIt.instance;
-//
-// Future<void> init() async {
-//   // ══════════════════════════════════════════════════════════════════════════
-//   //  Cubits
-//   // ══════════════════════════════════════════════════════════════════════════
-//
-//   sl.registerFactory(
-//         () => SignUpCubit(
-//       preSignUpUseCase: sl(),
-//       verifySignUpUseCase: sl(),
-//     ),
-//   );
-//
-//   sl.registerFactory(
-//         () => SignInCubit(
-//       preSignInUseCase: sl(),
-//       verifySignInUseCase: sl(),
-//     ),
-//   );
-//
-//   sl.registerFactory(
-//         () => ResetPasswordCubit(
-//       resetPasswordUseCase: sl(),
-//       verifyPasswordOtpUseCase: sl(),
-//     ),
-//   );
-//
-//   sl.registerFactory(
-//         () => ChangePasswordCubit(
-//       changePasswordUseCase: sl(),
-//     ),
-//   );
-//
-//   sl.registerFactory(
-//         () => CreateDoctorCubit(
-//       createDoctorUseCase: sl(),
-//     ),
-//   );
-//
-//   // ══════════════════════════════════════════════════════════════════════════
-//   //  Use Cases
-//   // ══════════════════════════════════════════════════════════════════════════
-//
-//   sl.registerLazySingleton(() => PreSignUpUseCase(repository: sl()));
-//   sl.registerLazySingleton(() => VerifySignUpUseCase(repository: sl()));
-//   sl.registerLazySingleton(() => PreSignInUseCase(repository: sl()));
-//   sl.registerLazySingleton(() => VerifySignInUseCase(repository: sl()));
-//   sl.registerLazySingleton(() => ResetPasswordUseCase(repository: sl()));
-//   sl.registerLazySingleton(() => VerifyPasswordOtpUseCase(repository: sl()));
-//   sl.registerLazySingleton(() => ChangePasswordUseCase(repository: sl()));
-//   sl.registerLazySingleton(() => CreateDoctorUseCase(repository: sl()));
-//
-//   // ══════════════════════════════════════════════════════════════════════════
-//   //  Repository
-//   // ══════════════════════════════════════════════════════════════════════════
-//
-//   sl.registerLazySingleton<AuthRepository>(
-//         () => AuthRepositoryImpl(
-//       remoteDataSource: sl(),
-//       networkInfo: sl(),
-//     ),
-//   );
-//
-//   // ══════════════════════════════════════════════════════════════════════════
-//   //  Data Sources
-//   // ══════════════════════════════════════════════════════════════════════════
-//
-//   sl.registerLazySingleton<AuthRemoteDataSource>(
-//         () => AuthRemoteDataSourceImpl(dio: sl()),
-//   );
-//
-//   // ══════════════════════════════════════════════════════════════════════════
-//   //  Core
-//   // ══════════════════════════════════════════════════════════════════════════
-//
-//   sl.registerLazySingleton<NetworkInfo>(
-//         () => NetworkInfoImpl(sl()),
-//   );
-//
-//   sl.registerLazySingleton(
-//         () => InternetConnection(),
-//   );
-//
-//   sl.registerLazySingleton<Dio>(
-//         () => Dio(
-//       BaseOptions(
-//         baseUrl: ApiConstant.baseUrl,
-//         connectTimeout: const Duration(seconds: 15),
-//         receiveTimeout: const Duration(seconds: 15),
-//         headers: {'Accept': 'application/json'},
-//       ),
-//     ),
-//   );
-// }
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  // ═══════════════════════════════════════
   // Core
-  // ═══════════════════════════════════════
-
   sl.registerLazySingleton<Dio>(
         () => Dio(
       BaseOptions(
@@ -169,9 +74,8 @@ Future<void> init() async {
         () => NetworkInfoImpl(sl()),
   );
 
-  // ═══════════════════════════════════════
   // Data Sources
-  // ═══════════════════════════════════════
+
 
   sl.registerLazySingleton<AuthRemoteDataSource>(
         () => AuthRemoteDataSourceImpl(dio: sl()),
@@ -191,9 +95,18 @@ Future<void> init() async {
     ),
   );
 
-  // ═══════════════════════════════════════
+  //  BOOKS MODULE
+
+
+  sl.registerLazySingleton<BooksRemoteDataSource>(
+        () => BooksRemoteDataSourceImpl(sl<ApiManger>()),
+  );
+
+  sl.registerLazySingleton<BookRepository>(
+        () => BooksRepoImpl(sl<BooksRemoteDataSource>()),
+  );
+
   // Repositories
-  // ═══════════════════════════════════════
 
   sl.registerLazySingleton<AuthRepository>(
         () => AuthRepositoryImpl(
@@ -217,9 +130,7 @@ Future<void> init() async {
     ),
   );
 
-  // ═══════════════════════════════════════
   // UseCases
-  // ═══════════════════════════════════════
 
   sl.registerLazySingleton(() => PreSignUpUseCase(repository: sl()));
   sl.registerLazySingleton(() => VerifySignUpUseCase(repository: sl()));
@@ -233,7 +144,6 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetAllDoctorsUseCase(repository: sl()));
   sl.registerLazySingleton(() => GetDoctorByIdUseCase(repository: sl()));
 
-  // 🔥 FIXED: proper injection style
   sl.registerLazySingleton<GetAllVideosUseCase>(
         () => GetAllVideosUseCase(sl()),
   );
@@ -246,9 +156,7 @@ Future<void> init() async {
         () => GetVideoByIdUseCase(sl()),
   );
 
-  // ═══════════════════════════════════════
   // Cubits
-  // ═══════════════════════════════════════
 
   sl.registerFactory(
         () => SignUpCubit(
@@ -296,12 +204,18 @@ Future<void> init() async {
     ),
   );
 
-  // 🔥 FIXED: full injection (NOT sl() only)
   sl.registerFactory<VideoCubit>(
         () => VideoCubit(
       getAllVideosUseCase: sl(),
       getVideoByIdUseCase: sl(),
       searchVideosUseCase: sl(),
     ),
+  );
+
+
+  //  BOOK CUBIT
+
+  sl.registerFactory<BookCubit>(
+        () => BookCubit(sl<BookRepository>()),
   );
 }

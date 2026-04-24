@@ -13,11 +13,15 @@ abstract class BookState extends Equatable {
 
 /* ================= INITIAL ================= */
 
-class BookInitial extends BookState {}
+class BookInitial extends BookState {
+  const BookInitial();
+}
 
 /* ================= LOADING ================= */
 
-class BookLoading extends BookState {}
+class BookLoading extends BookState {
+  const BookLoading();
+}
 
 /* ================= LIST OF BOOKS ================= */
 

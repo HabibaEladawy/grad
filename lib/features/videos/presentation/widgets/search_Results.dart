@@ -53,9 +53,7 @@ class SearchResults extends StatelessWidget {
 
                 return VideoCard(
                   video: current,
-                  imageWidth: 192.w,
 
-                  // optional: لو مش مهم performance
                   relatedVideos: const [],
                 );
               },

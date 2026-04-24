@@ -36,7 +36,7 @@ class DoctorModel extends DoctorEntity {
       ratingQuantity: (json['ratingQuantity'] as num?)?.toInt() ?? 0,
       specialty: json['specialty'] ?? '',
       detectionPrice: (json['detectionPrice'] as num?)?.toDouble() ?? 0.0,
-      expirtes: (json['expirtes'] as num?)?.toInt() ?? 0, // ✅ مرة واحدة بس
+      expirtes: (json['expirtes'] as num?)?.toInt() ?? 0,
       avilableDate: List<String>.from(json['avilableDate'] ?? []),
       avilableTime: List<String>.from(json['avilableTime'] ?? []),
       role: json['role'] ?? '',

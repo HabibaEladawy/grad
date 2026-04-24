@@ -1,5 +1,7 @@
 import 'package:dana_graduation_project/features/books/domain/entity/book_entity.dart';
+import 'package:dartz/dartz.dart';
 
+import '../../../../core/errors/failures.dart';
 import '../repo/Book_Repository.dart';
 
 class GetBookById {
@@ -7,7 +9,7 @@ class GetBookById {
 
   GetBookById(this.repository);
 
-  Future<BookEntity> call(String id) async {
+  Future<Either<Failure, BookEntity>> call(String id) async {
     return await repository.getBookById(id);
   }
 }

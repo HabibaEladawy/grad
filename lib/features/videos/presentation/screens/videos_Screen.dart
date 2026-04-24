@@ -34,7 +34,6 @@ class _VideosScreenState extends State<VideosScreen> {
 
     _activeTab = AppLocalizations.of(context)!.videos;
 
-    // ✅ أول ما الشاشة تفتح نجيب كل الفيديوهات
     context.read<VideoCubit>().getAllVideos();
   }
 
@@ -70,46 +69,44 @@ class _VideosScreenState extends State<VideosScreen> {
               },
             ),
             SizedBox(height: 12.h),
-
             VideosTabBar(
               activeTab: _activeTab,
               onTabChanged: (t) => setState(() => _activeTab = t),
             ),
-
             SizedBox(height: 12.h),
 
             Expanded(
               child: BlocBuilder<VideoCubit, VideoState>(
                 builder: (context, state) {
-                  /// 🔄 Loading (get all)
+                  ///  Loading (get all)
                   if (state is VideoLoading) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
                   }
 
-                  /// 🔄 Loading (search)
+                  ///  Loading (search)
                   if (state is VideoSearchLoading) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
                   }
 
-                  /// ❌ Error
+                  ///  Error
                   if (state is VideoError) {
                     return Center(
                       child: Text(state.message),
                     );
                   }
 
-                  /// 🔍 Search Empty
+                  ///  Search Empty
                   if (state is VideoSearchEmpty) {
                     return const Center(
                       child: Text("No results found"),
                     );
                   }
 
-                  /// 🔍 Search Loaded
+                  ///  Search Loaded
                   if (state is VideoSearchLoaded) {
                     final videos = state.videos;
 
@@ -125,7 +122,7 @@ class _VideosScreenState extends State<VideosScreen> {
                     );
                   }
 
-                  /// 📺 Get All Loaded
+                  ///  Get All Loaded
                   if (state is VideoLoaded) {
                     final videos = state.videos;
 

@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../../../../core/utils/app_colors.dart';
-
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../providers/app_theme_provider.dart';
 import '../../domain/entity/Video_Entity.dart';
@@ -32,7 +31,7 @@ class VideoDetailsScreen extends StatelessWidget {
     final isDark =
         context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
 
-    final isRtl = Localizations.localeOf(context).languageCode == 'ar';
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
 
     final l10n = AppLocalizations.of(context)!;
 
@@ -43,10 +42,15 @@ class VideoDetailsScreen extends StatelessWidget {
       body: SafeArea(
         child: BlocBuilder<VideoCubit, VideoState>(
           builder: (context, state) {
+            final videos = state is VideoLoaded
+                ? state.videos
+                : relatedVideos;
+
+            final filtered = videos.where((v) => v.id != video.id).toList();
+
             return SingleChildScrollView(
               child: Column(
-                crossAxisAlignment:
-                isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CustomSectionHeader(title: l10n.videos),
 
@@ -63,8 +67,6 @@ class VideoDetailsScreen extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 24.w),
                     child: Row(
-                      textDirection:
-                      isRtl ? TextDirection.rtl : TextDirection.ltr,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
@@ -93,67 +95,34 @@ class VideoDetailsScreen extends StatelessWidget {
 
                   SizedBox(height: 12.h),
 
-                  // ✅ هنا الربط بالـ API
+                  /// 🔥 LIST
                   if (state is VideoLoading)
                     const Center(child: CircularProgressIndicator())
                   else if (state is VideoError)
                     Center(child: Text(state.message))
-                  else if (state is VideoLoaded)
-                      SizedBox(
-                        height: 280.h,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          reverse: isRtl,
-                          padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          itemCount: state.videos
-                              .where((v) => v.id != video.id)
-                              .length,
-                          itemBuilder: (context, index) {
-                            final related = state.videos
-                                .where((v) => v.id != video.id)
-                                .toList();
-                            final item = related[index];
+                  else
+                    SizedBox(
+                      height: 250.h, // ثابت زي الفيجما
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: EdgeInsets.symmetric(horizontal: 24.w),
+                        itemCount: filtered.length,
+                        separatorBuilder: (_, __) => SizedBox(width: 12.w),
+                        itemBuilder: (context, index) {
+                          final item = filtered[index];
 
-                            return Padding(
-                              padding: EdgeInsets.only(
-                                left: isRtl ? 12.w : 0,
-                                right: isRtl ? 0 : 12.w,
-                              ),
-                              child: VideoCard(
-                                video: item,
-                                relatedVideos: related
-                                    .where((v) => v.id != item.id)
-                                    .toList(),
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                    else
-                      SizedBox(
-                        height: 280.h,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          reverse: isRtl,
-                          padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          itemCount: relatedVideos.length,
-                          itemBuilder: (context, index) {
-                            final item = relatedVideos[index];
-                            return Padding(
-                              padding: EdgeInsets.only(
-                                left: isRtl ? 12.w : 0,
-                                right: isRtl ? 0 : 12.w,
-                              ),
-                              child: VideoCard(
-                                video: item,
-                                relatedVideos: relatedVideos
-                                    .where((v) => v.id != item.id)
-                                    .toList(),
-                              ),
-                            );
-                          },
-                        ),
+                          return SizedBox(
+                            width: 192.w, // مطابق للفيجما
+                            child: VideoCard(
+                              video: item,
+                              relatedVideos: filtered
+                                  .where((v) => v.id != item.id)
+                                  .toList(),
+                            ),
+                          );
+                        },
                       ),
+                    ),
 
                   SizedBox(height: 24.h),
                 ],

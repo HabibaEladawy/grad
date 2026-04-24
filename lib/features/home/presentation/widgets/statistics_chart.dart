@@ -13,7 +13,7 @@ class StatisticsChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Builder(
-      builder: (builderContext) {  // ✅ context جديد تحت الـ Provider
+      builder: (builderContext) {
         final themeProvider = builderContext.watch<AppThemeProvider>();
         final isDark =
             themeProvider.appTheme == ThemeMode.dark ||

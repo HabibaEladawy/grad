@@ -57,7 +57,7 @@ class AppRoutes {
   static const String doctors = DoctorsScreen.routeName;
 
   /// Books
-  // static const String books         = BooksScreen.routeName;
+  static const String books         = BooksScreen.routeName;
 
   /// Examination
   static const String examination = ExaminationScreen.routeName;

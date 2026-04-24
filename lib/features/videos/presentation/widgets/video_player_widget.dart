@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-
 import '../../../../../core/utils/app_colors.dart';
 import '../../../../../core/utils/app_raduis.dart';
+import '../../../../core/theming/app_text_styles.dart' hide AppColors, AppRadius;
 import '../../domain/entity/Video_Entity.dart';
-
 class VideoPlayerWidget extends StatefulWidget {
   final VideoEntity video;
 
@@ -67,126 +66,159 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppRadius.radius_lg),
-        child: Stack(
-          children: [
-            // YouTube Player
-            YoutubePlayer(
-              controller: _controller,
-              showVideoProgressIndicator: false,
+      child: Container(
+        width: 392.w,
+        height: 256.h,
+        decoration: BoxDecoration(
+          color: isDark
+              ? AppColors.bg_card_default_dark
+              : AppColors.bg_card_default_light,
+          borderRadius: BorderRadius.circular(AppRadius.radius_lg),
+          border: Border(
+            top: BorderSide(
+              color: isDark
+                  ? AppColors.border_card_default_dark
+                  : AppColors.border_card_default_light,
+              width: AppRadius.stroke_thin,
             ),
-
-            // Controls Bar في الأسفل
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                color: Colors.black.withOpacity(0.85),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Row الأزرار والوقت
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12.w,
-                        vertical: 6.h,
-                      ),
-                      child: Row(
-                        children: [
-                          // الوقت على اليسار
-                          Text(
-                            '${_formatDuration(_currentPosition)} / ${_formatDuration(_totalDuration)}',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-
-                          const Spacer(),
-
-                          // -10
-                          GestureDetector(
-                            onTap: _seekBackward,
-                            child: Icon(
-                              Icons.replay_10,
-                              color: Colors.white,
-                              size: 24.sp,
-                            ),
-                          ),
-
-                          SizedBox(width: 12.w),
-
-                          // Play/Pause
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _controller.value.isPlaying
-                                    ? _controller.pause()
-                                    : _controller.play();
-                              });
-                            },
-                            child: Icon(
-                              _controller.value.isPlaying
-                                  ? Icons.pause
-                                  : Icons.play_arrow,
-                              color: Colors.white,
-                              size: 28.sp,
-                            ),
-                          ),
-
-                          SizedBox(width: 12.w),
-
-                          // +10
-                          GestureDetector(
-                            onTap: _seekForward,
-                            child: Icon(
-                              Icons.forward_10,
-                              color: Colors.white,
-                              size: 24.sp,
-                            ),
-                          ),
-
-                          SizedBox(width: 12.w),
-
-                          // زرار إضافي
-                          Icon(
-                            Icons.more_vert,
-                            color: Colors.white,
-                            size: 22.sp,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Progress Bar ملاصق للأسفل بدون padding
-                    GestureDetector(
-                      onTapDown: (details) {
-                        final box = context.findRenderObject() as RenderBox;
-                        final dx = details.localPosition.dx / box.size.width;
-                        final seekTo = _totalDuration * dx;
-                        _controller.seekTo(seekTo);
-                      },
-                      child: SizedBox(
-                        height: 3.h,
-                        child: LinearProgressIndicator(
-                          value: _totalDuration.inSeconds > 0
-                              ? _currentPosition.inSeconds /
-                              _totalDuration.inSeconds
-                              : 0,
-                          backgroundColor: Colors.white.withOpacity(0.3),
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            AppColors.primary_default_light,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+///الفيديو
+                  Container(
+              width: 392.w,
+              height: 200.h,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(AppRadius.radius_lg),
+                  topRight: Radius.circular(AppRadius.radius_lg),
                 ),
+                border: Border(
+                  bottom: BorderSide(
+                    color: isDark
+                        ? AppColors.text_button_disabled_dark
+                        : AppColors.text_button_disabled_light,
+                    width: 2,
+                  ),
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(AppRadius.radius_lg),
+                  topRight: Radius.circular(AppRadius.radius_lg),
+                ),
+                child: YoutubePlayer(
+                  controller: _controller,
+                  showVideoProgressIndicator: false,
+                ),
+              ),
+            ),
+            // Progress Bar
+            GestureDetector(
+              onTapDown: (details) {
+                final box = context.findRenderObject() as RenderBox;
+                final dx = details.localPosition.dx / box.size.width;
+                final seekTo = _totalDuration * dx;
+                _controller.seekTo(seekTo);
+              },
+              child: SizedBox(
+                height: 3.h,
+                child: LinearProgressIndicator(
+                  value: _totalDuration.inSeconds > 0
+                      ? _currentPosition.inSeconds / _totalDuration.inSeconds
+                      : 0,
+                  backgroundColor: isDark
+                      ? AppColors.border_card_default_dark
+                      : AppColors.border_card_default_light,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.primary_default_light,
+                  ),
+                ),
+              ),
+            ),
+            /// Controls Row
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 16.w,
+                vertical: 10.h,
+              ),
+              child: Row(
+                textDirection: TextDirection.ltr,
+                children: [
+                  /// -10
+                  GestureDetector(
+                    onTap: _seekBackward,
+                    child: SizedBox(
+                      width: 24.w,
+                      height: 24.h,
+                      child: Icon(
+                        Icons.forward_10,
+                        color: isDark
+                            ? AppColors.text_heading_dark
+                            : AppColors.text_heading_light,
+                        size: 24.sp,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  /// Play/Pause
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _controller.value.isPlaying
+                            ? _controller.pause()
+                            : _controller.play();
+                      });
+                    },
+                    child: SizedBox(
+                      width: 24.w,
+                      height: 24.h,
+                      child: Icon(
+                        _controller.value.isPlaying
+                            ? Icons.pause
+                            : Icons.play_arrow,
+                        color: isDark
+                            ? AppColors.text_heading_dark
+                            : AppColors.text_heading_light,
+                        size: 24.sp,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  /// +10
+                  GestureDetector(
+                    onTap: _seekForward,
+                    child: SizedBox(
+                      width: 24.w,
+                      height: 24.h,
+                      child: Icon(
+                        Icons.replay_10,
+                        color: isDark
+                            ? AppColors.text_heading_dark
+                            : AppColors.text_heading_light,
+                        size: 24.sp,
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  /// الوقت على اليمين
+                  Text(
+                    '${_formatDuration(_currentPosition)} / ${_formatDuration(_totalDuration)}',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w500,
+                      color: isDark
+                          ? AppColors.text_body_dark
+                          : AppColors.text_body_light,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

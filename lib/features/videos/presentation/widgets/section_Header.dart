@@ -22,7 +22,7 @@ class SectionHeader extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       child: Row(
         children: [
-          /// 🔹 Title
+          ///  Title
           Expanded(
             child: Text(
               title,
@@ -31,7 +31,7 @@ class SectionHeader extends StatelessWidget {
             ),
           ),
 
-          /// 🔹 View All button
+          ///  View All button
           InkWell(
             onTap: onViewAll,
             borderRadius: BorderRadius.circular(8),

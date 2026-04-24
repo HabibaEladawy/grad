@@ -1,68 +1,61 @@
-import 'package:dio/dio.dart';
+import 'package:dana_graduation_project/core/api/api_endpoint.dart';
 
 import '../../../../core/api/api_manger.dart';
 import '../model/Book_Model.dart';
 import 'Book_Remote_DataSource.dart';
 
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 
-import '../../../../core/errors/exceptions.dart';
-
-class BookRemoteDataSourceImpl implements BookRemoteDataSource {
+class BooksRemoteDataSourceImpl implements BooksRemoteDataSource {
   final ApiManger apiManger;
 
-  const BookRemoteDataSourceImpl({
-    required this.apiManger,
-  });
+  BooksRemoteDataSourceImpl(this.apiManger);
 
   @override
-  Future<List<BookModel>> getAllBooks() async {
-    try {
-      final response = await apiManger.getData(
-        endPoint: '/books',
-      );
+  Future<List<BookModel>> getBooks() async {
+    final response = await apiManger.getData(
+      endPoint: ApiEndpoint.textBooks,
+    );
+    print(response.data.runtimeType);
+    print(response.data);
 
-      debugPrint("🟢 SUCCESS: /books fetched successfully");
+    final data = response.data;
 
-      final List<dynamic> jsonList = response.data;
+    print('RAW TYPE: ${data.runtimeType}');
+    print('RAW DATA: $data');
 
-      return jsonList
-          .map((json) => BookModel.fromJson(json))
+    if (data is List) {
+      return data
+          .map((e) => BookModel.fromJson(e))
           .toList();
-    } on DioException catch (e) {
-      debugPrint("🔴 NETWORK ERROR: ${e.message}");
-      throw NetworkException(
-        message: '❌ لا يوجد اتصال بالإنترنت',
-      );
-    } catch (e) {
-      debugPrint("🔴 SERVER ERROR: $e");
-      throw ServerException(
-        message: '❌ فشل في جلب الكتب',
-      );
     }
-  }
 
+    if (data is Map<String, dynamic> && data['data'] is List) {
+      return (data['data'] as List)
+          .map((e) => BookModel.fromJson(e))
+          .toList();
+    }
+
+    throw Exception('Unexpected API format');
+  }
   @override
   Future<BookModel> getBookById(String id) async {
-    try {
-      final response = await apiManger.getData(
-        endPoint: '/books/$id',
-      );
+    final response = await apiManger.getData(
+      endPoint: "${ApiEndpoint.bookById}$id",
+    );
 
-      debugPrint("🟢 SUCCESS: book $id fetched");
+    final data = response.data;
 
-      return BookModel.fromJson(response.data);
-    } on DioException catch (e) {
-      debugPrint("🔴 NETWORK ERROR: ${e.message}");
-      throw NetworkException(
-        message: '❌ لا يوجد اتصال بالإنترنت',
-      );
-    } catch (e) {
-      debugPrint("🔴 SERVER ERROR: $e");
-      throw ServerException(
-        message: '❌ فشل في جلب الكتاب',
-      );
+    print('TYPE: ${data.runtimeType}');
+    print('DATA: $data');
+
+    if (data is Map<String, dynamic>) {
+      return BookModel.fromJson(data);
     }
+
+    if (data is List) {
+      return BookModel.fromJson(data.first);
+    }
+
+    throw Exception('Unexpected format: ${data.runtimeType}');
   }
 }

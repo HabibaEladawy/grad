@@ -2,7 +2,6 @@ import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 
 import '../errors/failures.dart';
-
 /// Base UseCase contract.
 /// [Type] = return type on success.
 /// [Params] = input parameters (use [NoParams] if none needed).

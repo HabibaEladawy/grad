@@ -28,7 +28,6 @@ class VideosTabBar extends StatelessWidget {
 
     final tabs = [
       {'key': 'examination', 'icon': 'assets/Images/icon_examination.png', 'label': l10n.examination},
-
       {'key': 'videos', 'icon': 'assets/Images/icon_videos.png', 'label': l10n.videos},
       {'key': 'books', 'icon': 'assets/Images/icon_book.png', 'label': l10n.books},
     ];
@@ -54,7 +53,7 @@ class VideosTabBar extends StatelessWidget {
                   onTabChanged(tab['label'] as String);
                   switch (tab['key']) {
                     case 'books':
-                      // Navigator.pushReplacementNamed(context, AppRoutes.books);
+                      Navigator.pushReplacementNamed(context, AppRoutes.books);
                       break;
                     case 'videos':
                       Navigator.pushReplacementNamed(context, AppRoutes.videos);
@@ -79,25 +78,36 @@ class VideosTabBar extends StatelessWidget {
                     ),
                     borderRadius: BorderRadius.circular(AppRadius.radius_sm),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        tab['icon'] as String,
-                        width: 16.w,
-                        height: 16.h,
-                        color: isActive
-                            ? isDark ? AppColors.primary_default_dark : AppColors.primary_default_light
-                            : isDark ? AppColors.icon_onLight_dark : AppColors.icon_onLight_light,
-                      ),
-                      SizedBox(width: 4.w),
-                      Text(
-                        tab['label'] as String,
-                        style: isActive
-                            ? AppTextStyle.medium12TextButton(context)
-                            : AppTextStyle.medium12TextBody(context),
-                      ),
-                    ],
+                  child: Builder(
+                    builder: (context) {
+                      final color = isActive
+                          ? (isDark
+                          ? AppColors.primary_default_dark
+                          : AppColors.primary_default_light)
+                          : (isDark
+                          ? AppColors.icon_onLight_dark
+                          : AppColors.icon_onLight_light);
+
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            tab['icon'] as String,
+                            width: 16.w,
+                            height: 16.h,
+                            color: color,
+                          ),
+                          SizedBox(width: 4.w),
+                          Text(
+                            tab['label'] as String,
+                            style: (isActive
+                                ? AppTextStyle.medium12TextButton(context)
+                                : AppTextStyle.medium12TextBody(context))
+                                .copyWith(color: color),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),
@@ -108,3 +118,66 @@ class VideosTabBar extends StatelessWidget {
     );
   }
 }
+// class VideosTabBar extends StatelessWidget {
+//   final String activeTab;
+//   final void Function(String) onTabChanged;
+//
+//   const VideosTabBar({
+//     super.key,
+//     required this.activeTab,
+//     required this.onTabChanged,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final isDark =
+//         context.watch<AppThemeProvider>().appTheme == ThemeMode.dark;
+//
+//     final l10n = AppLocalizations.of(context)!;
+//
+//     final isRtl =
+//         Localizations.localeOf(context).languageCode == 'ar';
+//
+//     final tabs = [
+//       {
+//         'key': 'examination',
+//         'icon': 'assets/Images/icon_examination.png',
+//         'label': l10n.examination
+//       },
+//       {
+//         'key': 'videos',
+//         'icon': 'assets/Images/icon_videos.png',
+//         'label': l10n.videos
+//       },
+//       {
+//         'key': 'books',
+//         'icon': 'assets/Images/icon_book.png',
+//         'label': l10n.books
+//       },
+//     ];
+//
+//     return Padding(
+//       padding: EdgeInsets.symmetric(horizontal: 24.w),
+//       child: Row(
+//         textDirection:
+//         isRtl ? TextDirection.rtl : TextDirection.ltr,
+//         children: tabs.asMap().entries.map((entry) {
+//           final index = entry.key;
+//           final tab = entry.value;
+//
+//           final isActive = activeTab == tab['label'];
+//           final isLast = index == tabs.length - 1;
+//
+//           return VideoTabItem(
+//             tab: tab,
+//             isActive: isActive,
+//             isDark: isDark,
+//             isRtl: isRtl,
+//             isLast: isLast,
+//             onTabChanged: onTabChanged,
+//           );
+//         }).toList(),
+//       ),
+//     );
+//   }
+// }
