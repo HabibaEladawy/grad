@@ -126,7 +126,8 @@ class ParentProfileCubit extends Cubit<ParentProfileState> {
     }
   }
 
-  /// Updates parent profile photo via multipart `PATCH /v1/parentMe`. Returns `null` on success.
+  /// Updates parent profile photo via multipart `POST /v1/parent/:id/add-profile-image`.
+  /// Returns `null` on success.
   Future<String?> updateProfilePhoto(File photo) async {
     final cur = _lastGoodProfile;
     if (cur == null) {
