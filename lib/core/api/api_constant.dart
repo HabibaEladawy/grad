@@ -4,5 +4,5 @@ import '../config/app_config.dart';
 ///
 /// Prefer using `AppConfig.apiBaseUrl` directly in new code.
 class ApiConstant {
-  static const String baseUrl = AppConfig.apiBaseUrl;
+  static final String baseUrl = AppConfig.apiBaseUrl;
 }
