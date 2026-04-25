@@ -48,7 +48,6 @@ class SignUpCubit extends Cubit<SignUpState> {
 
   // ── Step 4: Password ──────────────────────────────────────────────────────
   String _password = '';
-  String _preSignUpPassword = '';
   String _verifiedToken = '';
 
   void updatePassword(String value) => _password = value;
@@ -59,6 +58,7 @@ class SignUpCubit extends Cubit<SignUpState> {
   // ── Validation ────────────────────────────────────────────────────────────
   String? validateStep1() {
     if (_parentName.trim().isEmpty) return 'من فضلك ادخل الاسم';
+    if (_parentName.trim().length < 3) return 'الاسم يجب أن يكون 3 أحرف على الأقل';
     if (_government.trim().isEmpty) return 'من فضلك اختر المحافظة';
     if (_address.trim().isEmpty) return 'من فضلك ادخل العنوان';
     return null;
@@ -149,13 +149,6 @@ class SignUpCubit extends Cubit<SignUpState> {
 
     final apiPhone = ParentPhoneUtils.normalizeForApi(_phone);
     final apiEmail = _email.trim().toLowerCase();
-    // Some backends require a password at `pre-SignUp` even if the UX wants
-    // password creation after OTP. Generate a temporary password for the
-    // registration step, then overwrite it after OTP using `change-password`.
-    if (_preSignUpPassword.isEmpty) {
-      final ms = DateTime.now().millisecondsSinceEpoch.toString();
-      _preSignUpPassword = 'Tmp@${ms.substring(ms.length - 8)}';
-    }
 
     final result = await preSignUpUseCase(
       PreSignUpParams(
@@ -164,7 +157,8 @@ class SignUpCubit extends Cubit<SignUpState> {
         phone: apiPhone,
         government: _government.trim(),
         address: _address.trim(),
-        password: _preSignUpPassword,
+        // note 2: pre-sign-up must not include password (OTP is step 2).
+        password: '',
         children: [
           ChildData(
             childName: _childName,

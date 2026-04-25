@@ -94,10 +94,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
             final msg = state.message;
             final lower = msg.toLowerCase();
             final alreadyExists =
-                lower.contains('already') ||
-                lower.contains('exist') ||
-                msg.contains('موجود') ||
-                msg.contains('مسجل');
+                lower.contains('account already exists') ||
+                lower.contains('already exists') ||
+                lower.contains('already registered') ||
+                msg.contains('الحساب موجود') ||
+                msg.contains('موجود بالفعل') ||
+                msg.contains('مسجل') ||
+                msg.contains('مسجل بالفعل');
 
             if (alreadyExists && context.mounted) {
               await showDialog<void>(
