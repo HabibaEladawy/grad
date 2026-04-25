@@ -42,11 +42,14 @@ class ApiEndpoint {
       '/v1/parentMe/updateChild/'; // PATCH + childId (JSON)
 
   // ── Profile images (note 2) ──────────────────────────────────────────────────
-  static String parentAddProfileImagePath(String parentId) =>
-      '/v1/parent/$parentId/add-profile-image'; // POST multipart file
+  /// Backend supports multipart image upload via:
+  /// - PATCH /v1/parentMe
+  /// - PATCH /v1/child/:id
+  static const String parentUploadProfileImage = parentMe; // PATCH multipart
 
-  static String childAddProfileImagePath(String childId) =>
-      '/v1/child/$childId/add-profile-image'; // POST multipart file
+  static String childById(String childId) => '/v1/child/$childId'; // GET/PATCH
+
+  static String childUploadProfileImage(String childId) => childById(childId);
 
   // ── Doctor ───────────────────────────────────────────────────────────────────
   static const String createDoctor = '/v1/doctor'; // POST

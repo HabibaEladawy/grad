@@ -94,7 +94,8 @@ class ParentProfileRemoteDataSourceImpl
           filename: file.path.split(RegExp(r'[\\/]')).last,
         ),
       });
-      await dio.post(ApiEndpoint.parentAddProfileImagePath(parentId), data: fd);
+      // Backend supports this upload via PATCH /v1/parentMe (baseUrl already includes /api).
+      await dio.patch(ApiEndpoint.parentUploadProfileImage, data: fd);
     } on DioException catch (e) {
       final msg = ApiError.messageFromDio(
         e,
@@ -230,7 +231,8 @@ class ParentProfileRemoteDataSourceImpl
             filename: profileImage.path.split(RegExp(r'[\\/]')).last,
           ),
         });
-        await dio.post(ApiEndpoint.childAddProfileImagePath(childId), data: fd);
+        // Backend supports this upload via PATCH /v1/child/:id.
+        await dio.patch(ApiEndpoint.childUploadProfileImage(childId), data: fd);
       }
 
       return child;
