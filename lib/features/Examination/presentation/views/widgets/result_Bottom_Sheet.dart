@@ -1,6 +1,5 @@
 import 'package:dana/core/widgets/custom_button.dart';
 import 'package:dana/features/Examination/presentation/views/widgets/result_Content.dart';
-import 'package:dana/features/Examination/presentation/views/widgets/sensitivity_Result_BottomSheet.dart';
 import 'package:dana/core/widgets/home_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -56,8 +55,8 @@ class ResultBottomSheet extends StatelessWidget {
             child: CustomButton(
               text: l10n.browseActivities,
               onTap: () {
+                // Normal (low) result: just close the sheet.
                 Navigator.pop(context);
-                SensitivityResultBottomSheet.show(context);
               },
             ),
           ),

@@ -2,6 +2,7 @@ import 'package:dana/core/widgets/custom_button.dart';
 import 'package:dana/features/Examination/presentation/views/widgets/result_Content.dart';
 import 'package:dana/features/Examination/presentation/views/widgets/result_Image.dart';
 import 'package:dana/core/widgets/home_indicator.dart';
+import 'package:dana/core/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -55,7 +56,10 @@ class SpecialistResultBottomSheet extends StatelessWidget {
             child: CustomButton(
               text: l10n.bookSpecialistConsultation,
               onTap: () {
-                Navigator.pop(context);
+                // Risky (high) result: go to booking entry (doctors list).
+                final nav = Navigator.of(context);
+                nav.pop();
+                nav.pushNamed(AppRoutes.doctors);
               },
             ),
           ),
