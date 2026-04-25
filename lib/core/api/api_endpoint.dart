@@ -42,14 +42,14 @@ class ApiEndpoint {
       '/v1/parentMe/updateChild/'; // PATCH + childId (JSON)
 
   // ── Profile images (note 2) ──────────────────────────────────────────────────
-  /// Backend supports multipart image upload via:
-  /// - PATCH /v1/parentMe
-  /// - PATCH /v1/child/:id
-  static const String parentUploadProfileImage = parentMe; // PATCH multipart
+  /// Multipart image upload endpoints (as used in Postman):
+  /// - PATCH /v1/parent/:id/add-profile-image
+  /// - PATCH /v1/child/:id/add-profile-image
+  static String parentAddProfileImagePath(String parentId) =>
+      '/v1/parent/$parentId/add-profile-image';
 
-  static String childById(String childId) => '/v1/child/$childId'; // GET/PATCH
-
-  static String childUploadProfileImage(String childId) => childById(childId);
+  static String childAddProfileImagePath(String childId) =>
+      '/v1/child/$childId/add-profile-image';
 
   // ── Doctor ───────────────────────────────────────────────────────────────────
   static const String createDoctor = '/v1/doctor'; // POST
