@@ -1,14 +1,13 @@
 import 'package:dana/core/utils/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../core/utils/app_colors.dart';
 import '../../../../../core/utils/app_raduis.dart';
-import '../../../../../providers/app_theme_provider.dart';
 import '../../../data/model/video_Model.dart';
 
 class VideoPlayerWidget extends StatefulWidget {
@@ -120,6 +119,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     _youtubeController = null;
   }
 
+  Future<void> _openExternally() async {
+    final uri = Uri.tryParse(_url);
+    if (uri == null) return;
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
   @override
   void dispose() {
     _disposePlayers();
@@ -128,24 +133,28 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = context.watch<AppThemeProvider>();
-    final isDark =
-        themeProvider.appTheme == ThemeMode.dark ||
-        (themeProvider.appTheme == ThemeMode.system &&
-            MediaQuery.of(context).platformBrightness == Brightness.dark);
-    final isRtl = Localizations.localeOf(context).languageCode == 'ar';
-
-    final iconColor = isDark
-        ? AppColors.icon_onLight_dark
-        : AppColors.icon_onLight_light;
     final player = _initError != null
         ? Center(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Text(
-                _initError!,
-                textAlign: TextAlign.center,
-                style: AppTextStyle.medium12TextBody(context),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _initError!,
+                    textAlign: TextAlign.center,
+                    style: AppTextStyle.medium12TextBody(context),
+                  ),
+                  SizedBox(height: 12.h),
+                  if (_isYouTube)
+                    SizedBox(
+                      height: 40.h,
+                      child: ElevatedButton(
+                        onPressed: _openExternally,
+                        child: const Text('Open in YouTube'),
+                      ),
+                    ),
+                ],
               ),
             ),
           )
@@ -158,8 +167,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                 ? Chewie(controller: _chewieController!)
                 : const Center(child: CircularProgressIndicator())));
 
-    return Stack(
-      alignment: Alignment.bottomCenter,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(AppRadius.radius_lg),
@@ -169,73 +178,16 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
             child: player,
           ),
         ),
-
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.bg_card_default_dark
-                  : AppColors.bg_card_default_light,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(12),
-              ),
-            ),
-            padding: EdgeInsets.only(
-              top: 16.h,
-              left: 16.w,
-              right: 16.w,
-              bottom: 8.h,
-            ),
-            child: Row(
-              textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  widget.video.duration,
-                  style: AppTextStyle.medium12TextBody(context),
-                ),
-                const Spacer(),
-                Row(
-                  children: [
-                    Icon(Icons.replay_10, color: iconColor, size: 24.w),
-
-                    SizedBox(width: 8.w),
-                    Icon(Icons.pause, color: iconColor, size: 24.w),
-                    SizedBox(width: 8.w),
-                    Icon(Icons.forward_10, color: iconColor, size: 24.w),
-                  ],
-                ),
-              ],
+        if (_isYouTube) ...[
+          SizedBox(height: 8.h),
+          SizedBox(
+            height: 40.h,
+            child: OutlinedButton(
+              onPressed: _openExternally,
+              child: const Text('Open in YouTube'),
             ),
           ),
-        ),
-
-        Positioned(
-          bottom: 44.h,
-          left: 0,
-          right: 0,
-          child: SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 0),
-              trackHeight: 2,
-              trackShape: const RectangularSliderTrackShape(),
-              activeTrackColor: isDark
-                  ? AppColors.primary_default_dark
-                  : AppColors.primary_default_light,
-              inactiveTrackColor: isDark
-                  ? AppColors.primary_default_dark.withAlpha(77)
-                  : AppColors.primary_default_light.withAlpha(77),
-              thumbColor: isDark
-                  ? AppColors.primary_default_dark
-                  : AppColors.primary_default_light,
-            ),
-            child: Slider(value: 0.0, onChanged: (_) {}),
-          ),
-        ),
+        ],
       ],
     );
   }
