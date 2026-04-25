@@ -26,9 +26,14 @@ class ResetPasswordOtpSent extends ResetPasswordState {
 class ResetPasswordOtpVerified extends ResetPasswordState {
   final String phone;
   final String otp;
-  const ResetPasswordOtpVerified({required this.phone, required this.otp});
+  final String token;
+  const ResetPasswordOtpVerified({
+    required this.phone,
+    required this.otp,
+    required this.token,
+  });
   @override
-  List<Object?> get props => [phone, otp];
+  List<Object?> get props => [phone, otp, token];
 }
 
 class ResetPasswordFailure extends ResetPasswordState {

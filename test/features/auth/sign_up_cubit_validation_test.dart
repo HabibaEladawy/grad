@@ -55,7 +55,7 @@ class _FakeAuthRepository implements AuthRepository {
       _unimplemented();
 
   @override
-  Future<Either<Failure, Unit>> verifyPasswordOtp({
+  Future<Either<Failure, String>> verifyPasswordOtp({
     required String phone,
     required String otp,
   }) async => _unimplemented();

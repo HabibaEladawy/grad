@@ -431,7 +431,8 @@ abstract class AuthRemoteDataSource {
   Future<void> resetPassword({required String phone});
 
   /// Verify reset-password OTP
-  Future<void> verifyPasswordOtp({required String phone, required String otp});
+  /// Some backends return a short-lived token to authorize password change.
+  Future<String> verifyPasswordOtp({required String phone, required String otp});
 
   /// Change password (authenticated)
   Future<void> changePassword({

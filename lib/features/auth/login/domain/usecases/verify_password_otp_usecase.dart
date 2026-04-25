@@ -5,12 +5,12 @@ import '../../../../../core/errors/failures.dart';
 import '../../../../../core/usecases/usecases.dart';
 import '../repo/auth_repository.dart';
 
-class VerifyPasswordOtpUseCase extends UseCase<Unit, VerifyPasswordOtpParams> {
+class VerifyPasswordOtpUseCase extends UseCase<String, VerifyPasswordOtpParams> {
   final AuthRepository repository;
   VerifyPasswordOtpUseCase({required this.repository});
 
   @override
-  Future<Either<Failure, Unit>> call(VerifyPasswordOtpParams params) {
+  Future<Either<Failure, String>> call(VerifyPasswordOtpParams params) {
     return repository.verifyPasswordOtp(phone: params.phone, otp: params.otp);
   }
 }

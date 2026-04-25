@@ -99,7 +99,12 @@ class MyApp extends StatelessWidget {
       /// Auth
       AppRoutes.login: (_) => const LoginScreen(),
       ForgetPasswordDialog.routeName: (_) => const ForgetPasswordDialog(),
-      NewPasswordScreen.routeName: (_) => const NewPasswordScreen(),
+      // This screen is normally opened via `NewPasswordScreen.show(...)` after OTP.
+      // Keep a route mapping for compatibility.
+      NewPasswordScreen.routeName: (_) => const NewPasswordScreen(
+        phone: '',
+        token: '',
+      ),
 
       /// Sign Up
       AppRoutes.signup: (_) => const SignUpScreen(),

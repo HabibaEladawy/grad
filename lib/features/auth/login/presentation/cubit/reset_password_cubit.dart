@@ -37,7 +37,9 @@ class ResetPasswordCubit extends Cubit<ResetPasswordState> {
     if (isClosed) return;
     result.fold(
       (f) => emit(ResetPasswordFailure(message: f.message)),
-      (_) => emit(ResetPasswordOtpVerified(phone: apiPhone, otp: otp)),
+      (token) => emit(
+        ResetPasswordOtpVerified(phone: apiPhone, otp: otp, token: token),
+      ),
     );
   }
 }

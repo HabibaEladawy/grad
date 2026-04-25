@@ -49,7 +49,7 @@ abstract class AuthRepository {
   Future<Either<Failure, Unit>> resetPassword({required String phone});
 
   /// Step 2: تأكيد OTP
-  Future<Either<Failure, Unit>> verifyPasswordOtp({
+  Future<Either<Failure, String>> verifyPasswordOtp({
     required String phone,
     required String otp,
   });

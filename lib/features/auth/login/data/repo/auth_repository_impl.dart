@@ -146,15 +146,15 @@ class AuthRepositoryImpl implements AuthRepository {
       });
 
   @override
-  Future<Either<Failure, Unit>> verifyPasswordOtp({
+  Future<Either<Failure, String>> verifyPasswordOtp({
     required String phone,
     required String otp,
   }) => _guard(() async {
-    await remoteDataSource.verifyPasswordOtp(
+    final token = await remoteDataSource.verifyPasswordOtp(
       phone: ParentPhoneUtils.normalizeForApi(phone),
       otp: otp,
     );
-    return unit;
+    return token;
   });
 
   // ── Change Password ──────────────────────────────────────────────────────────

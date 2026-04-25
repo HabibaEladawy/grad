@@ -124,7 +124,11 @@ class _ForgetPasswordDialogState extends State<ForgetPasswordDialog> {
           }
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (nav.context.mounted) {
-              NewPasswordScreen.show(nav.context);
+              NewPasswordScreen.show(
+                nav.context,
+                phone: state.phone,
+                token: state.token,
+              );
             }
           });
         } else if (state is ResetPasswordFailure) {

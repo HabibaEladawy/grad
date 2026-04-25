@@ -4,25 +4,34 @@ import 'package:dana/core/utils/app_raduis.dart';
 import 'package:dana/features/auth/login/presentation/views/screens/new_password/widgets/new_password_body.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../../../../core/di/injection_container.dart';
+import '../../../../cubit/change_password_cubit.dart';
 import '../../../../../../../../providers/app_theme_provider.dart';
 
 class NewPasswordScreen extends StatelessWidget {
-  const NewPasswordScreen({super.key});
+  const NewPasswordScreen({super.key, required this.phone, required this.token});
 
   static String routeName = 'NewPasswordScreen';
 
-  static void show(BuildContext context) {
+  static void show(BuildContext context, {required String phone, required String token}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       isDismissible: true,
       enableDrag: true,
-      builder: (context) => const NewPasswordScreen(),
+      builder: (context) => BlocProvider(
+        create: (_) => sl<ChangePasswordCubit>(),
+        child: NewPasswordScreen(phone: phone, token: token),
+      ),
     );
   }
+
+  final String phone;
+  final String token;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +51,7 @@ class NewPasswordScreen extends StatelessWidget {
           topRight: Radius.circular(AppRadius.radius_lg),
         ),
       ),
-      child: const NewPasswordBody(),
+      child: NewPasswordBody(phone: phone, token: token),
     );
   }
 }
