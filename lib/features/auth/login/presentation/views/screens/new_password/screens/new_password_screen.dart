@@ -5,7 +5,6 @@ import 'package:dana/features/auth/login/presentation/views/screens/new_password
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../../../../../core/di/injection_container.dart';
 import '../../../../cubit/change_password_cubit.dart';
