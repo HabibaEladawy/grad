@@ -68,6 +68,16 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
     return TimeOfDay(hour: h, minute: m);
   }
 
+  String _doctorDisplayName(BuildContext context, String rawName) {
+    final name = rawName.trim();
+    final dr = context.l10n.dr.trim();
+    if (name.isEmpty) return '';
+    if (dr.isNotEmpty && name.startsWith(dr)) return name;
+    if (name.toLowerCase().startsWith('dr ')) return name;
+    if (name.startsWith('د.')) return name;
+    return dr.isNotEmpty ? '$dr $name' : name;
+  }
+
   Appointment _mapBookingToAppointment(BuildContext context, Booking b) {
     final start = _parseTime(b.time);
     final end = TimeOfDay(hour: (start.hour + 1) % 24, minute: start.minute);
@@ -75,20 +85,21 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
     final image = b.doctor.profileImage?.isNotEmpty == true
         ? b.doctor.profileImage!
         : 'assets/Images/appointment/doctor_image.png';
+    final loc = b.doctor.locationLine.trim();
 
     return Appointment(
       bookingId: b.id,
       childId: b.child.id,
       doctorId: b.doctor.id,
-      doctorName: '${context.l10n.dr} ${b.doctor.name}',
+      doctorName: _doctorDisplayName(context, b.doctor.name),
       doctorNamePlain: b.doctor.name,
-      specialty: '',
+      specialty: b.doctor.specialty,
       detectionPrice: b.doctor.price.toDouble(),
       image: image,
       date: date,
       startTime: start,
       endTime: end,
-      address: context.l10n.physiotherapist, // backend has no address field yet
+      address: loc,
       status: _mapStatus(b.status),
     );
   }

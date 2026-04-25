@@ -55,7 +55,9 @@ class AppointmentDoctorInfo extends StatelessWidget {
               ),
               SizedBox(height: 8.h),
               Text(
-                context.l10n.physiotherapist,
+                appointment.specialty.isNotEmpty
+                    ? appointment.specialty
+                    : context.l10n.physiotherapist,
                 style: AppTextStyle.medium12TextBody(context),
               ),
               SizedBox(height: 8.h),
@@ -68,9 +70,14 @@ class AppointmentDoctorInfo extends StatelessWidget {
                         ? AppColors.icon_onLight_dark
                         : AppColors.icon_onLight_light,
                   ),
-                  Text(
-                    appointment.address,
-                    style: AppTextStyle.regular12TextBody(context),
+                  SizedBox(width: 6.w),
+                  Flexible(
+                    child: Text(
+                      appointment.address,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyle.regular12TextBody(context),
+                    ),
                   ),
                 ],
               ),
