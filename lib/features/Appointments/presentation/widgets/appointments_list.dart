@@ -93,6 +93,8 @@ class _AppointmentsListState extends State<AppointmentsList> {
       return RefreshIndicator(
         onRefresh: onRefresh,
         child: ListView(
+          primary: false,
+          shrinkWrap: true,
           physics: const AlwaysScrollableScrollPhysics(),
           children: [SizedBox(height: 120), empty],
         ),
@@ -100,6 +102,8 @@ class _AppointmentsListState extends State<AppointmentsList> {
     }
 
     final list = ListView.builder(
+      primary: false,
+      shrinkWrap: true,
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: filtered.length,
       itemBuilder: (context, index) {
