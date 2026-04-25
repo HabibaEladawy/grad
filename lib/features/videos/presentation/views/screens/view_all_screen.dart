@@ -63,65 +63,67 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
 
     return BlocProvider.value(
       value: _videosCubit,
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: isDark
-              ? AppColors.bg_card_default_dark
-              : AppColors.bg_card_default_light,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          automaticallyImplyLeading: false,
-          toolbarHeight: 56.w,
-          titleSpacing: 0,
-          title: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomAppBarButton(
-                  iconSrc: 'assets/Icons/search_icon.svg',
-                  onTap: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (_) =>
-                          SearchScreen(searchType: SearchType.videos),
-                    );
-                  },
-                ),
-                Text(
-                  'الفديوهات',
-                  style: AppTextStyle.medium16TextHeading(context),
-                ),
-                CustomAppBarButton(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
+      child: Builder(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            backgroundColor: isDark
+                ? AppColors.bg_card_default_dark
+                : AppColors.bg_card_default_light,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            automaticallyImplyLeading: false,
+            toolbarHeight: 56.w,
+            titleSpacing: 0,
+            title: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomAppBarButton(
+                    iconSrc: 'assets/Icons/search_icon.svg',
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (_) =>
+                            SearchScreen(searchType: SearchType.videos),
+                      );
+                    },
+                  ),
+                  Text(
+                    'الفديوهات',
+                    style: AppTextStyle.medium16TextHeading(context),
+                  ),
+                  CustomAppBarButton(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: Column(
-              children: [
-                SizedBox(height: 12.h),
-                VideosTabBar(
-                  activeTab: _activeTab,
-                  onTabChanged: (t) => setState(() => _activeTab = t),
-                ),
-                SizedBox(height: 16.h),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: ViewAllWidget(
-                      videos: widget.videos,
-                      sectionTitle: widget.sectionTitle,
+          body: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: Column(
+                children: [
+                  SizedBox(height: 12.h),
+                  VideosTabBar(
+                    activeTab: _activeTab,
+                    onTabChanged: (t) => setState(() => _activeTab = t),
+                  ),
+                  SizedBox(height: 16.h),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: ViewAllWidget(
+                        videos: widget.videos,
+                        sectionTitle: widget.sectionTitle,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

@@ -2,6 +2,7 @@ import 'package:dana/core/utils/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../core/utils/app_colors.dart';
 import '../../../../../core/utils/app_raduis.dart';
@@ -12,6 +13,29 @@ class VideoPlayerWidget extends StatelessWidget {
   final VideoModel video;
 
   const VideoPlayerWidget({super.key, required this.video});
+
+  Future<void> _openVideo(BuildContext context) async {
+    final url = (video.videoUrl ?? '').trim();
+    if (url.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Video link is not available')),
+      );
+      return;
+    }
+    final uri = Uri.tryParse(url);
+    if (uri == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid video link')),
+      );
+      return;
+    }
+    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!ok && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not open video')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,31 +49,63 @@ class VideoPlayerWidget extends StatelessWidget {
     final iconColor = isDark
         ? AppColors.icon_onLight_dark
         : AppColors.icon_onLight_light;
+    final cover = video.imageUrl.trim();
+    final isNetworkCover =
+        cover.startsWith('http://') || cover.startsWith('https://');
+    final hasCover = cover.isNotEmpty;
 
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(AppRadius.radius_lg),
-          child:
-              (video.imageUrl.startsWith('http://') ||
-                  video.imageUrl.startsWith('https://'))
-              ? Image.network(
-                  video.imageUrl,
-                  width: 392.w,
-                  height: 256.h,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const SizedBox.shrink(),
-                )
-              : Image.asset(
-                  video.imageUrl,
-                  width: 392.w,
-                  height: 256.h,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const SizedBox.shrink(),
+          child: hasCover
+              ? (isNetworkCover
+                  ? Image.network(
+                      cover,
+                      width: 392.w,
+                      height: 256.h,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const SizedBox.shrink(),
+                    )
+                  : Image.asset(
+                      cover,
+                      width: 392.w,
+                      height: 256.h,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const SizedBox.shrink(),
+                    ))
+              : SizedBox(width: 392.w, height: 256.h),
+        ),
+
+        Positioned.fill(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(AppRadius.radius_lg),
+              onTap: () => _openVideo(context),
+              child: Center(
+                child: Container(
+                  width: 56.w,
+                  height: 56.w,
+                  decoration: BoxDecoration(
+                    color: (isDark
+                            ? AppColors.bg_card_default_dark
+                            : AppColors.bg_card_default_light)
+                        .withAlpha(200),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.play_arrow,
+                    color: iconColor,
+                    size: 32.w,
+                  ),
                 ),
+              ),
+            ),
+          ),
         ),
 
         Positioned(
@@ -76,7 +132,7 @@ class VideoPlayerWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '12:32 / ${video.duration}',
+                  video.duration,
                   style: AppTextStyle.medium12TextBody(context),
                 ),
                 const Spacer(),
@@ -115,7 +171,7 @@ class VideoPlayerWidget extends StatelessWidget {
                   ? AppColors.primary_default_dark
                   : AppColors.primary_default_light,
             ),
-            child: Slider(value: 0.6, onChanged: (_) {}),
+            child: Slider(value: 0.0, onChanged: (_) {}),
           ),
         ),
       ],

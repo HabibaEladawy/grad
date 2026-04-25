@@ -58,61 +58,64 @@ class _VideosScreenState extends State<VideosScreen> {
 
     return BlocProvider.value(
       value: _videosCubit,
-      child: Scaffold(
-        appBar: CustomAppBar(
-          title: context.l10n.videos,
-          isDark: isDark,
-          trailing: CustomAppBarButton(
-            iconSrc: 'assets/Icons/search_icon.svg',
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                builder: (_) => SearchScreen(searchType: SearchType.videos),
-              );
-            },
+      child: Builder(
+        builder: (context) => Scaffold(
+          appBar: CustomAppBar(
+            title: context.l10n.videos,
+            isDark: isDark,
+            trailing: CustomAppBarButton(
+              iconSrc: 'assets/Icons/search_icon.svg',
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (_) => SearchScreen(searchType: SearchType.videos),
+                );
+              },
+            ),
           ),
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: Column(
-              children: [
-                SizedBox(height: AppSizes.h12),
-                VideosTabBar(
-                  activeTab: _activeTab,
-                  onTabChanged: (t) => setState(() => _activeTab = t),
-                ),
-                SizedBox(height: AppSizes.h12),
-                Expanded(
-                  child: BlocBuilder<VideosCubit, VideosState>(
-                    builder: (context, state) {
-                      if (state is VideosLoading) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      if (state is VideosError) {
-                        return Center(child: Text(state.message));
-                      }
-                      final videos = state is VideosLoaded
-                          ? state.videos
-                          : context.read<VideosCubit>().cachedVideos;
-                      final sections = [
-                        VideoSection(
-                          title: context.l10n.videos,
-                          videos: videos,
-                        ),
-                      ];
-                      return SingleChildScrollView(
-                        child: Column(
-                          children: sections
-                              .map((section) => SectionRow(section: section))
-                              .toList(),
-                        ),
-                      );
-                    },
+          body: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: Column(
+                children: [
+                  SizedBox(height: AppSizes.h12),
+                  VideosTabBar(
+                    activeTab: _activeTab,
+                    onTabChanged: (t) => setState(() => _activeTab = t),
                   ),
-                ),
-              ],
+                  SizedBox(height: AppSizes.h12),
+                  Expanded(
+                    child: BlocBuilder<VideosCubit, VideosState>(
+                      builder: (context, state) {
+                        if (state is VideosLoading) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                        if (state is VideosError) {
+                          return Center(child: Text(state.message));
+                        }
+                        final videos = state is VideosLoaded
+                            ? state.videos
+                            : context.read<VideosCubit>().cachedVideos;
+                        final sections = [
+                          VideoSection(
+                            title: context.l10n.videos,
+                            videos: videos,
+                          ),
+                        ];
+                        return SingleChildScrollView(
+                          child: Column(
+                            children: sections
+                                .map((section) => SectionRow(section: section))
+                                .toList(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
