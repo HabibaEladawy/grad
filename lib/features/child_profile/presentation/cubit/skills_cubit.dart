@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/errors/error_mapper.dart';
 import '../../../parent_profile/data/models/parent_profile_model.dart';
@@ -13,6 +14,41 @@ class SkillsCubit extends Cubit<SkillsState> {
 
   SkillsCubit({required this.repo, required this.parentRepo})
     : super(const SkillsInitial());
+
+  int? _averagePercent({
+    required List<SkillApiModel> skills,
+    required Map<String, int> checked,
+    required Map<String, int> total,
+  }) {
+    if (skills.isEmpty) return null;
+    var sum = 0;
+    var n = 0;
+    for (final sk in skills) {
+      final t = total[sk.id] ?? 0;
+      if (t <= 0) continue;
+      final c = checked[sk.id] ?? 0;
+      sum += ((c * 100) / t).round();
+      n++;
+    }
+    if (n == 0) return null;
+    return (sum / n).round().clamp(0, 100);
+  }
+
+  String _monthKey(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}';
+
+  Future<void> _persistMonthlyIndicator({
+    required String childId,
+    required List<SkillApiModel> skills,
+    required Map<String, int> checked,
+    required Map<String, int> total,
+  }) async {
+    final pct = _averagePercent(skills: skills, checked: checked, total: total);
+    if (pct == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'skills_indicator_${childId}_${_monthKey(DateTime.now())}';
+    await prefs.setInt(key, pct);
+  }
 
   ParentChildModel? _pickChild(ParentProfileModel me, String? preferredId) {
     if (preferredId != null && preferredId.isNotEmpty) {
@@ -65,6 +101,12 @@ class SkillsCubit extends Cubit<SkillsState> {
           skillTotalById: maps.total,
         ),
       );
+      await _persistMonthlyIndicator(
+        childId: resolvedId,
+        skills: skills,
+        checked: maps.checked,
+        total: maps.total,
+      );
     } catch (e) {
       emit(SkillsError(ErrorMapper.message(e)));
     }
@@ -114,6 +156,12 @@ class SkillsCubit extends Cubit<SkillsState> {
           skillTotalById: totalMap,
         ),
       );
+      await _persistMonthlyIndicator(
+        childId: childId,
+        skills: skills,
+        checked: checkedMap,
+        total: totalMap,
+      );
     } catch (e) {
       emit(SkillsError(ErrorMapper.message(e)));
     }
@@ -150,6 +198,12 @@ class SkillsCubit extends Cubit<SkillsState> {
           skillCheckedById: checkedMap,
           skillTotalById: totalMap,
         ),
+      );
+      await _persistMonthlyIndicator(
+        childId: current.childId,
+        skills: current.skills,
+        checked: checkedMap,
+        total: totalMap,
       );
     } catch (e) {
       emit(SkillsError(ErrorMapper.message(e)));

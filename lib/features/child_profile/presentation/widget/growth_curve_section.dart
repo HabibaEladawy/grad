@@ -56,6 +56,18 @@ class GrowthCurveSection extends StatelessWidget {
                 final List<double> head = records
                     .map((r) => r.headCircumference)
                     .toList();
+                if (state is GrowthLoaded && records.isEmpty) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12.h),
+                    child: Center(
+                      child: Image.asset(
+                        'assets/Images/home/no_data.png',
+                        width: 220.w,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  );
+                }
                 return StatisticsChart(
                   xDates: xDates,
                   heightCm: height,

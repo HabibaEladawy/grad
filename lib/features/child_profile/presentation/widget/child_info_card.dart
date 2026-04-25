@@ -13,11 +13,15 @@ import 'package:dana/features/child_profile/presentation/cubit/skills_cubit.dart
 import 'package:dana/features/child_profile/presentation/cubit/skills_state.dart';
 import 'package:dana/features/child_profile/domain/growth_monthly.dart';
 import 'package:dana/features/child_profile/presentation/widget/custom_stat_card.dart';
+import 'package:dana/features/parent_profile/presentation/cubit/parent_profile_cubit.dart';
 import 'package:dana/features/parent_profile/data/models/parent_profile_model.dart';
 import 'package:dana/providers/app_theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
 
 (int years, int months) _ageFromBirth(DateTime? birthDate) {
   if (birthDate == null) return (0, 0);
@@ -90,6 +94,16 @@ int? _averageSkillDevelopmentPercent(SkillsState s) {
   return (sum / n).round();
 }
 
+String _monthKey(DateTime d) =>
+    '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}';
+
+Future<int?> _previousMonthIndicator(String childId) async {
+  final now = DateTime.now();
+  final prev = DateTime(now.year, now.month - 1, 1);
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getInt('skills_indicator_${childId}_${_monthKey(prev)}');
+}
+
 Widget _childProfileAvatar({
   required bool isGirl,
   required String? profileUrl,
@@ -139,6 +153,52 @@ class _ChildInfoCardState extends State<ChildInfoCard> {
   bool _pickerExpanded = false;
   String? _lastSyncedChildId;
 
+  Future<void> _pickAndUploadChildPhoto(
+    BuildContext context, {
+    required String childId,
+    required String childName,
+    required String gender,
+    required DateTime? birthDate,
+  }) async {
+    if (birthDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.addChildMissingFields),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1600,
+      imageQuality: 88,
+    );
+    if (picked == null || !context.mounted) return;
+
+    final parentCubit = context.read<ParentProfileCubit>();
+    final err = await parentCubit.updateChild(
+      childId: childId,
+      childName: childName,
+      gender: gender,
+      birthDate: birthDate,
+      profileImage: File(picked.path),
+    );
+    if (!context.mounted) return;
+    if (err != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(err),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    await context.read<GrowthCubit>().load(childId: childId);
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<AppThemeProvider>();
@@ -159,6 +219,7 @@ class _ChildInfoCardState extends State<ChildInfoCard> {
             (loaded != null ? loaded.gender : (snap?.gender ?? ''))
                 .toLowerCase();
         final isGirl = genderRaw == 'female';
+        final gender = isGirl ? 'female' : 'male';
         final profileUrl = loaded?.profileImageUrl ?? snap?.profileImageUrl;
 
         final age = _ageFromBirth(birth);
@@ -239,10 +300,45 @@ class _ChildInfoCardState extends State<ChildInfoCard> {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                _childProfileAvatar(
-                                  isGirl: isGirl,
-                                  profileUrl: profileUrl,
-                                  side: 48.w,
+                                Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    _childProfileAvatar(
+                                      isGirl: isGirl,
+                                      profileUrl: profileUrl,
+                                      side: 48.w,
+                                    ),
+                                    if (loaded != null)
+                                      PositionedDirectional(
+                                        end: -2.w,
+                                        bottom: -2.h,
+                                        child: Material(
+                                          color: isDark
+                                              ? AppColors.primary_default_dark
+                                              : AppColors.primary_default_light,
+                                          shape: const CircleBorder(),
+                                          child: InkWell(
+                                            customBorder:
+                                                const CircleBorder(),
+                                            onTap: () => _pickAndUploadChildPhoto(
+                                              context,
+                                              childId: loaded.childId,
+                                              childName: loaded.childName,
+                                              gender: gender,
+                                              birthDate: loaded.birthDate,
+                                            ),
+                                            child: Padding(
+                                              padding: EdgeInsets.all(6.r),
+                                              child: Icon(
+                                                Icons.camera_alt_rounded,
+                                                size: 14.r,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                                 Expanded(
                                   child: Container(
@@ -600,12 +696,37 @@ class _ChildInfoCardState extends State<ChildInfoCard> {
                     BlocBuilder<SkillsCubit, SkillsState>(
                       builder: (context, sk) {
                         final pct = _averageSkillDevelopmentPercent(sk);
-                        return CustomStatCard(
-                          title: context.l10n.growthIndicator,
-                          value: pct != null ? '$pct %' : '—',
-                          change: '—',
-                          iconPath:
-                              'assets/Icons/child_profile/indicator_icon.svg',
+                        final childId = switch (growth) {
+                          GrowthLoaded g => g.childId,
+                          _ => '',
+                        };
+                        if (pct == null || childId.isEmpty) {
+                          return CustomStatCard(
+                            title: context.l10n.growthIndicator,
+                            value: '—',
+                            change: '—',
+                            iconPath:
+                                'assets/Icons/child_profile/indicator_icon.svg',
+                          );
+                        }
+                        return FutureBuilder<int?>(
+                          future: _previousMonthIndicator(childId),
+                          builder: (context, snap) {
+                            final prev = snap.data;
+                            final delta = prev == null ? null : (pct - prev);
+                            final change = delta == null
+                                ? '—'
+                                : delta == 0
+                                ? '—'
+                                : '${delta > 0 ? '+' : ''}$delta %';
+                            return CustomStatCard(
+                              title: context.l10n.growthIndicator,
+                              value: '$pct %',
+                              change: change,
+                              iconPath:
+                                  'assets/Icons/child_profile/indicator_icon.svg',
+                            );
+                          },
                         );
                       },
                     ),

@@ -50,16 +50,26 @@ Future<void> showUpdateMeasurementsBottomSheet(BuildContext hostContext) async {
             ),
           );
         },
+        onDuplicateMonth: () {
+          if (!hostContext.mounted) return;
+          ScaffoldMessenger.of(hostContext).showSnackBar(
+            SnackBar(
+              content: Text(hostContext.l10n.growthDuplicateMonth),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        },
       ),
     ),
   );
 }
 
 class UpdateDataBottomSheet extends StatefulWidget {
-  const UpdateDataBottomSheet({super.key, this.onSaved});
+  const UpdateDataBottomSheet({super.key, this.onSaved, this.onDuplicateMonth});
 
   /// Called after a successful save and sheet dismiss, using the **host** screen context.
   final VoidCallback? onSaved;
+  final VoidCallback? onDuplicateMonth;
 
   @override
   State<UpdateDataBottomSheet> createState() => _UpdateDataBottomSheetState();
@@ -173,12 +183,8 @@ class _UpdateDataBottomSheetState extends State<UpdateDataBottomSheet> {
                       );
                       if (!context.mounted) return;
                       if (err == 'growthDuplicateMonth') {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(context.l10n.growthDuplicateMonth),
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
+                        Navigator.pop(context);
+                        widget.onDuplicateMonth?.call();
                         return;
                       }
                       if (err == 'growthNotLoaded') {

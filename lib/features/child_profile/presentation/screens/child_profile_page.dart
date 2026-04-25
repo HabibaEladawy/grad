@@ -14,6 +14,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/di/injection_container.dart';
+import 'package:dana/features/parent_profile/presentation/cubit/parent_profile_cubit.dart';
+import 'package:dana/features/parent_profile/data/repo/parent_profile_repository.dart';
 import '../cubit/growth_cubit.dart';
 import '../cubit/growth_state.dart';
 import '../cubit/skills_cubit.dart';
@@ -36,6 +38,7 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
   late final SkillsCubit _skillsCubit;
   late final GrowthCubit _growthCubit;
   late final VaccinationScheduleCubit _vaccinationCubit;
+  late final ParentProfileCubit _parentProfileCubit;
 
   @override
   void initState() {
@@ -44,6 +47,8 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
     _skillsCubit = sl<SkillsCubit>()..loadSkills(childId: id);
     _growthCubit = sl<GrowthCubit>()..load(childId: id);
     _vaccinationCubit = sl<VaccinationScheduleCubit>()..load(childId: id);
+    _parentProfileCubit = ParentProfileCubit(sl<ParentProfileRepository>())
+      ..loadMe(silent: true);
   }
 
   @override
@@ -51,6 +56,7 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
     _skillsCubit.close();
     _growthCubit.close();
     _vaccinationCubit.close();
+    _parentProfileCubit.close();
     super.dispose();
   }
 
@@ -67,6 +73,7 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
         BlocProvider.value(value: _skillsCubit),
         BlocProvider.value(value: _growthCubit),
         BlocProvider.value(value: _vaccinationCubit),
+        BlocProvider.value(value: _parentProfileCubit),
       ],
       child: MultiBlocListener(
         listeners: [

@@ -6,6 +6,7 @@ import 'package:dana/extensions/localization_extension.dart';
 import 'package:dana/features/child_profile/data/models/skill_api_models.dart';
 import 'package:dana/features/child_profile/presentation/cubit/skills_cubit.dart';
 import 'package:dana/features/child_profile/presentation/cubit/skills_state.dart';
+import 'package:dana/features/child_profile/presentation/bottom_sheets/skill_checklist_bottom_sheet.dart';
 import 'package:dana/features/child_profile/presentation/widget/skill_row.dart';
 import 'package:dana/features/child_profile/presentation/widget/skill_ui_utils.dart';
 import 'package:dana/providers/app_theme_provider.dart';
@@ -23,6 +24,39 @@ int _percentForSkill(
   if (t <= 0) return 0;
   final c = checked[s.id] ?? 0;
   return ((c * 100) / t).round().clamp(0, 100);
+}
+
+void _openSkillChecklist(
+  BuildContext hostContext, {
+  required SkillsCubit cubit,
+  required String skillId,
+  required String title,
+}) {
+  final themeProvider = hostContext.read<AppThemeProvider>();
+  final isDark =
+      themeProvider.appTheme == ThemeMode.dark ||
+      (themeProvider.appTheme == ThemeMode.system &&
+          MediaQuery.of(hostContext).platformBrightness == Brightness.dark);
+
+  cubit.loadChecklist(skillId);
+  showModalBottomSheet<void>(
+    context: hostContext,
+    isScrollControlled: true,
+    backgroundColor: isDark
+        ? AppColors.bg_surface_default_dark
+        : AppColors.bg_surface_default_light,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+    ),
+    builder: (_) => BlocProvider.value(
+      value: cubit,
+      child: SkillChecklistBottomSheet(
+        skillId: skillId,
+        title: title,
+        description: '',
+      ),
+    ),
+  );
 }
 
 class SkillsOverviewCard extends StatelessWidget {
@@ -125,6 +159,7 @@ class SkillsOverviewCard extends StatelessWidget {
                   }
 
                   final visibleSkills = visibleSkillsUpToFour(skills, total);
+                  final cubit = context.read<SkillsCubit>();
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,9 +186,17 @@ class SkillsOverviewCard extends StatelessWidget {
                         )
                       else
                         for (final s in visibleSkills)
-                          SkillRow(
-                            label: s.name,
-                            value: _percentForSkill(s, checked, total),
+                          InkWell(
+                            onTap: () => _openSkillChecklist(
+                              context,
+                              cubit: cubit,
+                              skillId: s.id,
+                              title: s.name,
+                            ),
+                            child: SkillRow(
+                              label: s.name,
+                              value: _percentForSkill(s, checked, total),
+                            ),
                           ),
                     ],
                   );
