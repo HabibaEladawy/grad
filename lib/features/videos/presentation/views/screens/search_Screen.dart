@@ -92,35 +92,49 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = context.watch<AppThemeProvider>();
-    final isDark =
-        themeProvider.appTheme == ThemeMode.dark ||
-        (themeProvider.appTheme == ThemeMode.system &&
-            MediaQuery.of(context).platformBrightness == Brightness.dark);
+    // This screen is frequently shown in a bottom sheet (new route), so it must
+    // provide its cubits locally to avoid ProviderNotFound errors.
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<VideosCubit>(create: (_) => sl<VideosCubit>()),
+        BlocProvider<TextBooksCubit>(create: (_) => sl<TextBooksCubit>()),
+      ],
+      child: Builder(
+        builder: (context) {
+          final themeProvider = context.watch<AppThemeProvider>();
+          final isDark =
+              themeProvider.appTheme == ThemeMode.dark ||
+              (themeProvider.appTheme == ThemeMode.system &&
+                  MediaQuery.of(context).platformBrightness ==
+                      Brightness.dark);
 
-    return SizedBox(
-      height: 956.h,
-      child: Container(
-        decoration: BoxDecoration(
-          color: isDark
-              ? AppColors.bg_surface_default_dark
-              : AppColors.bg_surface_default_light,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              const HomeIndicator(),
-              SizedBox(height: 24.h),
-              SearchBarWidget(controller: _controller, onChanged: _search),
-              Expanded(child: _buildBody()),
-            ],
-          ),
-        ),
+          return SizedBox(
+            height: 956.h,
+            child: Container(
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppColors.bg_surface_default_dark
+                    : AppColors.bg_surface_default_light,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    const HomeIndicator(),
+                    SizedBox(height: 24.h),
+                    SearchBarWidget(controller: _controller, onChanged: _search),
+                    Expanded(child: _buildBody()),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
