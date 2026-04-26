@@ -9,12 +9,14 @@ class AppointmentTimeGrid extends StatelessWidget {
   final List<TimeOfDay> times;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
+  final bool Function(TimeOfDay t)? isBooked;
 
   const AppointmentTimeGrid({
     super.key,
     required this.times,
     required this.selectedIndex,
     required this.onSelected,
+    this.isBooked,
   });
 
   @override
@@ -31,11 +33,13 @@ class AppointmentTimeGrid extends StatelessWidget {
           spacing: 8.w,
           runSpacing: 8.h,
           children: List.generate(times.length, (index) {
+            final booked = isBooked?.call(times[index]) ?? false;
             return GestureDetector(
-              onTap: () => onSelected(index),
+              onTap: booked ? null : () => onSelected(index),
               child: TimeCard(
                 textTime: formatSingleTime(context, times[index]),
                 isSelected: selectedIndex == index,
+                isDisabled: booked,
               ),
             );
           }),

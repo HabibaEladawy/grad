@@ -9,12 +9,14 @@ class DateCard extends StatelessWidget {
   final int number;
   final String day;
   final bool isSelected;
+  final bool isDisabled;
 
   const DateCard({
     super.key,
     required this.number,
     required this.day,
     this.isSelected = false,
+    this.isDisabled = false,
   });
 
   @override
@@ -30,7 +32,11 @@ class DateCard extends StatelessWidget {
         width: 92.w,
         height: 61.h,
         decoration: BoxDecoration(
-          color: isSelected
+          color: isDisabled
+              ? (isDark
+                    ? AppColors.bg_surface_subtle_dark
+                    : AppColors.bg_surface_subtle_light)
+              : isSelected
               ? (isDark
                     ? AppColors.primary_500_dark
                     : AppColors.primary_500_light)
@@ -39,7 +45,11 @@ class DateCard extends StatelessWidget {
                     : AppColors.bg_card_default_light),
           borderRadius: BorderRadius.circular(8.r),
           border: Border.all(
-            color: isSelected
+            color: isDisabled
+                ? (isDark
+                      ? AppColors.border_card_default_dark
+                      : AppColors.border_card_default_light)
+                : isSelected
                 ? (isDark
                       ? AppColors.border_button_primary_dark
                       : AppColors.border_button_primary_light)
@@ -59,6 +69,12 @@ class DateCard extends StatelessWidget {
                 number.toString(),
                 style: isSelected
                     ? AppTextStyle.semibold16TextButton(context)
+                    : isDisabled
+                    ? AppTextStyle.semibold16TextHeading(context).copyWith(
+                      color: isDark
+                          ? AppColors.text_body_dark
+                          : AppColors.text_body_light,
+                    )
                     : AppTextStyle.semibold16TextHeading(context),
               ),
               Text(
@@ -68,6 +84,12 @@ class DateCard extends StatelessWidget {
                 softWrap: false,
                 style: isSelected
                     ? AppTextStyle.bold12TextButton(context)
+                    : isDisabled
+                    ? AppTextStyle.bold12TextBody(context).copyWith(
+                      color: isDark
+                          ? AppColors.text_body_dark
+                          : AppColors.text_body_light,
+                    )
                     : AppTextStyle.bold12TextBody(context),
               ),
             ],

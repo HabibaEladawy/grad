@@ -6,6 +6,7 @@ import 'package:dana/core/di/injection_container.dart';
 import 'package:dio/dio.dart';
 
 import '../../../core/api/api_endpoint.dart';
+import '../../../core/api/api_response.dart';
 
 class AppointmentController extends ChangeNotifier {
   AppointmentController();
@@ -22,6 +23,9 @@ class AppointmentController extends ChangeNotifier {
   int? totalPatients;
   List<String> availableDateStrs = const [];
   List<TimeOfDay> timeSlots = AppointmentTimeData.availableTimes;
+  Map<String, List<String>> timesByDate = const {};
+  Map<String, Set<String>> bookedTimesByDate = const {};
+  Set<String> _selectedDateBookedTimes = const {};
 
   int selectedTimeIndex = -1;
   DateTime currentMonth = DateTime(DateTime.now().year, DateTime.now().month);
@@ -38,16 +42,83 @@ class AppointmentController extends ChangeNotifier {
     ratingQuantity = args.ratingQuantity;
     experienceYears = args.experienceYears;
     totalPatients = null;
-    availableDateStrs = List<String>.from(args.availableDates);
+    timesByDate = Map<String, List<String>>.from(args.timesByDate);
+    bookedTimesByDate = {
+      for (final e in args.bookedTimesByDate.entries)
+        e.key: Set<String>.from(e.value),
+    };
+    availableDateStrs = timesByDate.isNotEmpty
+        ? timesByDate.keys.toList()
+        : List<String>.from(args.availableDates);
     final parsed = BookingDraft.parseTimeStrings(args.availableTimes);
     timeSlots = parsed.isNotEmpty ? parsed : AppointmentTimeData.availableTimes;
     selectedDate = null;
     selectedTimeIndex = -1;
+    _selectedDateBookedTimes = const {};
     notifyListeners();
 
     // Best-effort: public doctor list doesn't include patients count.
     // We'll try to fetch it from backend if the endpoint is accessible.
     _loadPatientsCount();
+  }
+
+  Future<void> refreshDoctorAvailability() async {
+    final id = doctorId;
+    if (id == null || id.isEmpty) return;
+    try {
+      final dio = sl<Dio>();
+      final res = await dio.get('${ApiEndpoint.doctorById}$id');
+      final decoded = ApiResponse.decode(res.data);
+      final root = ApiResponse.unwrapMap(decoded);
+      final av = root['availability'];
+      if (av is! List) return;
+
+      final nextTimesByDate = <String, List<String>>{};
+      final nextBookedByDate = <String, Set<String>>{};
+
+      for (final row in av) {
+        if (row is! Map) continue;
+        final date = row['date']?.toString() ?? '';
+        if (date.isEmpty) continue;
+
+        final timesRaw = row['times'];
+        final bookedRaw = row['bookedTimes'];
+
+        List<String> asStringList(dynamic v) {
+          if (v is! List) return const [];
+          return v.map((e) => e.toString()).toList();
+        }
+
+        final times = asStringList(timesRaw);
+        final booked = asStringList(bookedRaw).toSet();
+        nextTimesByDate[date] = times;
+        nextBookedByDate[date] = booked;
+      }
+
+      if (nextTimesByDate.isEmpty) return;
+
+      timesByDate = nextTimesByDate;
+      bookedTimesByDate = nextBookedByDate;
+      availableDateStrs = timesByDate.keys.toList();
+
+      // Recompute selected date/time slots if already selected.
+      final sel = selectedDate;
+      if (sel != null) {
+        final key = BookingDoctorArgs.dateKey(sel);
+        final times = timesByDate[key] ?? const <String>[];
+        timeSlots = BookingDraft.parseTimeStrings(times);
+        _selectedDateBookedTimes = bookedTimesByDate[key] ?? const {};
+        if (selectedTimeIndex >= timeSlots.length) {
+          selectedTimeIndex = -1;
+        } else if (selectedTimeIndex >= 0 && isTimeBooked(timeSlots[selectedTimeIndex])) {
+          selectedTimeIndex = -1;
+        }
+      }
+
+      notifyListeners();
+    } catch (_) {
+      // Silent: booking UI should still function with cached availability.
+    }
   }
 
   Future<void> _loadPatientsCount() async {
@@ -103,6 +174,12 @@ class AppointmentController extends ChangeNotifier {
 
   void selectDate(DateTime date) {
     selectedDate = date;
+    final key = BookingDoctorArgs.dateKey(date);
+    if (timesByDate.isNotEmpty && timesByDate.containsKey(key)) {
+      timeSlots = BookingDraft.parseTimeStrings(timesByDate[key] ?? const []);
+      _selectedDateBookedTimes = bookedTimesByDate[key] ?? const {};
+      selectedTimeIndex = -1;
+    }
     notifyListeners();
   }
 
@@ -119,7 +196,22 @@ class AppointmentController extends ChangeNotifier {
     if (selectedTimeIndex < 0 || selectedTimeIndex >= timeSlots.length) {
       return false;
     }
+    if (isTimeBooked(timeSlots[selectedTimeIndex])) return false;
     return true;
+  }
+
+  bool isDateFullyBooked(DateTime d) {
+    final key = BookingDoctorArgs.dateKey(d);
+    final times = timesByDate[key];
+    if (times == null || times.isEmpty) return false;
+    final booked = bookedTimesByDate[key] ?? const {};
+    return booked.length >= times.length;
+  }
+
+  bool isTimeBooked(TimeOfDay t) {
+    if (_selectedDateBookedTimes.isEmpty) return false;
+    final api = BookingDraft.timeToApi(t);
+    return _selectedDateBookedTimes.contains(api);
   }
 
   BookingDoctorArgs toDoctorArgs() {
@@ -132,6 +224,8 @@ class AppointmentController extends ChangeNotifier {
       detectionPrice: detectionPrice,
       availableDates: availableDateStrs,
       availableTimes: timeSlots.map(BookingDraft.timeToApi).toList(),
+      timesByDate: timesByDate,
+      bookedTimesByDate: bookedTimesByDate,
     );
   }
 

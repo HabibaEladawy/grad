@@ -28,6 +28,16 @@ class DoctorTimeScreen extends StatefulWidget {
 
 class _DoctorTimeScreenState extends State<DoctorTimeScreen> {
   @override
+  void initState() {
+    super.initState();
+    // Fetch latest availability (including booked slots) once.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<AppointmentController>().refreshDoctorAvailability();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppointmentController>();
     final themeProvider = context.watch<AppThemeProvider>();
@@ -155,12 +165,14 @@ class _DoctorTimeScreenState extends State<DoctorTimeScreen> {
                             AppointmentDateRow(
                               dates: controller.dateList,
                               selectedDate: controller.selectedDate,
+                              isDisabled: controller.isDateFullyBooked,
                               onSelected: controller.selectDate,
                             ),
                             SizedBox(height: 24.h),
                             AppointmentTimeGrid(
                               times: controller.timeSlots,
                               selectedIndex: controller.selectedTimeIndex,
+                              isBooked: controller.isTimeBooked,
                               onSelected: controller.selectTime,
                             ),
                             SizedBox(height: 40.h),

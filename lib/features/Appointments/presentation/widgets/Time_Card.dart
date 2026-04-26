@@ -8,8 +8,14 @@ import 'package:provider/provider.dart';
 class TimeCard extends StatelessWidget {
   final String textTime;
   final bool isSelected;
+  final bool isDisabled;
 
-  const TimeCard({super.key, required this.textTime, this.isSelected = false});
+  const TimeCard({
+    super.key,
+    required this.textTime,
+    this.isSelected = false,
+    this.isDisabled = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +30,11 @@ class TimeCard extends StatelessWidget {
         width: 92.w,
         height: 36.h,
         decoration: BoxDecoration(
-          color: isSelected
+          color: isDisabled
+              ? (isDark
+                    ? AppColors.bg_surface_subtle_dark
+                    : AppColors.bg_surface_subtle_light)
+              : isSelected
               ? (isDark
                     ? AppColors.primary_500_dark
                     : AppColors.primary_500_light)
@@ -33,7 +43,11 @@ class TimeCard extends StatelessWidget {
                     : AppColors.bg_card_default_light),
           borderRadius: BorderRadius.circular(8.r),
           border: Border.all(
-            color: isSelected
+            color: isDisabled
+                ? (isDark
+                      ? AppColors.border_card_default_dark
+                      : AppColors.border_card_default_light)
+                : isSelected
                 ? (isDark
                       ? AppColors.border_button_primary_dark
                       : AppColors.border_button_primary_light)
@@ -53,12 +67,22 @@ class TimeCard extends StatelessWidget {
                 textTime,
                 style: isSelected
                     ? AppTextStyle.bold12TextButton(context)
+                    : isDisabled
+                    ? AppTextStyle.bold12TextHeading(context).copyWith(
+                      color: isDark
+                          ? AppColors.text_body_dark
+                          : AppColors.text_body_light,
+                    )
                     : AppTextStyle.bold12TextHeading(context),
               ),
               SizedBox(width: 4.w),
               Icon(
                 Icons.access_time,
-                color: isSelected
+                color: isDisabled
+                    ? (isDark
+                          ? AppColors.icon_onLight_dark
+                          : AppColors.icon_onLight_light)
+                    : isSelected
                     ? (isDark
                           ? AppColors.icon_onDark_dark
                           : AppColors.icon_onDark_light)

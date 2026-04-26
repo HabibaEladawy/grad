@@ -13,6 +13,8 @@ class BookingDoctorArgs {
     required this.detectionPrice,
     this.availableDates = const [],
     this.availableTimes = const [],
+    this.timesByDate = const {},
+    this.bookedTimesByDate = const {},
     this.ratingAverage = 0,
     this.ratingQuantity = 0,
     this.experienceYears = 0,
@@ -26,6 +28,15 @@ class BookingDoctorArgs {
   final double detectionPrice;
   final List<String> availableDates;
   final List<String> availableTimes;
+  /// Per-date offered time slots (API `HH:mm` strings).
+  ///
+  /// Preferred over [availableDates]/[availableTimes] when present.
+  final Map<String, List<String>> timesByDate;
+
+  /// Per-date booked time slots (subset of [timesByDate]).
+  ///
+  /// Dates that are fully booked should have `bookedTimes.length == times.length`.
+  final Map<String, Set<String>> bookedTimesByDate;
   final double ratingAverage;
   final int ratingQuantity;
   final int experienceYears;

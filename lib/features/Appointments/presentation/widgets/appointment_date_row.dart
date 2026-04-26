@@ -7,12 +7,14 @@ class AppointmentDateRow extends StatelessWidget {
   final List<DateTime> dates;
   final DateTime? selectedDate;
   final ValueChanged<DateTime> onSelected;
+  final bool Function(DateTime date)? isDisabled;
 
   const AppointmentDateRow({
     super.key,
     required this.dates,
     required this.selectedDate,
     required this.onSelected,
+    this.isDisabled,
   });
 
   bool _isSelected(DateTime date) {
@@ -30,14 +32,16 @@ class AppointmentDateRow extends StatelessWidget {
       child: Row(
         children: List.generate(dates.length, (index) {
           final date = dates[index];
+          final disabled = isDisabled?.call(date) ?? false;
           return Padding(
             padding: EdgeInsets.only(right: 8.w),
             child: GestureDetector(
-              onTap: () => onSelected(date),
+              onTap: disabled ? null : () => onSelected(date),
               child: DateCard(
                 number: date.day,
                 day: DateFormat.EEEE(locale).format(date),
                 isSelected: _isSelected(date),
+                isDisabled: disabled,
               ),
             ),
           );
