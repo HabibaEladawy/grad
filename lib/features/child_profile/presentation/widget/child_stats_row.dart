@@ -1,4 +1,5 @@
 import 'package:dana/extensions/localization_extension.dart';
+import 'package:dana/core/utils/app_colors.dart';
 import 'package:dana/features/child_profile/presentation/cubit/growth_state.dart';
 import 'package:dana/features/child_profile/presentation/cubit/skills_cubit.dart';
 import 'package:dana/features/child_profile/presentation/cubit/skills_state.dart';
@@ -30,6 +31,7 @@ class ChildStatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -80,10 +82,18 @@ class ChildStatsRow extends StatelessWidget {
                       : delta == 0
                       ? '—'
                       : '${delta > 0 ? '+' : ''}$delta %';
+                  final changeColor = delta == null || delta <= 0
+                      ? (isDark
+                            ? AppColors.icon_onLight_dark
+                            : AppColors.icon_onLight_light)
+                      : (isDark
+                            ? AppColors.success_default_dark
+                            : AppColors.success_default_light);
                   return CustomStatCard(
                     title: context.l10n.growthIndicator,
                     value: '$pct %',
                     change: change,
+                    changeColor: changeColor,
                     iconPath: 'assets/Icons/child_profile/indicator_icon.svg',
                   );
                 },

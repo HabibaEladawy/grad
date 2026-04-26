@@ -29,8 +29,11 @@ class BookModel {
     this.link,
   });
 
-  int get pageCount =>
-      chapters.isNotEmpty ? chapters.length : (pagesCount ?? 0);
+  int get pageCount {
+    final p = pagesCount;
+    if (p != null && p > 0) return p;
+    return chapters.length;
+  }
 
   factory BookModel.fromJson(Map<String, dynamic> json) {
     final chaptersJson = json['chapters'];

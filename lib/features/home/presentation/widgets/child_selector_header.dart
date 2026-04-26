@@ -14,6 +14,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+Widget _childAvatar({
+  required ParentChildModel child,
+  required double size,
+}) {
+  final isGirl = child.gender.toLowerCase() == 'female';
+  final fallbackAsset = isGirl
+      ? 'assets/Images/girl_child_photo.png'
+      : 'assets/Images/home/boy_child_photo.png';
+
+  final u = child.profileImageUrl;
+  final hasHttpUrl = u != null && u.isNotEmpty && u.startsWith('http');
+  if (!hasHttpUrl) {
+    return Image.asset(fallbackAsset, width: size, height: size);
+  }
+
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(AppRadius.radius_full),
+    child: Image.network(
+      u,
+      width: size,
+      height: size,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) =>
+          Image.asset(fallbackAsset, width: size, height: size),
+    ),
+  );
+}
+
 class ChildSelectorHeader extends StatelessWidget {
   final bool isDark;
   final String? selectedChildId;
@@ -85,7 +113,6 @@ class ChildSelectorHeader extends StatelessWidget {
             orElse: () => children.first,
           );
           final age = ageFromBirth(c.birthDate);
-          final isBoy = c.gender.toLowerCase() != 'female';
           final showPicker = children.length > 1;
           final otherChildren = children
               .where((ch) => ch.id != c.id)
@@ -97,12 +124,7 @@ class ChildSelectorHeader extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.asset(
-                    isBoy
-                        ? 'assets/Images/home/boy_child_photo.png'
-                        : 'assets/Images/girl_child_photo.png',
-                    width: 48.w,
-                  ),
+                  _childAvatar(child: c, size: 48.w),
                   SizedBox(width: 12.w),
                   Expanded(
                     child: Padding(
@@ -217,12 +239,9 @@ class ChildSelectorHeader extends StatelessWidget {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Image.asset(
-                                    otherChildren[i].gender.toLowerCase() ==
-                                            'female'
-                                        ? 'assets/Images/girl_child_photo.png'
-                                        : 'assets/Images/home/boy_child_photo.png',
-                                    width: 44.w,
+                                  _childAvatar(
+                                    child: otherChildren[i],
+                                    size: 44.w,
                                   ),
                                   SizedBox(width: 12.w),
                                   Expanded(

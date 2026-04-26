@@ -15,6 +15,7 @@ class CustomStatCard extends StatelessWidget {
     required this.change,
     required this.iconPath,
     this.color,
+    this.changeColor,
   });
 
   final String title;
@@ -22,6 +23,7 @@ class CustomStatCard extends StatelessWidget {
   final String value;
   final String change;
   final Color? color;
+  final Color? changeColor;
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +80,14 @@ class CustomStatCard extends StatelessWidget {
             ),
             Padding(
               padding: EdgeInsets.only(top: 2.h),
-              child: Text(change, style: AppTextStyle.medium8Succes(context)),
+              child: Text(
+                change,
+                style: changeColor == null
+                    ? AppTextStyle.medium8Succes(context)
+                    : AppTextStyle.medium8Succes(
+                        context,
+                      ).copyWith(color: changeColor),
+              ),
             ),
           ],
         ),
