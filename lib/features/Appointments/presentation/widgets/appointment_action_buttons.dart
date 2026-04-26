@@ -1,12 +1,13 @@
 import 'package:dana/core/utils/app_colors.dart';
 import 'package:dana/core/utils/app_raduis.dart';
-import 'package:dana/core/utils/app_routes.dart';
 import 'package:dana/core/utils/app_text_style.dart';
 import 'package:dana/core/widgets/custom_button.dart';
 import 'package:dana/extensions/localization_extension.dart';
 import 'package:dana/features/Appointments/data/models/appointment_model.dart';
 import 'package:dana/features/Appointments/presentation/appointment_rebook_args.dart';
 import 'package:dana/features/Appointments/presentation/bottom_sheets/change_appointment_bottom_sheet.dart';
+import 'package:dana/features/Appointments/presentation/bottom_sheets/rebook_cancelled_bottom_sheet.dart';
+import 'package:dana/features/Appointments/presentation/bottom_sheets/rebook_completed_bottom_sheet.dart';
 import 'package:dana/features/Appointments/presentation/bottom_sheets/rate_doctor_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -48,7 +49,14 @@ class AppointmentActionButtons extends StatelessWidget {
       );
       return;
     }
-    Navigator.pushNamed(context, AppRoutes.doctorTime, arguments: args);
+    // New UX: rebook uses the bottom-sheet flow (dates/times as a sheet),
+    // not routing to the main doctor time screen.
+    _showSheet(
+      context,
+      appointment.status == Status.completed
+          ? const RebookCompletedBottomSheet()
+          : const RebookCancelledBottomSheet(),
+    );
   }
 
   @override
