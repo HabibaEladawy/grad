@@ -8,8 +8,10 @@ import 'package:dana/features/Appointments/presentation/appointment_rebook_args.
 import 'package:dana/features/Appointments/presentation/bottom_sheets/change_appointment_bottom_sheet.dart';
 import 'package:dana/features/Appointments/presentation/bottom_sheets/rate_doctor_bottom_sheet.dart';
 import 'package:dana/core/utils/app_routes.dart';
+import 'package:dana/features/booking/presentation/cubit/booking_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AppointmentActionButtons extends StatelessWidget {
   final Appointment appointment;
@@ -24,6 +26,7 @@ class AppointmentActionButtons extends StatelessWidget {
   });
 
   void _showSheet(BuildContext context, Widget child) {
+    final bookingCubit = context.read<BookingCubit>();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -33,7 +36,7 @@ class AppointmentActionButtons extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
-      builder: (_) => child,
+      builder: (_) => BlocProvider.value(value: bookingCubit, child: child),
     );
   }
 
