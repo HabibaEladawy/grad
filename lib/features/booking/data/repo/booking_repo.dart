@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../services/booking_service.dart';
 import '../models/booking_model.dart';
 import '../models/booking_create_result.dart';
@@ -123,9 +125,23 @@ class BookingRepo {
 
   Future<void> rateBooking({
     required String bookingId,
-    required int rating,
+    required num rating,
   }) async {
-    await service.rateBooking(bookingId: bookingId, rating: rating);
+    try {
+      await service.rateBooking(bookingId: bookingId, rating: rating);
+    } on DioException catch (e) {
+      final code = e.response?.statusCode ?? 0;
+      final isValidation = code == 400 || code == 409 || code == 422;
+      final isNonInt = rating is double && rating % 1 != 0;
+      if (isValidation && isNonInt) {
+        await service.rateBooking(
+          bookingId: bookingId,
+          rating: rating.round(),
+        );
+        return;
+      }
+      rethrow;
+    }
   }
 
   Future<Booking> getBookingById({required String bookingId}) async {

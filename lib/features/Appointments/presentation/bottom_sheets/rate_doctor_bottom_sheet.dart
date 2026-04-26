@@ -91,7 +91,13 @@ class _RateDoctorBottomSheetState extends State<RateDoctorBottomSheet> {
                 if (!isButtonEnabled) return;
                 final bookingId = widget.bookingId;
                 if (bookingId == null || bookingId.isEmpty) {
-                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(context.l10n.ratingSubmitFailed),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
                   return;
                 }
                 await context.read<BookingCubit>().rateBooking(

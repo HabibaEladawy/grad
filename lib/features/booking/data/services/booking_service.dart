@@ -59,7 +59,7 @@ class BookingService {
 
   Future<Response> rateBooking({
     required String bookingId,
-    required int rating,
+    required num rating,
   }) {
     return dio.post(
       ApiEndpoint.bookingRatePath(bookingId),

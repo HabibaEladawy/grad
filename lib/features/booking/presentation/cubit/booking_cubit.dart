@@ -99,7 +99,7 @@ class BookingCubit extends Cubit<BookingState> {
   }) async {
     emit(BookingLoading());
     try {
-      await repo.rateBooking(bookingId: bookingId, rating: rating.round());
+      await repo.rateBooking(bookingId: bookingId, rating: rating);
       final pid = _lastParentId;
       if (pid != null && pid.isNotEmpty) {
         await _reloadParentBookings(pid);

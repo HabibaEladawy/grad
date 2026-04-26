@@ -6,13 +6,14 @@ import 'package:dana/features/Appointments/data/models/appointment_model.dart';
 import 'package:dana/features/Appointments/logic/appointment_calendar_logic.dart';
 import 'package:dana/features/Appointments/presentation/widgets/appointment_date_row.dart';
 import 'package:dana/features/Appointments/presentation/widgets/appointment_month_navigator.dart';
-import 'package:dana/features/Appointments/presentation/widgets/appointment_time_data.dart';
 import 'package:dana/features/Appointments/presentation/widgets/appointment_time_grid.dart';
+import 'package:dana/features/Appointments/logic/appointment_controller.dart';
+import 'package:dana/features/booking/booking_flow_models.dart';
 import 'package:dana/features/booking/presentation/cubit/booking_cubit.dart';
 import 'package:dana/features/parent_profile/data/repo/parent_profile_repository.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/di/injection_container.dart';
 
@@ -28,34 +29,39 @@ class ChangeAppointmentBottomSheet extends StatefulWidget {
 
 class _ChangeAppointmentBottomSheetState
     extends State<ChangeAppointmentBottomSheet> {
-  int _selectedTimeIndex = -1;
-  DateTime _currentMonth = DateTime(DateTime.now().year, DateTime.now().month);
-  DateTime? _selectedDate;
   bool _submitting = false;
+  late final AppointmentController _controller;
 
-  List<DateTime> get _dateList =>
-      AppointmentCalendarLogic.getMonthDays(_currentMonth, DateTime.now());
-
-  void _goToPreviousMonth() {
-    setState(() {
-      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month - 1);
-      _selectedDate = null;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _controller = AppointmentController();
+    final doctorId = widget.appointment.doctorId;
+    if (doctorId != null && doctorId.isNotEmpty) {
+      _controller.applyBookingDoctor(
+        BookingDoctorArgs(
+          doctorId: doctorId,
+          doctorName: widget.appointment.doctorNamePlain.isNotEmpty
+              ? widget.appointment.doctorNamePlain
+              : widget.appointment.doctorName,
+          specialty: widget.appointment.specialty,
+          locationLine: widget.appointment.address,
+          imageUrl: widget.appointment.image,
+          detectionPrice: widget.appointment.detectionPrice,
+          availableDates: const [],
+          availableTimes: const [],
+        ),
+      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _controller.refreshDoctorAvailability();
+      });
+    }
   }
 
-  void _goToNextMonth() {
-    setState(() {
-      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1);
-      _selectedDate = null;
-    });
-  }
-
-  void _selectDate(DateTime date) {
-    setState(() => _selectedDate = date);
-  }
-
-  void _selectTime(int index) {
-    setState(() => _selectedTimeIndex = index);
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> _onConfirm(BuildContext context) async {
@@ -63,9 +69,11 @@ class _ChangeAppointmentBottomSheetState
     final doctorId = widget.appointment.doctorId;
     if (bookingId == null || bookingId.isEmpty) return;
     if (doctorId == null || doctorId.isEmpty) return;
-    if (_selectedDate == null ||
-        _selectedTimeIndex < 0 ||
-        _selectedTimeIndex >= AppointmentTimeData.availableTimes.length) {
+    final date = _controller.selectedDate;
+    final timeIndex = _controller.selectedTimeIndex;
+    if (date == null ||
+        timeIndex < 0 ||
+        timeIndex >= _controller.timeSlots.length) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -79,17 +87,15 @@ class _ChangeAppointmentBottomSheetState
     setState(() => _submitting = true);
     try {
       final me = await sl<ParentProfileRepository>().getMe();
-      final picked = AppointmentTimeData.availableTimes[_selectedTimeIndex];
-      final time =
-          '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
-      final date =
-          '${_selectedDate!.year.toString().padLeft(4, '0')}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}';
+      final picked = _controller.timeSlots[timeIndex];
+      final time = BookingDraft.timeToApi(picked);
+      final dateIso = BookingDoctorArgs.dateKey(date);
 
       final err = await context.read<BookingCubit>().changeAppointment(
         bookingId: bookingId,
         doctorId: doctorId,
         parentId: me.id,
-        date: date,
+        date: dateIso,
         time: time,
       );
       if (!context.mounted) return;
@@ -125,56 +131,67 @@ class _ChangeAppointmentBottomSheetState
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 24.w,
-        right: 24.w,
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Center(child: HomeIndicator()),
-            SizedBox(height: 20.h),
-            CustomScreenHeader(
-              title: context.l10n.needBetterTimeTitle,
-              subtitle: context.l10n.needBetterTimeDesc,
+    return ChangeNotifierProvider.value(
+      value: _controller,
+      child: Consumer<AppointmentController>(
+        builder: (context, controller, _) {
+          // Keep the UI stable even if availability isn't loaded yet.
+          final fallbackDates = AppointmentCalendarLogic.getMonthDays(
+            controller.currentMonth,
+            DateTime.now(),
+          );
+          final dates = controller.dateList.isNotEmpty ? controller.dateList : fallbackDates;
+          return Padding(
+            padding: EdgeInsets.only(
+              left: 24.w,
+              right: 24.w,
+              bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
-            SizedBox(height: 24.h),
-
-            AppointmentMonthNavigator(
-              currentMonth: _currentMonth,
-              onPrevious: _goToPreviousMonth,
-              onNext: _goToNextMonth,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Center(child: HomeIndicator()),
+                  SizedBox(height: 20.h),
+                  CustomScreenHeader(
+                    title: context.l10n.needBetterTimeTitle,
+                    subtitle: context.l10n.needBetterTimeDesc,
+                  ),
+                  SizedBox(height: 24.h),
+                  AppointmentMonthNavigator(
+                    currentMonth: controller.currentMonth,
+                    onPrevious: controller.goToPreviousMonth,
+                    onNext: controller.goToNextMonth,
+                  ),
+                  SizedBox(height: 12.h),
+                  AppointmentDateRow(
+                    dates: dates,
+                    selectedDate: controller.selectedDate,
+                    isDisabled: controller.isDateFullyBooked,
+                    onSelected: controller.selectDate,
+                  ),
+                  SizedBox(height: 24.h),
+                  AppointmentTimeGrid(
+                    times: controller.timeSlots,
+                    selectedIndex: controller.selectedTimeIndex,
+                    isBooked: controller.isTimeBooked,
+                    onSelected: controller.selectTime,
+                  ),
+                  SizedBox(height: 40.h),
+                  CustomButton(
+                    text: _submitting ? '…' : context.l10n.confirmNewAppointment,
+                    onTap: () {
+                      if (_submitting) return;
+                      _onConfirm(context);
+                    },
+                  ),
+                  SizedBox(height: 20.h),
+                ],
+              ),
             ),
-            SizedBox(height: 12.h),
-
-            AppointmentDateRow(
-              dates: _dateList,
-              selectedDate: _selectedDate,
-              onSelected: _selectDate,
-            ),
-            SizedBox(height: 24.h),
-
-            AppointmentTimeGrid(
-              times: AppointmentTimeData.availableTimes,
-              selectedIndex: _selectedTimeIndex,
-              onSelected: _selectTime,
-            ),
-            SizedBox(height: 40.h),
-
-            CustomButton(
-              text: _submitting ? '…' : context.l10n.confirmNewAppointment,
-              onTap: () {
-                if (_submitting) return;
-                _onConfirm(context);
-              },
-            ),
-            SizedBox(height: 20.h),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
