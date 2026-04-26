@@ -1,6 +1,5 @@
 import 'package:dana/core/utils/app_colors.dart';
 import 'package:dana/core/utils/app_text_style.dart';
-import 'package:dana/extensions/localization_extension.dart';
 import 'package:dana/features/Appointments/data/models/appointment_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -60,7 +59,7 @@ class AppointmentDoctorInfo extends StatelessWidget {
                 Text(
                   appointment.specialty.isNotEmpty
                       ? appointment.specialty
-                      : context.l10n.physiotherapist,
+                      : '—',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTextStyle.medium12TextBody(context),

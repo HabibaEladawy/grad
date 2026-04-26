@@ -1,5 +1,4 @@
 import 'package:dana/features/Appointments/logic/appointment_calendar_logic.dart';
-import 'package:dana/features/Appointments/presentation/widgets/appointment_time_data.dart';
 import 'package:dana/features/booking/booking_flow_models.dart';
 import 'package:flutter/material.dart';
 import 'package:dana/core/di/injection_container.dart';
@@ -22,7 +21,7 @@ class AppointmentController extends ChangeNotifier {
   int experienceYears = 0;
   int? totalPatients;
   List<String> availableDateStrs = const [];
-  List<TimeOfDay> timeSlots = AppointmentTimeData.availableTimes;
+  List<TimeOfDay> timeSlots = const [];
   Map<String, List<String>> timesByDate = const {};
   Map<String, Set<String>> bookedTimesByDate = const {};
   Set<String> _selectedDateBookedTimes = const {};
@@ -51,7 +50,7 @@ class AppointmentController extends ChangeNotifier {
         ? timesByDate.keys.toList()
         : List<String>.from(args.availableDates);
     final parsed = BookingDraft.parseTimeStrings(args.availableTimes);
-    timeSlots = parsed.isNotEmpty ? parsed : AppointmentTimeData.availableTimes;
+    timeSlots = parsed;
     selectedDate = null;
     selectedTimeIndex = -1;
     _selectedDateBookedTimes = const {};

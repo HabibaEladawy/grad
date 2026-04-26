@@ -50,18 +50,10 @@ class DoctorCard extends StatelessWidget {
         (themeProvider.appTheme == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
 
-    final name = controller.doctorName.isNotEmpty
-        ? controller.doctorName
-        : 'إسلام غنيم';
-    final spec = controller.specialty.isNotEmpty
-        ? controller.specialty
-        : context.l10n.physiotherapist;
-    final loc = controller.locationLine.isNotEmpty
-        ? controller.locationLine
-        : 'القاهرة – مصر الجديدة';
-    final price = controller.detectionPrice > 0
-        ? controller.detectionPrice
-        : 250;
+    final name = controller.doctorName.trim();
+    final spec = controller.specialty.trim();
+    final loc = controller.locationLine.trim();
+    final price = controller.detectionPrice;
     final img = (image != null && image!.trim().isNotEmpty)
         ? image!.trim()
         : controller.imageUrl;
@@ -92,11 +84,12 @@ class DoctorCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${context.l10n.dr} $name',
+                    '${context.l10n.dr} ${name.isEmpty ? '—' : name}',
                     style: AppTextStyle.semibold20TextHeading(context),
                   ),
                   SizedBox(height: 8.h),
-                  Text(spec, style: AppTextStyle.bold12TextBody(context)),
+                  if (spec.isNotEmpty)
+                    Text(spec, style: AppTextStyle.bold12TextBody(context)),
                   SizedBox(height: 8.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -109,7 +102,7 @@ class DoctorCard extends StatelessWidget {
                       ),
                       Expanded(
                         child: Text(
-                          loc,
+                          loc.isEmpty ? '—' : loc,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: AppTextStyle.bold12TextBody(context),
@@ -157,7 +150,7 @@ class DoctorCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  CurrencyHelper.format(context, price),
+                  price > 0 ? CurrencyHelper.format(context, price) : '—',
                   style: AppTextStyle.bold16TextBody(context),
                 ),
               ],

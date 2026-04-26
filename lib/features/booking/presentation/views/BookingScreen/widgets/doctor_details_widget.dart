@@ -12,13 +12,9 @@ class DoctorDetailsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = doctor?.doctorName ?? 'إسلام غنيم';
-    final spec = (doctor?.specialty.isNotEmpty ?? false)
-        ? doctor!.specialty
-        : context.l10n.physiotherapist;
-    final loc = (doctor?.locationLine.isNotEmpty ?? false)
-        ? doctor!.locationLine
-        : 'القاهرة – مصر الجديدة';
+    final name = doctor?.doctorName.trim() ?? '';
+    final spec = doctor?.specialty.trim() ?? '';
+    final loc = doctor?.locationLine.trim() ?? '';
     const fallback = 'assets/Images/home/doctor1.png';
     final img = doctor?.imageUrl ?? fallback;
 
@@ -55,11 +51,12 @@ class DoctorDetailsWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${context.l10n.dr} $name',
+                '${context.l10n.dr} ${name.isEmpty ? '—' : name}',
                 style: AppTextStyle.semibold20TextHeading(context),
               ),
               SizedBox(height: 8.h),
-              Text(spec, style: AppTextStyle.bold12TextBody(context)),
+              if (spec.isNotEmpty)
+                Text(spec, style: AppTextStyle.bold12TextBody(context)),
               SizedBox(height: 8.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -71,7 +68,7 @@ class DoctorDetailsWidget extends StatelessWidget {
                   ),
                   Expanded(
                     child: Text(
-                      loc,
+                      loc.isEmpty ? '—' : loc,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyle.bold12TextBody(context),
