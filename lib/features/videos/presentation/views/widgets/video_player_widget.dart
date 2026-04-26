@@ -5,6 +5,7 @@ import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../../../core/utils/app_colors.dart';
 import '../../../../../core/utils/app_raduis.dart';
@@ -23,6 +24,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   VideoPlayerController? _videoController;
   ChewieController? _chewieController;
   YoutubePlayerController? _youtubeController;
+  WebViewController? _webViewController;
+  bool _useWebView = false;
+  bool _webViewLoading = false;
   bool _initStarted = false;
   String? _initError;
 
@@ -31,6 +35,15 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   bool get _isYouTube {
     final u = _url.toLowerCase();
     return u.contains('youtube.com') || u.contains('youtu.be');
+  }
+
+  bool _looksLikeDirectVideoUrl(Uri uri) {
+    final p = uri.path.toLowerCase();
+    return p.endsWith('.mp4') ||
+        p.endsWith('.m3u8') ||
+        p.endsWith('.mov') ||
+        p.endsWith('.webm') ||
+        p.endsWith('.mkv');
   }
 
   @override
@@ -46,6 +59,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       _disposePlayers();
       _initStarted = false;
       _initError = null;
+      _useWebView = false;
+      _webViewLoading = false;
       _init();
     }
   }
@@ -86,27 +101,73 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         return;
       }
 
-      final controller = VideoPlayerController.networkUrl(uri);
-      _videoController = controller;
-      await controller.initialize();
-      _chewieController = ChewieController(
-        videoPlayerController: controller,
-        autoPlay: false,
-        looping: false,
-        allowFullScreen: true,
-        allowPlaybackSpeedChanging: true,
-        materialProgressColors: ChewieProgressColors(
-          playedColor: AppColors.primary_default_light,
-          bufferedColor: AppColors.border_card_default_light,
-          handleColor: AppColors.primary_default_light,
-          backgroundColor: AppColors.border_card_default_light,
-        ),
-      );
+      // Prefer native playback for direct video streams/files. If initialization
+      // fails (or the URL is likely a normal webpage), fall back to an in-app WebView.
+      final shouldTryNativeFirst = _looksLikeDirectVideoUrl(uri);
+      if (shouldTryNativeFirst) {
+        final controller = VideoPlayerController.networkUrl(uri);
+        _videoController = controller;
+        await controller.initialize();
+        _chewieController = ChewieController(
+          videoPlayerController: controller,
+          autoPlay: false,
+          looping: false,
+          allowFullScreen: true,
+          allowPlaybackSpeedChanging: true,
+          materialProgressColors: ChewieProgressColors(
+            playedColor: AppColors.primary_default_light,
+            bufferedColor: AppColors.border_card_default_light,
+            handleColor: AppColors.primary_default_light,
+            backgroundColor: AppColors.border_card_default_light,
+          ),
+        );
+        if (mounted) setState(() {});
+        return;
+      }
+
+      _useWebView = true;
+      _webViewController = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setBackgroundColor(Colors.transparent)
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onPageStarted: (_) {
+              if (mounted) setState(() => _webViewLoading = true);
+            },
+            onPageFinished: (_) {
+              if (mounted) setState(() => _webViewLoading = false);
+            },
+            onWebResourceError: (_) {
+              if (mounted) {
+                setState(() => _initError = 'Failed to load page');
+              }
+            },
+          ),
+        )
+        ..loadRequest(uri);
       if (mounted) setState(() {});
     } catch (e) {
-      if (mounted) {
+      // If native init fails, try WebView as a last resort (useful for embed pages).
+      if (!mounted) return;
+      final uri = Uri.tryParse(url);
+      if (uri == null) {
         setState(() => _initError = 'Failed to load video');
+        return;
       }
+      _disposePlayers();
+      _useWebView = true;
+      _webViewController = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setBackgroundColor(Colors.transparent)
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onPageStarted: (_) => setState(() => _webViewLoading = true),
+            onPageFinished: (_) => setState(() => _webViewLoading = false),
+            onWebResourceError: (_) => setState(() => _initError = 'Failed to load page'),
+          ),
+        )
+        ..loadRequest(uri);
+      setState(() {});
     }
   }
 
@@ -117,6 +178,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     _videoController = null;
     _youtubeController?.close();
     _youtubeController = null;
+    _webViewController = null;
   }
 
   Future<void> _openExternally() async {
@@ -146,12 +208,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                     style: AppTextStyle.medium12TextBody(context),
                   ),
                   SizedBox(height: 12.h),
-                  if (_isYouTube)
+                  if (_isYouTube || _useWebView)
                     SizedBox(
                       height: 40.h,
                       child: ElevatedButton(
                         onPressed: _openExternally,
-                        child: const Text('Open in YouTube'),
+                        child: Text(_isYouTube ? 'Open in YouTube' : 'Open in browser'),
                       ),
                     ),
                 ],
@@ -165,7 +227,15 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
               )
             : (_chewieController != null
                 ? Chewie(controller: _chewieController!)
-                : const Center(child: CircularProgressIndicator())));
+                : (_useWebView && _webViewController != null
+                    ? Stack(
+                        children: [
+                          WebViewWidget(controller: _webViewController!),
+                          if (_webViewLoading)
+                            const Center(child: CircularProgressIndicator()),
+                        ],
+                      )
+                    : const Center(child: CircularProgressIndicator()))));
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -178,13 +248,13 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
             child: player,
           ),
         ),
-        if (_isYouTube) ...[
+        if (_isYouTube || _useWebView) ...[
           SizedBox(height: 8.h),
           SizedBox(
             height: 40.h,
             child: OutlinedButton(
               onPressed: _openExternally,
-              child: const Text('Open in YouTube'),
+              child: Text(_isYouTube ? 'Open in YouTube' : 'Open in browser'),
             ),
           ),
         ],
