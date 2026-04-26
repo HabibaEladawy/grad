@@ -176,9 +176,12 @@ class _AnimatedDropdownState extends State<AnimatedDropdown>
                   'assets/Icons/arrow_drop_icon.svg',
                   width: 24.w,
                   height: 24.h,
-                  color: isDark
-                      ? AppColors.icon_onLight_dark
-                      : AppColors.icon_onLight_light,
+                  colorFilter: ColorFilter.mode(
+                    isDark
+                        ? AppColors.icon_onLight_dark
+                        : AppColors.icon_onLight_light,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ],

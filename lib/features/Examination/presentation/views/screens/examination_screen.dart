@@ -176,14 +176,14 @@ class _ExaminationScreenState extends State<ExaminationScreen> {
     _applyStoredAnswersToSections();
   }
 
-  void _showResultForLevel(BuildContext context, String level) {
-    final l = level.toLowerCase();
+  void _showResultForLevel(BuildContext context, SensoryTestResult result) {
+    final l = result.level.toLowerCase();
     if (l == 'low') {
-      ResultBottomSheet.show(context);
+      ResultBottomSheet.show(context, result: result);
     } else if (l == 'medium') {
-      SensitivityResultBottomSheet.show(context);
+      SensitivityResultBottomSheet.show(context, result: result);
     } else {
-      SpecialistResultBottomSheet.show(context);
+      SpecialistResultBottomSheet.show(context, result: result);
     }
   }
 
@@ -291,7 +291,7 @@ class _ExaminationScreenState extends State<ExaminationScreen> {
                       final result =
                           await _cubit.submit(_answersByQuestionId);
                       if (result == null || !mounted) return;
-                      _showResultForLevel(context, result.level);
+                      _showResultForLevel(context, result);
                     },
                   ),
                 ],

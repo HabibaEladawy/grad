@@ -61,16 +61,41 @@ class SensoryTestResult {
   final int totalScore;
   final String level; // low | medium | high
   final Map<String, int> categoryScores;
+  final double? percentage;
+  final int? maxScore;
 
   SensoryTestResult({
     required this.totalScore,
     required this.level,
     required this.categoryScores,
+    this.percentage,
+    this.maxScore,
   });
 
   factory SensoryTestResult.fromJson(Map<String, dynamic> json) {
+    // Backend sometimes wraps data in an envelope:
+    // { response: { status, message, data: { test: {...}, percentage, maxScore } } }
+    // While older/alternative shapes may be raw: { totalScore, level, categoryScores }.
+    Map<String, dynamic> root = json;
+    double? percentage;
+    int? maxScore;
+
+    final response = root['response'];
+    if (response is Map) {
+      final data = response['data'];
+      if (data is Map) {
+        percentage = double.tryParse(data['percentage']?.toString() ?? '');
+        maxScore = int.tryParse(data['maxScore']?.toString() ?? '');
+
+        final test = data['test'];
+        if (test is Map) {
+          root = test.cast<String, dynamic>();
+        }
+      }
+    }
+
     final cs = <String, int>{};
-    final raw = json['categoryScores'];
+    final raw = root['categoryScores'];
     if (raw is Map) {
       for (final e in raw.entries) {
         if (e.key.toString() == '_id') continue;
@@ -78,9 +103,11 @@ class SensoryTestResult {
       }
     }
     return SensoryTestResult(
-      totalScore: int.tryParse(json['totalScore']?.toString() ?? '') ?? 0,
-      level: json['level']?.toString() ?? '',
+      totalScore: int.tryParse(root['totalScore']?.toString() ?? '') ?? 0,
+      level: root['level']?.toString() ?? '',
       categoryScores: cs,
+      percentage: percentage,
+      maxScore: maxScore,
     );
   }
 }

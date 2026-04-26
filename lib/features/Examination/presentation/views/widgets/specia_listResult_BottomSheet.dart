@@ -10,16 +10,19 @@ import '../../../../../core/utils/app_assets.dart';
 import '../../../../../core/utils/app_colors.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../providers/app_theme_provider.dart';
+import '../../../data/model/sensory_test_models.dart';
 
 class SpecialistResultBottomSheet extends StatelessWidget {
-  const SpecialistResultBottomSheet({super.key});
+  final SensoryTestResult result;
 
-  static void show(BuildContext context) {
+  const SpecialistResultBottomSheet({super.key, required this.result});
+
+  static void show(BuildContext context, {required SensoryTestResult result}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const SpecialistResultBottomSheet(),
+      builder: (_) => SpecialistResultBottomSheet(result: result),
     );
   }
 
@@ -31,6 +34,12 @@ class SpecialistResultBottomSheet extends StatelessWidget {
         (themeProvider.appTheme == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
     final l10n = AppLocalizations.of(context)!;
+    final scoreLine = (result.maxScore != null && result.maxScore! > 0)
+        ? '${result.totalScore} / ${result.maxScore}'
+        : '${result.totalScore}';
+    final percentageLine = result.percentage != null
+        ? ' (${result.percentage!.toStringAsFixed(1)}%)'
+        : '';
 
     return Container(
       decoration: BoxDecoration(
@@ -49,7 +58,8 @@ class SpecialistResultBottomSheet extends StatelessWidget {
           ResultContent(
             titleColor: AppColors.error_default_light,
             title: l10n.resultSpecialistTitle,
-            description: l10n.resultSpecialistDescription,
+            description:
+                '${l10n.resultSpecialistDescription}\n\n$scoreLine$percentageLine',
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(24.w, 40.h, 24.w, 32.h),
