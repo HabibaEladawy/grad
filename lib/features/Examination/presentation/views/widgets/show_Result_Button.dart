@@ -3,6 +3,7 @@ import 'package:dana/features/Examination/presentation/views/widgets/result_Bott
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:dana/features/Examination/data/model/sensory_test_models.dart';
 import '../../../../../core/utils/app_colors.dart';
 import '../../../../../providers/app_theme_provider.dart';
 
@@ -10,13 +11,18 @@ class ShowResultButton extends StatelessWidget {
   final bool isEnabled;
   final String label;
   final VoidCallback? onTap;
+  final SensoryTestResult? result;
 
   const ShowResultButton({
     super.key,
     required this.isEnabled,
     required this.label,
+    this.result,
     this.onTap,
-  });
+  }) : assert(
+          onTap != null || result != null,
+          'Either provide onTap or a non-null result.',
+        );
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +62,16 @@ class ShowResultButton extends StatelessWidget {
                   ? AppColors.bg_button_primary_disabled_dark
                   : AppColors.bg_button_primary_disabled_light),
         onTap: isEnabled
-            ? (onTap ?? () => ResultBottomSheet.show(context))
+            ? () {
+                if (onTap != null) {
+                  onTap!.call();
+                  return;
+                }
+                final r = result;
+                if (r != null) {
+                  ResultBottomSheet.show(context, result: r);
+                }
+              }
             : () {},
       ),
     );
