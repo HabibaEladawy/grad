@@ -50,8 +50,9 @@ class AppointmentController extends ChangeNotifier {
     availableDateStrs = timesByDate.isNotEmpty
         ? timesByDate.keys.toList()
         : List<String>.from(args.availableDates);
-    final parsed = BookingDraft.parseTimeStrings(args.availableTimes);
-    timeSlots = parsed;
+    // Slots should come from backend (`/available-slots?date=...`) for the
+    // selected date, not from any prefilled/mock lists.
+    timeSlots = const [];
     selectedDate = null;
     selectedTimeIndex = -1;
     _selectedDateBookedTimes = const {};
@@ -138,17 +139,19 @@ class AppointmentController extends ChangeNotifier {
         key: bookedTimes,
       };
 
-      // Show ALL offered times, but disable booked ones.
-      final offered = timesByDate[key] ?? const <String>[];
-      timeSlots = BookingDraft.parseTimeStrings(offered);
+      // Show ONLY real available times returned by backend for the chosen date.
+      timeSlots = BookingDraft.parseTimeStrings(availableTimes);
+      // Keep bookedTimes for any UI logic that needs it (even though the grid
+      // is driven by availableTimes only).
       _selectedDateBookedTimes = bookedTimes;
       selectedTimeIndex = -1;
       notifyListeners();
     } catch (_) {
-      // Fallback: show offered times if we have them; no bookedTimes info.
-      final offered = timesByDate[key] ?? const <String>[];
-      timeSlots = BookingDraft.parseTimeStrings(offered);
-      _selectedDateBookedTimes = bookedTimesByDate[key] ?? const {};
+      // Fallback: keep UI consistent by showing last known backend result.
+      // If we don't have it cached, show nothing (avoid mock/fake slots).
+      final cachedAvailable = availableTimesByDate[key] ?? const <String>[];
+      timeSlots = BookingDraft.parseTimeStrings(cachedAvailable);
+      _selectedDateBookedTimes = bookedTimesByDate[key] ?? const <String>{};
       selectedTimeIndex = -1;
       notifyListeners();
     }
