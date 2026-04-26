@@ -33,16 +33,16 @@ class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _controller = TextEditingController();
   bool _hasSearched = false;
 
-  void _search(String query) {
+  void _search(BuildContext scopedContext, String query) {
     setState(() {
       _hasSearched = query.trim().isNotEmpty;
       if (widget.searchType == SearchType.books) {}
     });
 
     if (widget.searchType == SearchType.videos) {
-      context.read<VideosCubit>().search(query);
+      scopedContext.read<VideosCubit>().search(query);
     } else {
-      context.read<TextBooksCubit>().search(query);
+      scopedContext.read<TextBooksCubit>().search(query);
     }
   }
 
@@ -127,7 +127,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   children: [
                     const HomeIndicator(),
                     SizedBox(height: 24.h),
-                    SearchBarWidget(controller: _controller, onChanged: _search),
+                    SearchBarWidget(
+                      controller: _controller,
+                      onChanged: (q) => _search(context, q),
+                    ),
                     Expanded(child: _buildBody()),
                   ],
                 ),
