@@ -2,12 +2,14 @@ import '../../presentation/controller/data/model/message_model.dart';
 
 class AIChatSession {
   final String id;
+  final String? conversationId;
   final DateTime createdAt;
   final DateTime updatedAt;
   final List<Message> messages;
 
   const AIChatSession({
     required this.id,
+    required this.conversationId,
     required this.createdAt,
     required this.updatedAt,
     required this.messages,
@@ -30,12 +32,14 @@ class AIChatSession {
   }
 
   AIChatSession copyWith({
+    String? conversationId,
     DateTime? createdAt,
     DateTime? updatedAt,
     List<Message>? messages,
   }) {
     return AIChatSession(
       id: id,
+      conversationId: conversationId ?? this.conversationId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       messages: messages ?? this.messages,
@@ -44,6 +48,7 @@ class AIChatSession {
 
   Map<String, dynamic> toJson() => {
         'id': id,
+        'conversationId': conversationId,
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt.toIso8601String(),
         'messages': messages.map((m) => m.toJson()).toList(),
@@ -67,6 +72,9 @@ class AIChatSession {
 
     return AIChatSession(
       id: (json['id'] ?? '').toString(),
+      conversationId: (json['conversationId'] ?? '').toString().trim().isEmpty
+          ? null
+          : (json['conversationId']).toString(),
       createdAt: createdAt,
       updatedAt: updatedAt,
       messages: messages,

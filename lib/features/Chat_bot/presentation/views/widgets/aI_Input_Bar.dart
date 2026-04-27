@@ -10,8 +10,9 @@ import '../../../../Chat_with_doctor/presentation/views/screens/Doctor_chat/widg
 
 class AIInputBar extends StatefulWidget {
   final Function(String) onSend;
+  final bool enabled;
 
-  const AIInputBar({super.key, required this.onSend});
+  const AIInputBar({super.key, required this.onSend, this.enabled = true});
 
   @override
   State<AIInputBar> createState() => _AIInputBarState();
@@ -36,6 +37,7 @@ class _AIInputBarState extends State<AIInputBar> {
   }
 
   void _handleSend() {
+    if (!widget.enabled) return;
     final text = _controller.text.trim();
     if (text.isNotEmpty) {
       widget.onSend(text);

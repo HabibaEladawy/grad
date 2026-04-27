@@ -43,6 +43,7 @@ class AIChatStorage {
     final now = DateTime.now();
     final session = AIChatSession(
       id: now.millisecondsSinceEpoch.toString(),
+      conversationId: null,
       createdAt: now,
       updatedAt: now,
       messages: const <Message>[],
@@ -56,6 +57,7 @@ class AIChatStorage {
   static Future<void> upsertSession({
     required String sessionId,
     required List<Message> messages,
+    String? conversationId,
   }) async {
     final sessions = await loadSessions();
     final now = DateTime.now();
@@ -63,6 +65,7 @@ class AIChatStorage {
     final idx = sessions.indexWhere((s) => s.id == sessionId);
     final next = AIChatSession(
       id: sessionId,
+      conversationId: conversationId ?? (idx >= 0 ? sessions[idx].conversationId : null),
       createdAt: idx >= 0 ? sessions[idx].createdAt : now,
       updatedAt: now,
       messages: messages,

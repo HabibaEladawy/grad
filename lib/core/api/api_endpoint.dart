@@ -68,6 +68,9 @@ class ApiEndpoint {
   static const String videoById = '/v1/videos/'; // GET by id
   static const String videosSearch = '/v1/videos/search'; // GET ?q=
 
+  // ── AI Chat ──────────────────────────────────────────────────────────────────
+  static const String chatSend = '/v1/chat/send'; // POST
+
   // ── Booking ──────────────────────────────────────────────────────────────────
   static const String createBooking = '/v1/booking'; // POST
   static const String getAllBookings = '/v1/booking'; // GET

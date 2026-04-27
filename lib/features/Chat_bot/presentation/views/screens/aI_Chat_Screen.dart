@@ -12,6 +12,8 @@ import '../widgets/aI_Input_Bar.dart';
 import '../widgets/aI_Profile_Card.dart';
 import '../widgets/aI_Suggested_Questions.dart';
 import '../../../data/storage/ai_chat_storage.dart';
+import '../../../data/services/ai_chat_service.dart';
+import '../../../../../core/di/injection_container.dart';
 
 class AIChatScreen extends StatefulWidget {
   static const String routeName = 'AIChatScreen';
@@ -28,6 +30,9 @@ class _AIChatScreenState extends State<AIChatScreen> {
   final List<Message> _messages = [];
   bool _chatStarted = false;
   String? _sessionId;
+  String? _conversationId;
+  bool _sending = false;
+  late final AIChatService _service = AIChatService(sl());
 
   @override
   void initState() {
@@ -46,6 +51,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
         ..clear()
         ..addAll(session.messages);
       _chatStarted = _messages.isNotEmpty;
+      _conversationId = session.conversationId;
     });
   }
 
@@ -57,7 +63,8 @@ class _AIChatScreenState extends State<AIChatScreen> {
     AppLocalizations.of(context)!.suggestedQ5,
   ];
 
-  void _handleSend(String text) {
+  Future<void> _handleSend(String text) async {
+    if (_sending) return;
     final newMessage = Message(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       text: text,
@@ -68,14 +75,53 @@ class _AIChatScreenState extends State<AIChatScreen> {
     setState(() {
       _chatStarted = true;
       _messages.add(newMessage);
+      _sending = true;
     });
-    _persist();
+
+    await _persist();
+
+    try {
+      final result = await _service.send(
+        message: text,
+        conversationId: _conversationId,
+      );
+
+      _conversationId = result.conversationId;
+      final botMessage = Message(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        text: result.reply,
+        sender: MessageSender.doctor,
+        time: _formatTime(DateTime.now()),
+        isRead: true,
+      );
+
+      if (!mounted) return;
+      setState(() {
+        _messages.add(botMessage);
+      });
+      await _persist();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send message. Please try again.')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _sending = false;
+        });
+      }
+    }
   }
 
   Future<void> _persist() async {
     final sid = _sessionId ?? await AIChatStorage.createEmptySession();
     _sessionId = sid;
-    await AIChatStorage.upsertSession(sessionId: sid, messages: _messages);
+    await AIChatStorage.upsertSession(
+      sessionId: sid,
+      messages: _messages,
+      conversationId: _conversationId,
+    );
   }
 
   String _formatTime(DateTime dt) {
@@ -137,7 +183,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
               ),
             ),
           ),
-          AIInputBar(onSend: _handleSend),
+          AIInputBar(onSend: (t) => _handleSend(t), enabled: !_sending),
         ],
       ),
     );
