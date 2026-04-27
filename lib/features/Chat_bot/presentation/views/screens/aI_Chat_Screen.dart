@@ -11,12 +11,14 @@ import '../../../../Chat_with_doctor/presentation/views/screens/Doctor_chat/widg
 import '../widgets/aI_Input_Bar.dart';
 import '../widgets/aI_Profile_Card.dart';
 import '../widgets/aI_Suggested_Questions.dart';
+import '../../../data/storage/ai_chat_storage.dart';
 
 class AIChatScreen extends StatefulWidget {
   static const String routeName = 'AIChatScreen';
   final Doctor doctor;
+  final String? sessionId;
 
-  const AIChatScreen({super.key, required this.doctor});
+  const AIChatScreen({super.key, required this.doctor, this.sessionId});
 
   @override
   State<AIChatScreen> createState() => _AIChatScreenState();
@@ -25,6 +27,27 @@ class AIChatScreen extends StatefulWidget {
 class _AIChatScreenState extends State<AIChatScreen> {
   final List<Message> _messages = [];
   bool _chatStarted = false;
+  String? _sessionId;
+
+  @override
+  void initState() {
+    super.initState();
+    _sessionId = widget.sessionId;
+    _hydrate();
+  }
+
+  Future<void> _hydrate() async {
+    if (_sessionId == null) return;
+    final session = await AIChatStorage.loadSession(_sessionId!);
+    if (!mounted || session == null) return;
+
+    setState(() {
+      _messages
+        ..clear()
+        ..addAll(session.messages);
+      _chatStarted = _messages.isNotEmpty;
+    });
+  }
 
   List<String> get _suggestedQuestions => [
     AppLocalizations.of(context)!.suggestedQ1,
@@ -43,12 +66,16 @@ class _AIChatScreenState extends State<AIChatScreen> {
       isRead: false,
     );
     setState(() {
-      if (!_chatStarted) {
-        _messages.addAll(getSampleMessages(context));
-      }
       _chatStarted = true;
       _messages.add(newMessage);
     });
+    _persist();
+  }
+
+  Future<void> _persist() async {
+    final sid = _sessionId ?? await AIChatStorage.createEmptySession();
+    _sessionId = sid;
+    await AIChatStorage.upsertSession(sessionId: sid, messages: _messages);
   }
 
   String _formatTime(DateTime dt) {

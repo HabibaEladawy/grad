@@ -800,6 +800,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get aiAssistantName => 'مساعد ضنا الذكي';
 
   @override
+  String get newChat => 'محادثة جديدة';
+
+  @override
+  String get noChatsYet => 'لا توجد محادثات حتى الآن.';
+
+  @override
+  String get tapToContinue => 'اضغط للمتابعة';
+
+  @override
   String get suggestedQuestionsHint =>
       'دي شوية أسئلة مقترحة تساعدك تبدأ معايا...\nاختر اللي يناسبك وهنكمل سوا.';
 

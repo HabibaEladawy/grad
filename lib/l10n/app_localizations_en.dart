@@ -807,6 +807,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiAssistantName => 'Dana AI Assistant';
 
   @override
+  String get newChat => 'New chat';
+
+  @override
+  String get noChatsYet => 'No chats yet.';
+
+  @override
+  String get tapToContinue => 'Tap to continue';
+
+  @override
   String get suggestedQuestionsHint =>
       'Here are some suggested questions to help you get started...\nPick what suits you and we\'ll go from there.';
 

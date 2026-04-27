@@ -20,6 +20,25 @@ class Message {
     required this.time,
     this.isRead = false,
   });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'text': text,
+    'sender': sender.name,
+    'time': time,
+    'isRead': isRead,
+  };
+
+  static Message fromJson(Map<String, dynamic> json) => Message(
+    id: (json['id'] ?? '').toString(),
+    text: (json['text'] ?? '').toString(),
+    sender: MessageSender.values.firstWhere(
+      (s) => s.name == (json['sender'] ?? 'user').toString(),
+      orElse: () => MessageSender.user,
+    ),
+    time: (json['time'] ?? '').toString(),
+    isRead: json['isRead'] == true,
+  );
 }
 
 class Doctor {

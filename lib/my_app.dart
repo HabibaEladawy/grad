@@ -30,6 +30,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'features/Chat_bot/presentation/controller/data/model/message_model.dart';
 import 'features/Chat_bot/presentation/views/screens/aI_Chat_Screen.dart';
+import 'features/Chat_bot/presentation/views/screens/ai_chat_history_screen.dart';
 import 'features/Chat_with_doctor/presentation/views/screens/Doctor_chat/screens/chat_screen.dart';
 import 'features/Examination/presentation/views/screens/examination_screen.dart';
 import 'features/auth/signUp/presentation/views/screens/add_children/views/screens/child_info_screen.dart';
@@ -137,6 +138,7 @@ class MyApp extends StatelessWidget {
       /// Chat (doctor chat uses [onGenerateRoute] + optional [Doctor] arguments)
       AIChatScreen.routeName: (context) =>
           AIChatScreen(doctor: getAIDoctor(context)),
+      AIChatHistoryScreen.routeName: (_) => const AIChatHistoryScreen(),
       AppRoutes.videos: (_) => const VideosScreen(),
       AppRoutes.search: (_) => const SearchScreen(),
 

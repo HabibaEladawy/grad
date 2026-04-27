@@ -1562,6 +1562,24 @@ abstract class AppLocalizations {
   /// **'Dana AI Assistant'**
   String get aiAssistantName;
 
+  /// No description provided for @newChat.
+  ///
+  /// In en, this message translates to:
+  /// **'New chat'**
+  String get newChat;
+
+  /// No description provided for @noChatsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No chats yet.'**
+  String get noChatsYet;
+
+  /// No description provided for @tapToContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to continue'**
+  String get tapToContinue;
+
   /// No description provided for @suggestedQuestionsHint.
   ///
   /// In en, this message translates to:

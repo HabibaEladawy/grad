@@ -1,7 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:dana/core/di/injection_container.dart';
-import 'package:dana/features/Chat_bot/presentation/controller/data/model/message_model.dart';
-import 'package:dana/features/Chat_bot/presentation/views/screens/aI_Chat_Screen.dart';
+import 'package:dana/features/Chat_bot/presentation/views/screens/ai_chat_history_screen.dart';
 import 'package:dana/features/child_profile/presentation/cubit/growth_cubit.dart';
 import 'package:dana/features/home/presentation/cubit/doctors_list_cubit.dart';
 import 'package:dana/features/home/presentation/screens/doctors_page.dart';
@@ -131,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onTap(int index) {
     if (index == 2 || index == 1) {
       final pages = {
-        2: AIChatScreen(doctor: getAIDoctor(context)),
+        2: const AIChatHistoryScreen(),
         1: const DoctorsScreen(),
       };
 

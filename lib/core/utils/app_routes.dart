@@ -16,6 +16,7 @@ import 'package:dana/features/notification/presentation/screens/notification_scr
 import 'package:dana/features/vaccinations/presentation/screens/vaccine_page.dart';
 
 import '../../features/Chat_bot/presentation/views/screens/aI_Chat_Screen.dart';
+import '../../features/Chat_bot/presentation/views/screens/ai_chat_history_screen.dart';
 import '../../features/Chat_with_doctor/presentation/views/screens/Doctor_chat/screens/chat_screen.dart';
 import '../../features/Examination/presentation/views/screens/examination_screen.dart';
 import '../../features/auth/signUp/presentation/views/screens/add_children/views/screens/child_info_screen.dart';
@@ -49,6 +50,7 @@ class AppRoutes {
   /// Chat
   static const String chatDoctor = ChatScreen.routeName;
   static const String aiChat = AIChatScreen.routeName;
+  static const String aiChatHistory = AIChatHistoryScreen.routeName;
 
   /// Videos
   static const String videos = VideosScreen.routeName;
