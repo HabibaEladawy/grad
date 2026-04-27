@@ -52,15 +52,17 @@ class ConfirmVaccineBottomSheet extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
 
-            ?extraWidgets,
+            if (extraWidgets != null) extraWidgets!,
 
             SizedBox(height: 40.h),
             CustomButton(
               text: buttonText,
               textStyle: AppTextStyle.semibold16TextButton(context),
               onTap: () {
-                if (onConfirm != null) onConfirm!();
-                Navigator.pop(context);
+                onConfirm?.call();
+                if (Navigator.of(context).canPop()) {
+                  Navigator.pop(context);
+                }
               },
             ),
             SizedBox(height: 20.h),
