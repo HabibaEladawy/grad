@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../cubit/sign_in_cubit.dart';
+import '../../../../cubit/google_auth_cubit.dart';
 import '../../../../../../signUp/presentation/views/screens/Personal_Information/views/widgets/custom_alreadyHaveAccount.dart';
 import '../../../../../../signUp/presentation/views/screens/Personal_Information/views/widgets/custom_text_rich.dart';
 import '../../../../../../signUp/presentation/views/screens/Personal_Information/views/widgets/cutom_google_signUp.dart';
@@ -30,7 +31,9 @@ class LoginActions extends StatelessWidget {
         ),
         SizedBox(height: AppSizes.h44),
         const CustomTextRich(),
-        const GoogleSignUpButton(),
+        GoogleSignUpButton(
+          onTap: () => context.read<GoogleAuthCubit>().start(),
+        ),
         CustomAlreadyHaveAccount(
           textOne: AppLocalizations.of(context)!.noAccount,
           textTwo: AppLocalizations.of(context)!.createAccount,

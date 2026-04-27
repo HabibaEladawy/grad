@@ -6,6 +6,8 @@ import 'package:dana/core/utils/app_routes.dart';
 import 'package:dana/extensions/localization_extension.dart';
 import 'package:dana/features/auth/login/presentation/cubit/sign_in_cubit.dart';
 import 'package:dana/features/auth/login/presentation/cubit/sign_in_state.dart';
+import 'package:dana/features/auth/login/presentation/cubit/google_auth_cubit.dart';
+import 'package:dana/features/auth/login/presentation/cubit/google_auth_state.dart';
 import 'package:dana/features/auth/login/presentation/views/screens/login/widgets/login_actions.dart';
 import 'package:dana/features/auth/login/presentation/views/screens/login/widgets/login_forgot_password.dart';
 import 'package:dana/features/auth/login/presentation/views/screens/login/widgets/login_password_field.dart';
@@ -19,32 +21,63 @@ class LoginBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<SignInCubit, SignInState>(
-      listener: (context, state) async {
-        if (state is SignInOtpSent) {
-          OtpBottomSheet.show(
-            context,
-            state.phone,
-            onVerified: (pin) async {
-              await context.read<SignInCubit>().verifySignIn(otp: pin);
-            },
-          );
-        } else if (state is SignInSuccess) {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          await sl<AuthSession>().setToken(state.user.token);
-          if (!context.mounted) return;
-          Navigator.pushReplacementNamed(context, AppRoutes.home);
-        } else if (state is SignInFailure) {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.red,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<SignInCubit, SignInState>(
+          listener: (context, state) async {
+            if (state is SignInOtpSent) {
+              OtpBottomSheet.show(
+                context,
+                state.phone,
+                onVerified: (pin) async {
+                  await context.read<SignInCubit>().verifySignIn(otp: pin);
+                },
+              );
+            } else if (state is SignInSuccess) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              await sl<AuthSession>().setToken(state.user.token);
+              if (!context.mounted) return;
+              Navigator.pushReplacementNamed(context, AppRoutes.home);
+            } else if (state is SignInFailure) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            }
+          },
+        ),
+        BlocListener<GoogleAuthCubit, GoogleAuthState>(
+          listener: (context, state) async {
+            if (state is GoogleAuthLaunchUrl) {
+              final requestId = await Navigator.pushNamed(
+                context,
+                AppRoutes.googleAuthWebView,
+                arguments: state.url,
+              );
+              if (!context.mounted) return;
+              if (requestId is String && requestId.trim().isNotEmpty) {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.googleComplete,
+                  arguments: requestId.trim(),
+                );
+              }
+            } else if (state is GoogleAuthFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            }
+          },
+        ),
+      ],
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

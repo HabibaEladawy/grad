@@ -11,6 +11,10 @@ class ApiEndpoint {
       '/v1/parent/verify-signin',
       '/v1/parent/reset-password',
       '/v1/parent/verify-password-otp',
+      // Google auth flow is unauthenticated (no Bearer token yet).
+      '/v1/parent/google',
+      '/v1/parent/google/compelete',
+      '/v1/parent/google/callback',
     ];
     for (final s in suffixes) {
       if (p.contains(s)) return true;

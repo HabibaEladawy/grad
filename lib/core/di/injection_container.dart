@@ -138,6 +138,7 @@ import '../../features/auth/login/domain/usecases/verify_sign_in_usecase.dart';
 import '../../features/auth/login/domain/usecases/verify_sign_up_usecase.dart';
 import '../../features/auth/login/presentation/cubit/change_password_cubit.dart';
 import '../../features/auth/login/presentation/cubit/create_doctor_cubit.dart';
+import '../../features/auth/login/presentation/cubit/google_auth_cubit.dart';
 import '../../features/auth/login/presentation/cubit/reset_password_cubit.dart';
 import '../../features/auth/login/presentation/cubit/sign_in_cubit.dart';
 import '../../features/auth/login/presentation/cubit/sign_up_cubit.dart';
@@ -489,6 +490,8 @@ Future<void> init() async {
   sl.registerFactory(() => ChangePasswordCubit(changePasswordUseCase: sl()));
 
   sl.registerFactory(() => CreateDoctorCubit(createDoctorUseCase: sl()));
+
+  sl.registerFactory<GoogleAuthCubit>(() => GoogleAuthCubit(sl()));
 
   sl.registerFactory<BookingCubit>(() => BookingCubit(sl()));
   sl.registerFactory<ParentProfileCubit>(() => ParentProfileCubit(sl()));

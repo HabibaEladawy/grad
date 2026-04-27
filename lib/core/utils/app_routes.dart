@@ -37,6 +37,10 @@ class AppRoutes {
   static const String contactInfo = ContactInfoScreen.routeName;
   static const String createPassword = CreatePasswordScreen.routeName;
 
+  /// Google Auth
+  static const String googleAuthWebView = 'GoogleAuthWebView';
+  static const String googleComplete = 'GoogleComplete';
+
   /// Home
   static const String home = HomeScreen.routeName;
 

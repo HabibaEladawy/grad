@@ -15,6 +15,10 @@ class ApiConstants {
   static const String verifyPasswordOtp = '/v1/parent/verify-password-otp';
   static const String changePassword = '/v1/parent/change-password';
 
+  // ── Parent / Google OAuth ────────────────────────────────────────────────────
+  static const String googleSignIn = '/v1/parent/google'; // GET
+  static const String googleComplete = '/v1/parent/google/compelete'; // POST
+
   // ── Parent Profile ───────────────────────────────────────────────────────────
   static const String parentMe = '/v1/parentMe'; // GET / PATCH / DELETE
 

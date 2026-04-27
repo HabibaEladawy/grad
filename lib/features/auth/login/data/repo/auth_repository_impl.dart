@@ -202,4 +202,31 @@ class AuthRepositoryImpl implements AuthRepository {
     );
     return unit;
   });
+
+  // ── Google Auth ──────────────────────────────────────────────────────────────
+
+  @override
+  Future<Either<Failure, dynamic>> googleSignIn() => _guard(
+        () => remoteDataSource.googleSignIn(),
+      );
+
+  @override
+  Future<Either<Failure, UserEntity>> googleComplete({
+    required String requestId,
+    required String phone,
+    required String password,
+    required String government,
+    required String address,
+    required List<ChildData> children,
+  }) =>
+      _guard(
+        () => remoteDataSource.googleComplete(
+          requestId: requestId.trim(),
+          phone: ParentPhoneUtils.normalizeForApi(phone),
+          password: password,
+          government: government,
+          address: address,
+          children: children,
+        ),
+      );
 }

@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../../../../core/di/injection_container.dart';
 import '../../../../../../../../core/utils/app_colors.dart';
 import '../../../../../../../../providers/app_theme_provider.dart';
+import '../../../../cubit/google_auth_cubit.dart';
 import '../../../../cubit/sign_in_cubit.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -27,9 +28,12 @@ class LoginScreen extends StatelessWidget {
           : AppColors.bg_surface_default_light,
       body: Padding(
         padding: EdgeInsets.only(top: 34.5.h, right: 24.w, left: 24.w),
-        child: BlocProvider(
-          create: (_) => sl<SignInCubit>(),
-          child: LoginBody(),
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (_) => sl<SignInCubit>()),
+            BlocProvider(create: (_) => sl<GoogleAuthCubit>()),
+          ],
+          child: const LoginBody(),
         ),
       ),
     );

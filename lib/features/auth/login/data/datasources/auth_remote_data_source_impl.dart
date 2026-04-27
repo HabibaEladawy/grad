@@ -395,4 +395,91 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw const ServerException(message: 'حدث خطأ غير متوقع');
     }
   }
+
+  // ── Parent / Google OAuth ────────────────────────────────────────────────────
+
+  @override
+  Future<dynamic> googleSignIn() async {
+    try {
+      // Many implementations respond with 302 redirect to Google consent screen.
+      // We must NOT follow redirects here; we need the `Location` header to open
+      // it in a browser/WebView.
+      final response = await dio.get(
+        ApiEndpoint.googleSignIn,
+        options: Options(
+          followRedirects: false,
+          validateStatus: (s) => s != null && s >= 200 && s < 400,
+        ),
+      );
+
+      final location = response.headers.value('location');
+      if (location != null && location.trim().isNotEmpty) {
+        return {'redirectUrl': location};
+      }
+
+      final data = ApiResponse.decode(response.data);
+      _throwIfError(data, response.statusCode, 'فشل تسجيل الدخول بجوجل');
+      return data;
+    } on DioException catch (e) {
+      final data = ApiResponse.decode(e.response?.data);
+      throw ServerException(
+        message: ApiError.messageFromDecoded(
+          data,
+          fallback: 'حدث خطأ في الخادم',
+        ),
+      );
+    } catch (e) {
+      if (e is ServerException) rethrow;
+      throw const ServerException(message: 'حدث خطأ غير متوقع');
+    }
+  }
+
+  @override
+  Future<UserModel> googleComplete({
+    required String requestId,
+    required String phone,
+    required String password,
+    required String government,
+    required String address,
+    required List<ChildData> children,
+  }) async {
+    try {
+      final payload = <String, dynamic>{
+        'phone': phone,
+        'password': password,
+        'government': government,
+        'address': address,
+        'children': children.map((c) => c.toJson()).toList(),
+      };
+
+      final response = await dio.post(
+        '${ApiEndpoint.googleComplete}/$requestId',
+        data: payload,
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
+
+      final data = ApiResponse.decode(response.data);
+      _throwIfError(data, response.statusCode, 'فشل استكمال بيانات حساب جوجل');
+
+      // Expected to return an access token like the other auth endpoints.
+      final accessToken = (data is Map ? data['accessToken'] : null);
+      final token =
+          (accessToken is Map ? accessToken['access_token'] : null) as String?;
+      if (token == null || token.trim().isEmpty) {
+        throw const ServerException(message: 'لم يتم استلام التوكن');
+      }
+      return UserModel.fromToken(token: token);
+    } on DioException catch (e) {
+      final data = ApiResponse.decode(e.response?.data);
+      throw ServerException(
+        message: ApiError.messageFromDecoded(
+          data,
+          fallback: 'حدث خطأ في الخادم',
+        ),
+      );
+    } catch (e) {
+      if (e is ServerException) rethrow;
+      throw const ServerException(message: 'حدث خطأ غير متوقع');
+    }
+  }
 }

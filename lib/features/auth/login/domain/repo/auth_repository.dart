@@ -76,4 +76,16 @@ abstract class AuthRepository {
     required List<String> availableTimes,
     File? profileImage,
   });
+
+  // ── Google Auth ──────────────────────────────────────────────────────────────
+  Future<Either<Failure, dynamic>> googleSignIn();
+
+  Future<Either<Failure, UserEntity>> googleComplete({
+    required String requestId,
+    required String phone,
+    required String password,
+    required String government,
+    required String address,
+    required List<ChildData> children,
+  });
 }

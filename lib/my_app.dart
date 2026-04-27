@@ -7,6 +7,8 @@ import 'package:dana/core/utils/app_theme.dart';
 import 'package:dana/features/auth/login/presentation/views/screens/forget_password/screens/forget_password_page.dart';
 import 'package:dana/features/auth/login/presentation/views/screens/login/screens/login_screen.dart';
 import 'package:dana/features/auth/login/presentation/views/screens/new_password/screens/new_password_screen.dart';
+import 'package:dana/features/auth/login/presentation/views/screens/google/google_auth_webview_screen.dart';
+import 'package:dana/features/auth/login/presentation/views/screens/google/google_complete_screen.dart';
 import 'package:dana/features/auth/signUp/presentation/views/screens/sign_up/views/screens/signUp_screen.dart';
 import 'package:dana/features/home/presentation/screens/doctors_page.dart';
 import 'package:dana/features/home/presentation/screens/home_screen.dart';
@@ -116,6 +118,18 @@ class MyApp extends StatelessWidget {
       AppRoutes.contactInfo: (ctx) => ContactInfoScreen(
         onNext: () => Navigator.pushNamed(ctx, AppRoutes.createPassword),
       ),
+
+      /// Google auth
+      AppRoutes.googleAuthWebView: (ctx) {
+        final raw = ModalRoute.of(ctx)?.settings.arguments;
+        final url = raw is String ? raw : '';
+        return GoogleAuthWebViewScreen(url: url);
+      },
+      AppRoutes.googleComplete: (ctx) {
+        final raw = ModalRoute.of(ctx)?.settings.arguments;
+        final id = raw is String ? raw : '';
+        return GoogleCompleteScreen(requestId: id);
+      },
 
       /// Booking
       AppRoutes.doctorTime: (ctx) {

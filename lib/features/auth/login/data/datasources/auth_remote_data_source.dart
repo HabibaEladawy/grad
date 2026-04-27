@@ -456,4 +456,21 @@ abstract class AuthRemoteDataSource {
     required List<String> availableTimes,
     File? profileImage,
   });
+
+  // ── Parent / Google OAuth ────────────────────────────────────────────────────
+  /// Start Google sign-in.
+  /// Backend typically returns a redirect URL / session ID, or performs a redirect.
+  Future<dynamic> googleSignIn();
+
+  /// Complete Google sign-in by filling the missing parent profile fields.
+  ///
+  /// Endpoint: `POST /v1/parent/google/compelete/:requestId`
+  Future<UserModel> googleComplete({
+    required String requestId,
+    required String phone,
+    required String password,
+    required String government,
+    required String address,
+    required List<ChildData> children,
+  });
 }
