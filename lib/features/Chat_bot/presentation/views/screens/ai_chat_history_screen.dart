@@ -12,6 +12,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../l10n/app_localizations.dart';
+import '../../../../../core/auth/auth_session.dart';
+import '../../../../../core/di/injection_container.dart';
+import '../../../../auth/login/data/model/user_model.dart';
 
 class AIChatHistoryScreen extends StatefulWidget {
   static const String routeName = 'AIChatHistoryScreen';
@@ -25,6 +28,7 @@ class AIChatHistoryScreen extends StatefulWidget {
 class _AIChatHistoryScreenState extends State<AIChatHistoryScreen> {
   bool _loading = true;
   List<AIChatSession> sessions = const [];
+  String? _userId;
 
   @override
   void initState() {
@@ -33,7 +37,16 @@ class _AIChatHistoryScreenState extends State<AIChatHistoryScreen> {
   }
 
   Future<void> _load() async {
-    final s = await AIChatStorage.loadSessions();
+    final userId = await _resolveUserId();
+    if (userId == null) {
+      if (!mounted) return;
+      setState(() {
+        sessions = const [];
+        _loading = false;
+      });
+      return;
+    }
+    final s = await AIChatStorage.loadSessions(userId: userId);
     if (!mounted) return;
     setState(() {
       sessions = s;
@@ -41,8 +54,21 @@ class _AIChatHistoryScreenState extends State<AIChatHistoryScreen> {
     });
   }
 
+  Future<String?> _resolveUserId() async {
+    if (_userId != null && _userId!.trim().isNotEmpty) return _userId;
+    final token = await sl<AuthSession>().token();
+    if (token == null || token.trim().isEmpty) return null;
+    final user = UserModel.fromToken(token: token);
+    final id = user.id.trim();
+    if (id.isEmpty) return null;
+    _userId = id;
+    return id;
+  }
+
   Future<void> _newChat() async {
-    final id = await AIChatStorage.createEmptySession();
+    final userId = await _resolveUserId();
+    if (userId == null) return;
+    final id = await AIChatStorage.createEmptySession(userId: userId);
     if (!mounted) return;
     await Navigator.push(
       context,
@@ -70,7 +96,9 @@ class _AIChatHistoryScreenState extends State<AIChatHistoryScreen> {
   }
 
   Future<void> _deleteChat(String id) async {
-    await AIChatStorage.deleteSession(id);
+    final userId = await _resolveUserId();
+    if (userId == null) return;
+    await AIChatStorage.deleteSession(userId: userId, sessionId: id);
     await _load();
   }
 

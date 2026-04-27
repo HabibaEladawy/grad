@@ -13,7 +13,9 @@ import '../widgets/aI_Profile_Card.dart';
 import '../widgets/aI_Suggested_Questions.dart';
 import '../../../data/storage/ai_chat_storage.dart';
 import '../../../data/services/ai_chat_service.dart';
+import '../../../../../core/auth/auth_session.dart';
 import '../../../../../core/di/injection_container.dart';
+import '../../../../auth/login/data/model/user_model.dart';
 
 class AIChatScreen extends StatefulWidget {
   static const String routeName = 'AIChatScreen';
@@ -32,6 +34,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
   String? _sessionId;
   String? _conversationId;
   bool _sending = false;
+  String? _userId;
   late final AIChatService _service = AIChatService(sl());
 
   @override
@@ -42,8 +45,12 @@ class _AIChatScreenState extends State<AIChatScreen> {
   }
 
   Future<void> _hydrate() async {
+    _userId ??= await _resolveUserId();
+    final userId = _userId;
+    if (userId == null || userId.trim().isEmpty) return;
     if (_sessionId == null) return;
-    final session = await AIChatStorage.loadSession(_sessionId!);
+    final session =
+        await AIChatStorage.loadSession(userId: userId, sessionId: _sessionId!);
     if (!mounted || session == null) return;
 
     setState(() {
@@ -115,13 +122,27 @@ class _AIChatScreenState extends State<AIChatScreen> {
   }
 
   Future<void> _persist() async {
-    final sid = _sessionId ?? await AIChatStorage.createEmptySession();
+    _userId ??= await _resolveUserId();
+    final userId = _userId;
+    if (userId == null || userId.trim().isEmpty) return;
+
+    final sid =
+        _sessionId ?? await AIChatStorage.createEmptySession(userId: userId);
     _sessionId = sid;
     await AIChatStorage.upsertSession(
+      userId: userId,
       sessionId: sid,
       messages: _messages,
       conversationId: _conversationId,
     );
+  }
+
+  Future<String?> _resolveUserId() async {
+    final token = await sl<AuthSession>().token();
+    if (token == null || token.trim().isEmpty) return null;
+    final user = UserModel.fromToken(token: token);
+    final id = user.id.trim();
+    return id.isEmpty ? null : id;
   }
 
   String _formatTime(DateTime dt) {

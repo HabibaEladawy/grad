@@ -6,11 +6,27 @@ import '../model/ai_chat_session.dart';
 import '../../presentation/controller/data/model/message_model.dart';
 
 class AIChatStorage {
-  static const _sessionsKey = 'ai_chat_sessions_v1';
+  static const _legacySessionsKey = 'ai_chat_sessions_v1';
 
-  static Future<List<AIChatSession>> loadSessions() async {
+  static String _scopedSessionsKey(String userId) =>
+      'ai_chat_sessions_v1.user.${userId.trim()}';
+
+  static Future<void> _clearLegacyKeyIfPresent() async {
     final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_sessionsKey);
+    if (prefs.containsKey(_legacySessionsKey)) {
+      // Privacy fix: legacy key was not user-scoped, so it could leak chats
+      // between different logins on the same device.
+      await prefs.remove(_legacySessionsKey);
+    }
+  }
+
+  static Future<List<AIChatSession>> loadSessions({
+    required String userId,
+  }) async {
+    await _clearLegacyKeyIfPresent();
+    final prefs = await SharedPreferences.getInstance();
+    final key = _scopedSessionsKey(userId);
+    final raw = prefs.getString(key);
     if (raw == null || raw.trim().isEmpty) return [];
 
     try {
@@ -30,8 +46,11 @@ class AIChatStorage {
     }
   }
 
-  static Future<AIChatSession?> loadSession(String sessionId) async {
-    final sessions = await loadSessions();
+  static Future<AIChatSession?> loadSession({
+    required String userId,
+    required String sessionId,
+  }) async {
+    final sessions = await loadSessions(userId: userId);
     try {
       return sessions.firstWhere((s) => s.id == sessionId);
     } catch (_) {
@@ -39,7 +58,8 @@ class AIChatStorage {
     }
   }
 
-  static Future<String> createEmptySession() async {
+  static Future<String> createEmptySession({required String userId}) async {
+    await _clearLegacyKeyIfPresent();
     final now = DateTime.now();
     final session = AIChatSession(
       id: now.millisecondsSinceEpoch.toString(),
@@ -48,18 +68,20 @@ class AIChatStorage {
       updatedAt: now,
       messages: const <Message>[],
     );
-    final sessions = await loadSessions();
+    final sessions = await loadSessions(userId: userId);
     final updated = [session, ...sessions];
-    await _saveAll(updated);
+    await _saveAll(userId: userId, sessions: updated);
     return session.id;
   }
 
   static Future<void> upsertSession({
+    required String userId,
     required String sessionId,
     required List<Message> messages,
     String? conversationId,
   }) async {
-    final sessions = await loadSessions();
+    await _clearLegacyKeyIfPresent();
+    final sessions = await loadSessions(userId: userId);
     final now = DateTime.now();
 
     final idx = sessions.indexWhere((s) => s.id == sessionId);
@@ -75,19 +97,32 @@ class AIChatStorage {
       next,
       ...sessions.where((s) => s.id != sessionId),
     ];
-    await _saveAll(updated);
+    await _saveAll(userId: userId, sessions: updated);
   }
 
-  static Future<void> deleteSession(String sessionId) async {
-    final sessions = await loadSessions();
+  static Future<void> deleteSession({
+    required String userId,
+    required String sessionId,
+  }) async {
+    await _clearLegacyKeyIfPresent();
+    final sessions = await loadSessions(userId: userId);
     final updated = sessions.where((s) => s.id != sessionId).toList();
-    await _saveAll(updated);
+    await _saveAll(userId: userId, sessions: updated);
   }
 
-  static Future<void> _saveAll(List<AIChatSession> sessions) async {
+  static Future<void> clearAllForUser({required String userId}) async {
+    await _clearLegacyKeyIfPresent();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_scopedSessionsKey(userId));
+  }
+
+  static Future<void> _saveAll({
+    required String userId,
+    required List<AIChatSession> sessions,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     final raw = jsonEncode(sessions.map((s) => s.toJson()).toList());
-    await prefs.setString(_sessionsKey, raw);
+    await prefs.setString(_scopedSessionsKey(userId), raw);
   }
 }
 

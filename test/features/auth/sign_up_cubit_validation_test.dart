@@ -80,6 +80,19 @@ class _FakeAuthRepository implements AuthRepository {
     required List<String> availableTimes,
     File? profileImage,
   }) async => _unimplemented();
+
+  @override
+  Future<Either<Failure, dynamic>> googleSignIn() async => _unimplemented();
+
+  @override
+  Future<Either<Failure, UserEntity>> googleComplete({
+    required String requestId,
+    required String phone,
+    required String password,
+    required String government,
+    required String address,
+    required List<ChildData> children,
+  }) async => _unimplemented();
 }
 
 SignUpCubit _buildCubit() {
