@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../../../core/utils/app_colors.dart';
@@ -56,7 +56,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     final host = uri.host.toLowerCase();
 
     // Standard patterns.
-    final fromPkg = _sanitizeYouTubeId(YoutubePlayer.convertUrlToId(u));
+    final fromPkg =
+        _sanitizeYouTubeId(YoutubePlayerController.convertUrlToId(u));
     if (fromPkg != null && fromPkg.isNotEmpty) return fromPkg;
 
     // https://youtu.be/<id>
@@ -137,12 +138,13 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           setState(() => _initError = 'Invalid YouTube link');
           return;
         }
-        _youtubeController = YoutubePlayerController(
-          initialVideoId: videoId,
-          flags: const YoutubePlayerFlags(
-            autoPlay: false,
-            mute: false,
-            enableCaption: true,
+        _youtubeController = YoutubePlayerController.fromVideoId(
+          videoId: videoId,
+          autoPlay: false,
+          params: const YoutubePlayerParams(
+            showControls: true,
+            showFullscreenButton: true,
+            strictRelatedVideos: true,
           ),
         );
         if (mounted) setState(() {});
@@ -230,7 +232,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     _chewieController = null;
     _videoController?.dispose();
     _videoController = null;
-    _youtubeController?.dispose();
+    _youtubeController?.close();
     _youtubeController = null;
     _webViewController = null;
   }
@@ -263,14 +265,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         : (_youtubeController != null
             ? YoutubePlayer(
                 controller: _youtubeController!,
-                showVideoProgressIndicator: true,
-                progressIndicatorColor: AppColors.primary_default_light,
-                progressColors: ProgressBarColors(
-                  playedColor: AppColors.primary_default_light,
-                  bufferedColor: AppColors.border_card_default_light,
-                  handleColor: AppColors.primary_default_light,
-                  backgroundColor: AppColors.border_card_default_light,
-                ),
+                aspectRatio: 392 / 256,
               )
             : (_chewieController != null
                 ? Chewie(controller: _chewieController!)
