@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
-import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../../../core/utils/app_colors.dart';
@@ -28,6 +28,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   bool _webViewLoading = false;
   bool _initStarted = false;
   String? _initError;
+  Duration _currentPosition = Duration.zero;
+  Duration _totalDuration = Duration.zero;
 
   String get _url => (widget.video.videoUrl ?? '').trim();
 
@@ -57,7 +59,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
     // Standard patterns.
     final fromPkg =
-        _sanitizeYouTubeId(YoutubePlayerController.convertUrlToId(u));
+        _sanitizeYouTubeId(YoutubePlayer.convertUrlToId(u));
     if (fromPkg != null && fromPkg.isNotEmpty) return fromPkg;
 
     // https://youtu.be/<id>
@@ -138,15 +140,21 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           setState(() => _initError = 'Invalid YouTube link');
           return;
         }
-        _youtubeController = YoutubePlayerController.fromVideoId(
-          videoId: videoId,
-          autoPlay: false,
-          params: const YoutubePlayerParams(
-            showControls: true,
-            showFullscreenButton: true,
-            strictRelatedVideos: true,
+        _youtubeController = YoutubePlayerController(
+          initialVideoId: videoId,
+          flags: const YoutubePlayerFlags(
+            autoPlay: false,
+            mute: false,
           ),
         );
+        _youtubeController!.addListener(() {
+          if (!mounted) return;
+          final c = _youtubeController!;
+          setState(() {
+            _currentPosition = c.value.position;
+            _totalDuration = c.metadata.duration;
+          });
+        });
         if (mounted) setState(() {});
         return;
       }
@@ -232,9 +240,29 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     _chewieController = null;
     _videoController?.dispose();
     _videoController = null;
-    _youtubeController?.close();
+    _youtubeController?.dispose();
     _youtubeController = null;
     _webViewController = null;
+  }
+
+  String _formatDuration(Duration duration) {
+    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
+  void _seekBackward() {
+    final c = _youtubeController;
+    if (c == null) return;
+    final newPosition = _currentPosition - const Duration(seconds: 10);
+    c.seekTo(newPosition < Duration.zero ? Duration.zero : newPosition);
+  }
+
+  void _seekForward() {
+    final c = _youtubeController;
+    if (c == null) return;
+    final newPosition = _currentPosition + const Duration(seconds: 10);
+    c.seekTo(newPosition > _totalDuration ? _totalDuration : newPosition);
   }
 
   @override
@@ -245,6 +273,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     final player = _initError != null
         ? Center(
             child: Padding(
@@ -263,9 +293,111 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
             ),
           )
         : (_youtubeController != null
-            ? YoutubePlayer(
-                controller: _youtubeController!,
-                aspectRatio: 392 / 256,
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Video
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(AppRadius.radius_lg),
+                      child: YoutubePlayer(
+                        controller: _youtubeController!,
+                        showVideoProgressIndicator: false,
+                      ),
+                    ),
+                  ),
+
+                  // Progress bar (tap to seek)
+                  GestureDetector(
+                    onTapDown: (details) {
+                      if (_totalDuration.inMilliseconds <= 0) return;
+                      final box = context.findRenderObject() as RenderBox?;
+                      if (box == null) return;
+                      final dx = details.localPosition.dx / box.size.width;
+                      final seekTo = _totalDuration * dx;
+                      _youtubeController!.seekTo(seekTo);
+                    },
+                    child: SizedBox(
+                      height: 3.h,
+                      child: LinearProgressIndicator(
+                        value: _totalDuration.inSeconds > 0
+                            ? (_currentPosition.inSeconds /
+                                _totalDuration.inSeconds)
+                            : 0,
+                        backgroundColor: isDark
+                            ? AppColors.border_card_default_dark
+                            : AppColors.border_card_default_light,
+                        valueColor: const AlwaysStoppedAnimation(
+                          AppColors.primary_default_light,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Controls row
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                    child: Row(
+                      textDirection: TextDirection.ltr,
+                      children: [
+                        GestureDetector(
+                          onTap: _seekBackward,
+                          child: Icon(
+                            Icons.replay_10,
+                            size: 24.sp,
+                            color: isDark
+                                ? AppColors.text_heading_dark
+                                : AppColors.text_heading_light,
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        GestureDetector(
+                          onTap: () {
+                            final c = _youtubeController!;
+                            if (c.value.isPlaying) {
+                              c.pause();
+                            } else {
+                              c.play();
+                            }
+                            setState(() {});
+                          },
+                          child: Icon(
+                            _youtubeController!.value.isPlaying
+                                ? Icons.pause
+                                : Icons.play_arrow,
+                            size: 24.sp,
+                            color: isDark
+                                ? AppColors.text_heading_dark
+                                : AppColors.text_heading_light,
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        GestureDetector(
+                          onTap: _seekForward,
+                          child: Icon(
+                            Icons.forward_10,
+                            size: 24.sp,
+                            color: isDark
+                                ? AppColors.text_heading_dark
+                                : AppColors.text_heading_light,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          '${_formatDuration(_currentPosition)} / ${_formatDuration(_totalDuration)}',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: isDark
+                                ? AppColors.text_body_dark
+                                : AppColors.text_body_light,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               )
             : (_chewieController != null
                 ? Chewie(controller: _chewieController!)
