@@ -12,9 +12,7 @@ import 'auth_remote_data_source.dart';
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final Dio dio;
 
-  // ✅ صح
   AuthRemoteDataSourceImpl({required this.dio});
-  // ── helpers ─────────────────────────────────────────────────────────────────
 
   void _throwIfError(dynamic data, int? statusCode, String fallback) {
     if (statusCode != null && statusCode >= 200 && statusCode < 300) return;
@@ -30,7 +28,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     return false;
   }
 
-  // ── Parent Auth ──────────────────────────────────────────────────────────────
 
   @override
   Future<void> preSignUp({
@@ -44,8 +41,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     File? profileImage,
   }) async {
     try {
-      // Updated contract (note 2): pre-sign-up body is raw JSON (not multipart).
-      // Shape stays the same: `{ parent: {...}, children: [...] }`.
       final parentMap = <String, dynamic>{
         'parentName': parentName,
         'email': email,
@@ -61,14 +56,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'children': children.map((c) => c.toJson()).toList(),
       };
       if (profileImage != null) {
-        // New image upload routes require a known parentId; pre-sign-up doesn't have it.
         throw const ServerException(message: 'Use add-profile-image after signup');
       }
 
       final response = await dio.post(
         ApiEndpoint.preSignUp,
 
-        // ApiConstant.preSignUp, // POST /v1/parent/pre-SignUp
         data: payload,
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
@@ -76,8 +69,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final data = ApiResponse.decode(response.data);
       _throwIfError(data, response.statusCode, 'فشل التسجيل');
     } on DioException catch (e) {
-      // Backend sometimes returns 400 with an empty body for duplicate accounts.
-      // Provide a stable message so the UI can offer "Login / Edit info".
       if (e.response?.statusCode == 400 && _isEmptyBody(e.response?.data)) {
         throw const ServerException(message: 'Account already exists');
       }
@@ -101,8 +92,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }) async {
     try {
       final response = await dio.post(
-        // ApiConstant.baseUrl + ApiEndpoint.verifySignUp,
-        ApiEndpoint.verifySignUp, // POST /v1/parent/verify-signUp
+        ApiEndpoint.verifySignUp,
         data: {'phone': phone, 'otp': int.tryParse(otp) ?? otp},
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
@@ -162,8 +152,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }) async {
     try {
       final response = await dio.post(
-        // ApiConstant.baseUrl + ApiEndpoint.preSignIn,
-        ApiEndpoint.preSignIn, // POST /v1/parent/pre-signIn
+        ApiEndpoint.preSignIn,
         data: {'phone': phone, 'password': password},
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
@@ -238,8 +227,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<void> resetPassword({required String phone}) async {
     try {
       final response = await dio.post(
-        // ApiConstant.baseUrl+ApiEndpoint.resetPassword,
-        ApiEndpoint.resetPassword, // POST /v1/parent/reset-password
+        ApiEndpoint.resetPassword,
         data: {'phone': phone},
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
@@ -266,8 +254,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }) async {
     try {
       final response = await dio.post(
-        // ApiConstant.baseUrl+ApiEndpoint.verifyPasswordOtp,
-        ApiEndpoint.verifyPasswordOtp, // POST /v1/parent/verify-password-otp
+        ApiEndpoint.verifyPasswordOtp,
         data: {'phone': phone, 'otp': int.tryParse(otp) ?? otp},
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
@@ -275,9 +262,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       _throwIfError(data, response.statusCode, 'كود التحقق غير صحيح');
       final accessToken = (data is Map ? data['accessToken'] : null);
 
-      // Backends are inconsistent here:
-      // - Some return: { accessToken: { access_token: "..." } }
-      // - Others return: { accessToken: "..." }
       final token = switch (accessToken) {
         String s => s,
         Map m => m['access_token']?.toString() ?? '',
@@ -311,8 +295,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }) async {
     try {
       final response = await dio.post(
-        // ApiConstant.baseUrl+ApiEndpoint.changePassword,
-        ApiEndpoint.changePassword, // POST /v1/parent/change-password
+        ApiEndpoint.changePassword,
         data: {'phone': phone, 'password': password},
         options: Options(
           headers: {
@@ -337,7 +320,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-  // ── Doctor ───────────────────────────────────────────────────────────────────
 
   @override
   Future<void> createDoctor({
@@ -375,8 +357,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       });
 
       final response = await dio.post(
-        // ApiConstant.baseUrl+ApiEndpoint.createDoctor,
-        ApiEndpoint.createDoctor, // POST /v1/doctor
+        ApiEndpoint.createDoctor,
         data: formData,
       );
 
@@ -396,14 +377,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-  // ── Parent / Google OAuth ────────────────────────────────────────────────────
 
   @override
   Future<dynamic> googleSignIn() async {
     try {
-      // Many implementations respond with 302 redirect to Google consent screen.
-      // We must NOT follow redirects here; we need the `Location` header to open
-      // it in a browser/WebView.
+
       final response = await dio.get(
         ApiEndpoint.googleSignIn,
         options: Options(
@@ -461,7 +439,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final data = ApiResponse.decode(response.data);
       _throwIfError(data, response.statusCode, 'فشل استكمال بيانات حساب جوجل');
 
-      // Expected to return an access token like the other auth endpoints.
       final accessToken = (data is Map ? data['accessToken'] : null);
       final token =
           (accessToken is Map ? accessToken['access_token'] : null) as String?;

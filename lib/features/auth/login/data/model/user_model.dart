@@ -45,7 +45,6 @@ class UserModel extends UserEntity {
               ?.toString() ??
           'مستخدم';
 
-      // ✅ phone بييجي من الـ JWT مش من الـ request
       final phone = decoded['phone']?.toString() ?? '';
 
       final role =
